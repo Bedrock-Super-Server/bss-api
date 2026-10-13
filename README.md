@@ -1,4 +1,4 @@
-# bss-api
+# bss-api - 1.4
 
 The plugin API of Bedrock Super Server, a software for Minecraft Bedrock Edition.
 
