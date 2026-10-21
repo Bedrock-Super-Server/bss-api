@@ -20,7 +20,9 @@ pub struct RecipeDef {
     pub width: i32,
     /// Height of the pattern, or `0` for a shapeless recipe.
     pub height: i32,
-    /// Item ids of the pattern, row by row; an empty string leaves a cell empty.
+    /// Item ids of the pattern, row by row; an empty string leaves a cell empty. An item tag,
+    /// such as `#minecraft:planks`, accepts any item of the tag on a server of ABI 1.5 or newer;
+    /// an older one drops the recipe.
     pub inputs: Vec<String>,
     /// Item id of the result.
     pub output: String,

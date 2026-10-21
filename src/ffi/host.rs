@@ -447,6 +447,24 @@ pub struct HostApi {
             unbreakable: bool,
         ) -> bool,
     >,
+    /// The slots of the player's inventory, as the server last saw them, as a JSON list of
+    /// `null` or `{ item_id, block_runtime_id, count, damage, uid, name, lore, enchants,
+    /// unbreakable }`.
+    pub player_inventory_snapshot: Option<unsafe extern "C" fn(handle: u64) -> FfiStr>,
+    /// Adds a recipe of a station, as `{ station, width, height, inputs, output, count }`, whose
+    /// inputs may be item tags written `#tag`.
+    pub recipe_register_at: Option<unsafe extern "C" fn(json: FfiStr)>,
+    /// Sends the HTTP request `request_json`, `{ uri, method, headers: [{ key, value }], body,
+    /// timeout }` with the timeout in seconds, from a thread of the server, and calls `callback`
+    /// once with `{ status, headers: [{ key, value }], body }` or `{ error }`. Returns whether the
+    /// request was sent; `callback` is not called when it was not.
+    pub http_request: Option<
+        unsafe extern "C" fn(
+            request_json: FfiStr,
+            callback: HttpCallback,
+            user_data: *mut c_void,
+        ) -> bool,
+    >,
 }
 
 #[repr(C)]

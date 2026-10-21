@@ -301,6 +301,30 @@ macro_rules! behaviour_methods {
         }
 
         /**
+        Called when the spawn point of a world is about to move, with `/setworldspawn` or a plugin. Set another position to move it there instead.
+
+        Returning `true` from a handler keeps the spawn point where it is.
+
+        See [`SpawnChangeEvent`](crate::event::SpawnChangeEvent).
+        */
+        fn on_spawn_change(&self, server: &Server, event: &SpawnChangeEvent) -> bool {
+            let _ = (server, event);
+            false
+        }
+
+        /**
+        Called when a world finishes loading and is ready for players and plugins.
+
+        Returning `true` changes nothing.
+
+        See [`WorldLoadEvent`](crate::event::WorldLoadEvent).
+        */
+        fn on_world_load(&self, server: &Server, event: &WorldLoadEvent) -> bool {
+            let _ = (server, event);
+            false
+        }
+
+        /**
         Called when the tick rate of the server is about to change, through `/tick` or a plugin.
 
         Returning `true` keeps the current rate.
@@ -817,6 +841,98 @@ macro_rules! behaviour_methods {
         }
 
         /**
+        Called when a player lies down in a bed: it is night or a thunderstorm, no monster is near and nobody else lies there.
+
+        Returning `true` from a handler keeps the player standing; the bed still becomes their respawn point.
+
+        See [`PlayerBedEnterEvent`](crate::event::PlayerBedEnterEvent).
+        */
+        fn on_player_bed_enter(&self, server: &Server, event: &PlayerBedEnterEvent) -> bool {
+            let _ = (server, event);
+            false
+        }
+
+        /**
+        Called when a player gets out of bed. `cause` is `morning` when the world woke everyone up, `manual` when the player left by themselves, `damage`, `gamemode` or `travel` when something forced them out, and `bed_destroyed` when the bed is gone.
+
+        Returning `true` changes nothing: the player leaves the bed anyway.
+
+        See [`PlayerBedLeaveEvent`](crate::event::PlayerBedLeaveEvent).
+        */
+        fn on_player_bed_leave(&self, server: &Server, event: &PlayerBedLeaveEvent) -> bool {
+            let _ = (server, event);
+            false
+        }
+
+        /**
+        Called when a player's client asks for another view distance, in chunks. `radius` is what the server grants, within its own `view_distance`; set another one to grant that instead.
+
+        Returning `true` from a handler keeps the view distance the player has.
+
+        See [`PlayerViewDistanceChangeEvent`](crate::event::PlayerViewDistanceChangeEvent).
+        */
+        fn on_player_view_distance_change(
+            &self,
+            server: &Server,
+            event: &PlayerViewDistanceChangeEvent,
+        ) -> bool {
+            let _ = (server, event);
+            false
+        }
+
+        /**
+        Called when something asks to disconnect a player: a plugin, the `/kick` command or the server's own protections.
+
+        Returning `true` from a handler keeps the player connected.
+
+        See [`PlayerKickEvent`](crate::event::PlayerKickEvent).
+        */
+        fn on_player_kick(&self, server: &Server, event: &PlayerKickEvent) -> bool {
+            let _ = (server, event);
+            false
+        }
+
+        /**
+        Called when a player jumps: their client presses jump while they stand on the ground.
+
+        Returning `true` changes nothing.
+
+        See [`PlayerJumpEvent`](crate::event::PlayerJumpEvent).
+        */
+        fn on_player_jump(&self, server: &Server, event: &PlayerJumpEvent) -> bool {
+            let _ = (server, event);
+            false
+        }
+
+        /**
+        Called when a player is about to get a potion effect, from a potion, food, a totem, a command or a plugin; `effect` is its name, such as `speed`.
+
+        Returning `true` from a handler keeps the player from getting the effect.
+
+        See [`PlayerEffectAddEvent`](crate::event::PlayerEffectAddEvent).
+        */
+        fn on_player_effect_add(&self, server: &Server, event: &PlayerEffectAddEvent) -> bool {
+            let _ = (server, event);
+            false
+        }
+
+        /**
+        Called when a player loses a potion effect: it ran out, milk or a command cleared it, or a totem replaced it.
+
+        Returning `true` changes nothing: the effect is removed anyway.
+
+        See [`PlayerEffectRemoveEvent`](crate::event::PlayerEffectRemoveEvent).
+        */
+        fn on_player_effect_remove(
+            &self,
+            server: &Server,
+            event: &PlayerEffectRemoveEvent,
+        ) -> bool {
+            let _ = (server, event);
+            false
+        }
+
+        /**
         Called when a player crafts an item.
 
         Returning `true` cancels the craft.
@@ -1163,6 +1279,66 @@ macro_rules! behaviour_methods {
             let _ = (server, event);
             false
         }
+
+        /**
+        Called when the server finished starting and now accepts players. `worlds` is how many worlds are loaded.
+
+        Returning `true` changes nothing.
+
+        See [`ServerStartedEvent`](crate::event::ServerStartedEvent).
+        */
+        fn on_server_started(&self, server: &Server, event: &ServerStartedEvent) -> bool {
+            let _ = (server, event);
+            false
+        }
+
+        /**
+        Called when the server begins to stop, before it disconnects the players, unloads the plugins and saves the worlds. `players` is how many are online.
+
+        Returning `true` does not keep the server from stopping.
+
+        See [`ServerStopEvent`](crate::event::ServerStopEvent).
+        */
+        fn on_server_stop(&self, server: &Server, event: &ServerStopEvent) -> bool {
+            let _ = (server, event);
+            false
+        }
+
+        /**
+        Called when a line is typed in the server console, before it runs. Change `command` to run something else.
+
+        Returning `true` from a handler keeps the line from running.
+
+        See [`ConsoleCommandEvent`](crate::event::ConsoleCommandEvent).
+        */
+        fn on_console_command(&self, server: &Server, event: &ConsoleCommandEvent) -> bool {
+            let _ = (server, event);
+            false
+        }
+
+        /**
+        Called when a plugin finished loading and is now enabled, itself included.
+
+        Returning `true` changes nothing.
+
+        See [`PluginEnableEvent`](crate::event::PluginEnableEvent).
+        */
+        fn on_plugin_enable(&self, server: &Server, event: &PluginEnableEvent) -> bool {
+            let _ = (server, event);
+            false
+        }
+
+        /**
+        Called when a plugin is about to be disabled, by a reload, an unload or the server stopping.
+
+        Returning `true` does not keep the plugin loaded.
+
+        See [`PluginDisableEvent`](crate::event::PluginDisableEvent).
+        */
+        fn on_plugin_disable(&self, server: &Server, event: &PluginDisableEvent) -> bool {
+            let _ = (server, event);
+            false
+        }
     };
 }
 
@@ -1193,6 +1369,8 @@ macro_rules! behaviour_installs {
         $server.on_rain_change(move |s, e| cancel($group, |h| h.on_rain_change(s, e)));
         $server.on_thunder_change(move |s, e| cancel($group, |h| h.on_thunder_change(s, e)));
         $server.on_weather_effect(move |s, e| cancel($group, |h| h.on_weather_effect(s, e)));
+        $server.on_spawn_change(move |s, e| cancel($group, |h| h.on_spawn_change(s, e)));
+        $server.on_world_load(move |s, e| cancel($group, |h| h.on_world_load(s, e)));
         $server.on_tick_rate_change(move |s, e| cancel($group, |h| h.on_tick_rate_change(s, e)));
         $server.on_redstone_power(move |s, e| cancel($group, |h| h.on_redstone_power(s, e)));
         $server.on_piston_move(move |s, e| cancel($group, |h| h.on_piston_move(s, e)));
@@ -1236,6 +1414,17 @@ macro_rules! behaviour_installs {
         $server.on_horn_blow(move |s, e| cancel($group, |h| h.on_horn_blow(s, e)));
         $server.on_book_edit(move |s, e| cancel($group, |h| h.on_book_edit(s, e)));
         $server.on_offhand_change(move |s, e| cancel($group, |h| h.on_offhand_change(s, e)));
+        $server.on_player_bed_enter(move |s, e| cancel($group, |h| h.on_player_bed_enter(s, e)));
+        $server.on_player_bed_leave(move |s, e| cancel($group, |h| h.on_player_bed_leave(s, e)));
+        $server.on_player_view_distance_change(move |s, e| {
+            cancel($group, |h| h.on_player_view_distance_change(s, e))
+        });
+        $server.on_player_kick(move |s, e| cancel($group, |h| h.on_player_kick(s, e)));
+        $server.on_player_jump(move |s, e| cancel($group, |h| h.on_player_jump(s, e)));
+        $server.on_player_effect_add(move |s, e| cancel($group, |h| h.on_player_effect_add(s, e)));
+        $server.on_player_effect_remove(move |s, e| {
+            cancel($group, |h| h.on_player_effect_remove(s, e))
+        });
         $server.on_craft_item(move |s, e| cancel($group, |h| h.on_craft_item(s, e)));
         $server.on_enchant_item(move |s, e| cancel($group, |h| h.on_enchant_item(s, e)));
         $server.on_anvil_use(move |s, e| cancel($group, |h| h.on_anvil_use(s, e)));
@@ -1267,5 +1456,10 @@ macro_rules! behaviour_installs {
             .on_villager_profession(move |s, e| cancel($group, |h| h.on_villager_profession(s, e)));
         $server.on_villager_trade(move |s, e| cancel($group, |h| h.on_villager_trade(s, e)));
         $server.on_villager_level_up(move |s, e| cancel($group, |h| h.on_villager_level_up(s, e)));
+        $server.on_server_started(move |s, e| cancel($group, |h| h.on_server_started(s, e)));
+        $server.on_server_stop(move |s, e| cancel($group, |h| h.on_server_stop(s, e)));
+        $server.on_console_command(move |s, e| cancel($group, |h| h.on_console_command(s, e)));
+        $server.on_plugin_enable(move |s, e| cancel($group, |h| h.on_plugin_enable(s, e)));
+        $server.on_plugin_disable(move |s, e| cancel($group, |h| h.on_plugin_disable(s, e)));
     };
 }

@@ -338,6 +338,45 @@ impl Player {
         }
     }
 
+    /// The 36 slots of the player's inventory, hotbar first, with their name, lore and
+    /// enchantments, as the server last saw them: at most a tick old, and read at once from any
+    /// thread, unlike [`request_inventory`](Self::request_inventory). An empty slot has `count`
+    /// `0`. Empty when the player is gone or the server is older than ABI 1.5.
+    pub fn inventory_snapshot(&self) -> Vec<(crate::ItemStack, ItemMeta)> {
+        #[derive(serde::Deserialize)]
+        struct Slot {
+            item_id: i16,
+            block_runtime_id: u32,
+            count: u8,
+            damage: u16,
+            uid: u64,
+            #[serde(flatten)]
+            meta: ItemMeta,
+        }
+        let Some(json) =
+            host_call!(self.host, player_inventory_snapshot(self.handle)).map(ffi_string)
+        else {
+            return Vec::new();
+        };
+        serde_json::from_str::<Vec<Option<Slot>>>(&json)
+            .unwrap_or_default()
+            .into_iter()
+            .map(|slot| match slot {
+                Some(s) => (
+                    crate::ItemStack {
+                        item_id: s.item_id,
+                        block_runtime_id: s.block_runtime_id,
+                        count: s.count,
+                        damage: s.damage,
+                        uid: s.uid,
+                    },
+                    s.meta,
+                ),
+                None => (crate::ItemStack::default(), ItemMeta::default()),
+            })
+            .collect()
+    }
+
     /// The player's experience level, or `None` when the server is too old to tell or the player
     /// is gone.
     pub fn experience_level(&self) -> Option<i32> {
@@ -518,6 +557,30 @@ impl Player {
         f.call((
             self.handle,
             FfiStr::new(&json),
+            FormCallback::Some(ui::answer_form),
+            user_data,
+        ));
+    }
+
+    /**
+    Shows a form written as the JSON of the game's `ModalFormRequest` packet, and calls `handler`
+    once with the player's raw answer, the JSON of `ModalFormResponse`, or `None` when they close
+    it. A player in another screen, such as the chat, answers `"busy"` on servers of ABI 1.5 or
+    newer. Use it for what [`Form`](crate::player::form::Form) does not describe, such as the headers,
+    labels and dividers of newer forms.
+    */
+    pub fn send_form_json(&self, json: &str, handler: impl FnOnce(Option<&str>) + Send + 'static) {
+        let Some(f) = self.host.form_send_raw else {
+            return;
+        };
+        let raw_handler: Box<dyn FnOnce(&str) + Send> = Box::new(move |response: &str| {
+            let answer = response.trim();
+            handler((!answer.is_empty() && answer != "null").then_some(answer));
+        });
+        let user_data = ui::box_form(raw_handler);
+        f.call((
+            self.handle,
+            FfiStr::new(json),
             FormCallback::Some(ui::answer_form),
             user_data,
         ));

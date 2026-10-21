@@ -1,7 +1,7 @@
 /*!
 The plugin API of [Bedrock Super Server](https://github.com/cmgcpf/Netherite).
 
-A plugin is a native library the server loads from its `plugins/` folder. It reacts to events, adds commands, forms, items and blocks, and drives players and worlds through a [`Server`](server::Server) handle.
+A plugin is a WebAssembly module, one `.wasm` file for every system and processor, that the server loads from its `plugins/` folder and runs in a sandbox. It reacts to events, adds commands, forms, items and blocks, and drives players and worlds through a [`Server`](server::Server) handle.
 
 # Quick start
 
@@ -72,7 +72,16 @@ impl Command for Hello {
 export_plugin!(Greeter);
 ```
 
-Build it with `cargo build --release` and copy the library from `target/release/` (`libgreeter.so` on Linux, `greeter.dll` on Windows) into the `plugins/` folder of the server, then restart it.
+Build it for WebAssembly and copy `target/wasm32-wasip1/release/greeter.wasm` into the `plugins/` folder of the server, then restart it or run `/plugins load greeter`:
+
+```sh
+rustup target add wasm32-wasip1
+cargo build --release --target wasm32-wasip1
+```
+
+# The sandbox
+
+The server runs each plugin in a sandbox. It sees no file but those of its own folder, `plugins/<file name>/`, where relative paths lead; it cannot start a program, open a socket or read the environment; its memory and the time of each call are limited; and the functions of the server that reach past the game (commands as the console, op, bans, raw packets, HTTP, the IP address of players...) are held back unless the server's `plugins.toml` grants them to the plugin. A function held back reads as absent, as on an older server.
 
 # Where to start
 
@@ -91,11 +100,11 @@ Build it with `cargo build --release` and copy the library from `target/release/
 
 # Threads and panics
 
-The server calls handlers from several threads, which is why they must be `Send + Sync`. A panic in a handler is caught and logged: the server keeps running and other handlers still run. A plugin must therefore be built with `panic = "unwind"`, the default; the server refuses a plugin built with `panic = "abort"`.
+A plugin runs on one thread at a time and cannot start threads of its own: run work over time with [`Server::schedule`](server::Server::schedule). Handlers are `Send + Sync` all the same, as the server may call them from different threads one after the other. A panic stops the plugin, not the server: the console says why, and the plugin runs again once it is reloaded.
 
 # Compatibility
 
-A plugin talks to the server through tables of C functions whose version, [`ABI_MAJOR`](ffi::ABI_MAJOR)`.`[`ABI_MINOR`](ffi::ABI_MINOR), the server reads before anything else. It refuses a plugin of another major version and loads one of any minor version: every table starts with its size, so what one side added since the other was built reads as absent instead of being read past its end.
+A plugin talks to the server through tables of functions whose version, [`ABI_MAJOR`](ffi::ABI_MAJOR)`.`[`ABI_MINOR`](ffi::ABI_MINOR), the server reads before anything else. It refuses a plugin of another major version and loads one of any minor version: every table starts with its size, so what one side added since the other was built reads as absent instead of being read past its end.
 */
 
 #![warn(missing_docs)]

@@ -66,6 +66,22 @@ pub struct WeatherEffectEventData {
 }
 
 #[repr(C)]
+pub struct SpawnChangeEventData {
+    pub header: EventHeader,
+    pub x: i32,
+    pub y: i32,
+    pub z: i32,
+    pub world: u32,
+}
+
+#[repr(C)]
+pub struct WorldLoadEventData {
+    pub header: EventHeader,
+    pub world: u32,
+    pub name: FfiStr,
+}
+
+#[repr(C)]
 pub struct TickRateChangeEventData {
     pub header: EventHeader,
     pub rate: f32,
@@ -79,5 +95,7 @@ crate::event_data! {
     RainChangeEventData = 1022, "rain_change";
     ThunderChangeEventData = 1023, "thunder_change";
     WeatherEffectEventData = 1024, "weather_effect";
+    SpawnChangeEventData = 1097, "spawn_change";
+    WorldLoadEventData = 1098, "world_load";
     TickRateChangeEventData = 1025, "tick_rate_change";
 }

@@ -8,6 +8,8 @@ pub mod events;
 pub mod host;
 pub mod version;
 pub mod vtable;
+#[cfg(target_arch = "wasm32")]
+pub mod wasm;
 
 pub use abi::*;
 pub use events::*;

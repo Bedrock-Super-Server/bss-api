@@ -20,6 +20,16 @@ pub(crate) fn box_form(handler: FormHandler) -> *mut c_void {
     Box::into_raw(Box::new(handler)) as *mut c_void
 }
 
+/// Takes back a handler `box_form` made that the server never received.
+///
+/// # Safety
+///
+/// `user_data` comes from `box_form` and was not handed to the server.
+pub(crate) unsafe fn unbox_form(user_data: *mut c_void) -> FormHandler {
+    // SAFETY: guaranteed by the caller.
+    *unsafe { Box::from_raw(user_data as *mut FormHandler) }
+}
+
 pub(crate) fn box_inventory(handler: InventoryHandler) -> *mut c_void {
     Box::into_raw(Box::new(handler)) as *mut c_void
 }

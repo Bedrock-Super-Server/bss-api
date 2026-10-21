@@ -89,13 +89,114 @@ macro_rules! export_plugin {
     ($plugin:expr) => {
         #[unsafe(no_mangle)]
         pub unsafe extern "C" fn bss_plugin_describe() -> *const $crate::ffi::vtable::PluginVtable {
-            $crate::registry::install(::std::boxed::Box::new($plugin));
-            $crate::registry::describe()
+            $crate::registry::describe_with(|| ::std::boxed::Box::new($plugin))
         }
 
-        #[unsafe(no_mangle)]
-        pub extern "C" fn plugin_panic_unwinds() -> bool {
-            cfg!(panic = "unwind")
-        }
+        // What the server drives the plugin with: see `bss_api::ffi::wasm`. A plugin is built to
+        // WebAssembly; built natively, it only serves the tests of the crate that holds it.
+        #[cfg(target_arch = "wasm32")]
+        const _: () = {
+            #[unsafe(no_mangle)]
+            pub extern "C" fn bss_wasm_glue() -> u32 {
+                $crate::ffi::wasm::GLUE_VERSION
+            }
+
+            #[unsafe(no_mangle)]
+            pub extern "C" fn bss_wasm_enable() {
+                // SAFETY: the table comes from `bss_plugin_describe`.
+                unsafe { $crate::ffi::wasm::enable(bss_plugin_describe()) }
+            }
+
+            #[unsafe(no_mangle)]
+            pub extern "C" fn bss_wasm_disable() {
+                // SAFETY: the table comes from `bss_plugin_describe`.
+                unsafe { $crate::ffi::wasm::disable(bss_plugin_describe()) }
+            }
+
+            #[unsafe(no_mangle)]
+            pub extern "C" fn bss_wasm_alloc(size: u32, align: u32) -> u32 {
+                $crate::ffi::wasm::alloc(size, align)
+            }
+
+            #[unsafe(no_mangle)]
+            pub extern "C" fn bss_wasm_reset() {
+                $crate::ffi::wasm::reset()
+            }
+
+            #[unsafe(no_mangle)]
+            pub unsafe extern "C" fn bss_wasm_call_event(
+                callback: u32,
+                event: u32,
+                user_data: u32,
+            ) {
+                // SAFETY: the server calls it with a callback the plugin registered and its data.
+                unsafe { $crate::ffi::wasm::call_event(callback, event, user_data) }
+            }
+
+            #[unsafe(no_mangle)]
+            pub unsafe extern "C" fn bss_wasm_call_form(
+                callback: u32,
+                response: u32,
+                user_data: u32,
+            ) {
+                // SAFETY: see `bss_wasm_call_event`.
+                unsafe { $crate::ffi::wasm::call_form(callback, response, user_data) }
+            }
+
+            #[unsafe(no_mangle)]
+            pub unsafe extern "C" fn bss_wasm_call_inventory(
+                callback: u32,
+                inventory: u32,
+                user_data: u32,
+            ) {
+                // SAFETY: see `bss_wasm_call_event`.
+                unsafe { $crate::ffi::wasm::call_inventory(callback, inventory, user_data) }
+            }
+
+            #[unsafe(no_mangle)]
+            pub unsafe extern "C" fn bss_wasm_call_chest(
+                callback: u32,
+                slot: u32,
+                player: u64,
+                user_data: u32,
+            ) {
+                // SAFETY: see `bss_wasm_call_event`.
+                unsafe { $crate::ffi::wasm::call_chest(callback, slot, player, user_data) }
+            }
+
+            #[unsafe(no_mangle)]
+            pub unsafe extern "C" fn bss_wasm_call_command(
+                callback: u32,
+                sender: u32,
+                args: u32,
+                user_data: u32,
+            ) {
+                // SAFETY: see `bss_wasm_call_event`.
+                unsafe { $crate::ffi::wasm::call_command(callback, sender, args, user_data) }
+            }
+
+            #[unsafe(no_mangle)]
+            pub unsafe extern "C" fn bss_wasm_call_service(
+                callback: u32,
+                request: u32,
+                user_data: u32,
+                out: u32,
+            ) {
+                // SAFETY: see `bss_wasm_call_event`.
+                unsafe { $crate::ffi::wasm::call_service(callback, request, user_data, out) }
+            }
+
+            #[unsafe(no_mangle)]
+            pub unsafe extern "C" fn bss_wasm_call_generator(
+                callback: u32,
+                cx: i32,
+                cz: i32,
+                chunk: u32,
+                user_data: u32,
+            ) {
+                // SAFETY: see `bss_wasm_call_event`.
+                unsafe { $crate::ffi::wasm::call_generator(callback, cx, cz, chunk, user_data) }
+            }
+        };
     };
 }

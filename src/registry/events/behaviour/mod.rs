@@ -2,6 +2,7 @@ mod block;
 mod dragon;
 mod entity;
 mod inventory;
+mod lifecycle;
 mod mob;
 mod player;
 mod portal;

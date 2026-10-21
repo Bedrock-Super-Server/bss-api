@@ -1,10 +1,11 @@
 use crate::event::world::{
-    ExplosionBlocksEvent, ExplosionEvent, LightningStrikeEvent, RainChangeEvent,
-    ThunderChangeEvent, TickRateChangeEvent, WeatherEffectEvent,
+    ExplosionBlocksEvent, ExplosionEvent, LightningStrikeEvent, RainChangeEvent, SpawnChangeEvent,
+    ThunderChangeEvent, TickRateChangeEvent, WeatherEffectEvent, WorldLoadEvent,
 };
 use crate::ffi::behaviour::{
     ExplosionBlocksEventData, ExplosionEventData, LightningStrikeEventData, RainChangeEventData,
-    ThunderChangeEventData, TickRateChangeEventData, WeatherEffectEventData,
+    SpawnChangeEventData, ThunderChangeEventData, TickRateChangeEventData, WeatherEffectEventData,
+    WorldLoadEventData,
 };
 use crate::registry::hook::{Cancellable, hook, register};
 use crate::server::{Server, ffi_string};
@@ -213,6 +214,67 @@ impl Server {
         handler: impl Fn(&Server, &WeatherEffectEvent) -> bool + Send + Sync + 'static,
     ) {
         register::<weather_effect>(handler);
+    }
+}
+
+hook!(
+    spawn_change,
+    SpawnChangeEventData => SpawnChangeEvent,
+    |raw: &SpawnChangeEventData| SpawnChangeEvent {
+        x: std::cell::Cell::new(raw.x),
+        y: std::cell::Cell::new(raw.y),
+        z: std::cell::Cell::new(raw.z),
+        world: raw.world,
+    },
+    |safe: SpawnChangeEvent, raw: &mut SpawnChangeEventData| {
+        raw.x = safe.x.get();
+        raw.y = safe.y.get();
+        raw.z = safe.z.get();
+    }
+);
+
+impl Cancellable for SpawnChangeEvent {}
+
+impl Server {
+    /**
+    Calls `handler` when the spawn point of a world is about to move, with `/setworldspawn` or a plugin. Set another position to move it there instead.
+
+    Returning `true` from a handler keeps the spawn point where it is.
+
+    See [`SpawnChangeEvent`].
+    */
+    pub fn on_spawn_change(
+        &self,
+        handler: impl Fn(&Server, &SpawnChangeEvent) -> bool + Send + Sync + 'static,
+    ) {
+        register::<spawn_change>(handler);
+    }
+}
+
+hook!(
+    world_load,
+    WorldLoadEventData => WorldLoadEvent,
+    |raw: &WorldLoadEventData| WorldLoadEvent {
+        world: raw.world,
+        name: ffi_string(raw.name),
+    }
+);
+
+impl Cancellable for WorldLoadEvent {}
+
+impl Server {
+    /**
+    Calls `handler` when a world finishes loading and is ready for players and plugins.
+
+    Returning `true` changes nothing.
+
+    See [`WorldLoadEvent`].
+    */
+    pub fn on_world_load(
+        &self,
+        handler: impl Fn(&Server, &WorldLoadEvent) -> bool + Send + Sync + 'static,
+    ) {
+        register::<world_load>(handler);
     }
 }
 

@@ -2,6 +2,7 @@ mod block;
 mod dragon;
 mod entity;
 mod inventory;
+mod lifecycle;
 mod mob;
 mod player;
 mod portal;
@@ -14,6 +15,7 @@ pub use block::*;
 pub use dragon::*;
 pub use entity::*;
 pub use inventory::*;
+pub use lifecycle::*;
 pub use mob::*;
 pub use player::*;
 pub use portal::*;
@@ -49,6 +51,8 @@ pub const BEHAVIOUR_EVENTS: &[(u32, &str)] = &[
     (1022, "rain_change"),
     (1023, "thunder_change"),
     (1024, "weather_effect"),
+    (1097, "spawn_change"),
+    (1098, "world_load"),
     (1025, "tick_rate_change"),
     (1026, "redstone_power"),
     (1027, "piston_move"),
@@ -92,6 +96,13 @@ pub const BEHAVIOUR_EVENTS: &[(u32, &str)] = &[
     (1065, "horn_blow"),
     (1066, "book_edit"),
     (1067, "offhand_change"),
+    (1099, "player_bed_enter"),
+    (1100, "player_bed_leave"),
+    (1101, "player_view_distance_change"),
+    (1102, "player_kick"),
+    (1103, "player_jump"),
+    (1104, "player_effect_add"),
+    (1105, "player_effect_remove"),
     (1068, "craft_item"),
     (1069, "enchant_item"),
     (1070, "anvil_use"),
@@ -121,4 +132,9 @@ pub const BEHAVIOUR_EVENTS: &[(u32, &str)] = &[
     (1094, "villager_profession"),
     (1095, "villager_trade"),
     (1096, "villager_level_up"),
+    (1106, "server_started"),
+    (1107, "server_stop"),
+    (1108, "console_command"),
+    (1109, "plugin_enable"),
+    (1110, "plugin_disable"),
 ];

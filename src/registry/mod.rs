@@ -72,6 +72,24 @@ pub fn install(plugin: Box<dyn Plugin>) {
     let _ = PLUGIN.set(plugin);
 }
 
+/**
+What `bss_plugin_describe` returns: builds the plugin the first time, with `make`, and returns its
+table. A panic while the plugin is built or names itself returns null, which the server reports as
+a plugin it cannot load, instead of unwinding out of an `extern "C"` function and aborting it.
+*/
+pub fn describe_with(make: impl FnOnce() -> Box<dyn Plugin>) -> *const PluginVtable {
+    let described = catch_unwind(AssertUnwindSafe(|| {
+        if PLUGIN.get().is_none() {
+            install(make());
+        }
+        describe()
+    }));
+    described.unwrap_or_else(|_| {
+        eprintln!("[bss-api] the plugin panicked while it was built; the server cannot load it");
+        std::ptr::null()
+    })
+}
+
 unsafe extern "C" fn on_enable(host: *const HostApi) {
     if !set_host(host) {
         eprintln!(

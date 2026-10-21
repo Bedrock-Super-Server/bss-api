@@ -1,0 +1,16 @@
+[package]
+name = "example_plugin"
+version = "1.0.0"
+edition = "2024"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+bss-api = { git = "https://github.com/Bedrock-Super-Server/bss-api" }
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true

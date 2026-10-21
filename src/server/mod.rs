@@ -154,6 +154,45 @@ impl Server {
         host_call!(self.host, broadcast(message.as_ptr(), message.len()));
     }
 
+    /**
+    Sends an HTTP request from a thread of the server and calls `on_answer` with its answer, on
+    a thread of the server too.
+
+    `request` is `{ "uri", "method", "headers": [{ "key", "value" }], "body", "timeout" }`, the
+    timeout in seconds; only `uri` is required, and the method defaults to `GET`. The answer is
+    `{ "status", "headers": [{ "key", "value" }], "body" }`, or `{ "error" }`.
+
+    Returns `false`, and drops `on_answer`, when the request is not sent: on a server too old to
+    send it, or one whose `plugins.toml` does not grant this plugin `http`.
+    */
+    pub fn http_request(
+        &self,
+        request: &serde_json::Value,
+        on_answer: impl FnOnce(serde_json::Value) + Send + 'static,
+    ) -> bool {
+        let Some(f) = self.host.http_request else {
+            return false;
+        };
+        let handler: Box<dyn FnOnce(&str) + Send> = Box::new(move |answer: &str| {
+            on_answer(
+                serde_json::from_str(answer)
+                    .unwrap_or_else(|error| serde_json::json!({ "error": error.to_string() })),
+            );
+        });
+        let user_data = crate::registry::callbacks::box_form(handler);
+        let request = request.to_string();
+        let sent = f.call((
+            FfiStr::new(&request),
+            crate::ffi::abi::HttpCallback::Some(crate::registry::callbacks::answer_form),
+            user_data,
+        ));
+        if !sent {
+            // SAFETY: the server did not take the handler: it is freed here, once.
+            drop(unsafe { crate::registry::callbacks::unbox_form(user_data) });
+        }
+        sent
+    }
+
     /// Sends the packet `name`, with `fields` as JSON, to every player; the server builds it once
     /// for each protocol version they speak. See [`Player::send_packet`](crate::player::Player::send_packet).
     pub fn broadcast_packet(&self, name: &str, fields: &serde_json::Value) -> Result<(), String> {

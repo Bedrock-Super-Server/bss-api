@@ -1,15 +1,19 @@
 use crate::event::player::{
     BookEditEvent, CrossbowLoadEvent, ExperienceChangeEvent, ExperiencePickupEvent, FishEvent,
     FoodChangeEvent, HornBlowEvent, ItemBreakEvent, ItemDamageEvent, ItemMendEvent,
-    OffhandChangeEvent, PlayerCombustEvent, PlayerDamageEvent, PlayerHealEvent, PlayerMountEvent,
+    OffhandChangeEvent, PlayerBedEnterEvent, PlayerBedLeaveEvent, PlayerCombustEvent,
+    PlayerDamageEvent, PlayerEffectAddEvent, PlayerEffectRemoveEvent, PlayerHealEvent,
+    PlayerJumpEvent, PlayerKickEvent, PlayerMountEvent, PlayerViewDistanceChangeEvent,
     PlayerWarpEvent, ShieldBlockEvent, TotemUseEvent, TridentRiptideEvent, VehicleMoveEvent,
 };
 use crate::ffi::behaviour::{
     BookEditEventData, CrossbowLoadEventData, ExperienceChangeEventData, ExperiencePickupEventData,
     FishEventData, FoodChangeEventData, HornBlowEventData, ItemBreakEventData, ItemDamageEventData,
-    ItemMendEventData, OffhandChangeEventData, PlayerCombustEventData, PlayerDamageEventData,
-    PlayerHealEventData, PlayerMountEventData, PlayerWarpEventData, ShieldBlockEventData,
-    TotemUseEventData, TridentRiptideEventData, VehicleMoveEventData,
+    ItemMendEventData, OffhandChangeEventData, PlayerBedEnterEventData, PlayerBedLeaveEventData,
+    PlayerCombustEventData, PlayerDamageEventData, PlayerEffectAddEventData,
+    PlayerEffectRemoveEventData, PlayerHealEventData, PlayerJumpEventData, PlayerKickEventData,
+    PlayerMountEventData, PlayerViewDistanceChangeEventData, PlayerWarpEventData,
+    ShieldBlockEventData, TotemUseEventData, TridentRiptideEventData, VehicleMoveEventData,
 };
 use crate::registry::hook::{Cancellable, hook, register};
 use crate::server::{Server, ffi_string};
@@ -614,5 +618,215 @@ impl Server {
         handler: impl Fn(&Server, &OffhandChangeEvent) -> bool + Send + Sync + 'static,
     ) {
         register::<offhand_change>(handler);
+    }
+}
+
+hook!(
+    player_bed_enter,
+    PlayerBedEnterEventData => PlayerBedEnterEvent,
+    |raw: &PlayerBedEnterEventData| PlayerBedEnterEvent {
+        player: ffi_string(raw.player),
+        x: raw.x,
+        y: raw.y,
+        z: raw.z,
+        world: raw.world,
+    }
+);
+
+impl Cancellable for PlayerBedEnterEvent {}
+
+impl Server {
+    /**
+    Calls `handler` when a player lies down in a bed: it is night or a thunderstorm, no monster is near and nobody else lies there.
+
+    Returning `true` from a handler keeps the player standing; the bed still becomes their respawn point.
+
+    See [`PlayerBedEnterEvent`].
+    */
+    pub fn on_player_bed_enter(
+        &self,
+        handler: impl Fn(&Server, &PlayerBedEnterEvent) -> bool + Send + Sync + 'static,
+    ) {
+        register::<player_bed_enter>(handler);
+    }
+}
+
+hook!(
+    player_bed_leave,
+    PlayerBedLeaveEventData => PlayerBedLeaveEvent,
+    |raw: &PlayerBedLeaveEventData| PlayerBedLeaveEvent {
+        player: ffi_string(raw.player),
+        x: raw.x,
+        y: raw.y,
+        z: raw.z,
+        cause: ffi_string(raw.cause),
+        world: raw.world,
+    }
+);
+
+impl Cancellable for PlayerBedLeaveEvent {}
+
+impl Server {
+    /**
+    Calls `handler` when a player gets out of bed. `cause` is `morning` when the world woke everyone up, `manual` when the player left by themselves, `damage`, `gamemode` or `travel` when something forced them out, and `bed_destroyed` when the bed is gone.
+
+    Returning `true` changes nothing: the player leaves the bed anyway.
+
+    See [`PlayerBedLeaveEvent`].
+    */
+    pub fn on_player_bed_leave(
+        &self,
+        handler: impl Fn(&Server, &PlayerBedLeaveEvent) -> bool + Send + Sync + 'static,
+    ) {
+        register::<player_bed_leave>(handler);
+    }
+}
+
+hook!(
+    player_view_distance_change,
+    PlayerViewDistanceChangeEventData => PlayerViewDistanceChangeEvent,
+    |raw: &PlayerViewDistanceChangeEventData| PlayerViewDistanceChangeEvent {
+        player: ffi_string(raw.player),
+        requested: raw.requested,
+        old_radius: raw.old_radius,
+        radius: std::cell::Cell::new(raw.radius),
+    },
+    |safe: PlayerViewDistanceChangeEvent, raw: &mut PlayerViewDistanceChangeEventData| {
+        raw.radius = safe.radius.get();
+    }
+);
+
+impl Cancellable for PlayerViewDistanceChangeEvent {}
+
+impl Server {
+    /**
+    Calls `handler` when a player's client asks for another view distance, in chunks. `radius` is what the server grants, within its own `view_distance`; set another one to grant that instead.
+
+    Returning `true` from a handler keeps the view distance the player has.
+
+    See [`PlayerViewDistanceChangeEvent`].
+    */
+    pub fn on_player_view_distance_change(
+        &self,
+        handler: impl Fn(&Server, &PlayerViewDistanceChangeEvent) -> bool + Send + Sync + 'static,
+    ) {
+        register::<player_view_distance_change>(handler);
+    }
+}
+
+hook!(
+    player_kick,
+    PlayerKickEventData => PlayerKickEvent,
+    |raw: &PlayerKickEventData| PlayerKickEvent {
+        player: ffi_string(raw.player),
+        reason: ffi_string(raw.reason),
+    }
+);
+
+impl Cancellable for PlayerKickEvent {}
+
+impl Server {
+    /**
+    Calls `handler` when something asks to disconnect a player: a plugin, the `/kick` command or the server's own protections.
+
+    Returning `true` from a handler keeps the player connected.
+
+    See [`PlayerKickEvent`].
+    */
+    pub fn on_player_kick(
+        &self,
+        handler: impl Fn(&Server, &PlayerKickEvent) -> bool + Send + Sync + 'static,
+    ) {
+        register::<player_kick>(handler);
+    }
+}
+
+hook!(
+    player_jump,
+    PlayerJumpEventData => PlayerJumpEvent,
+    |raw: &PlayerJumpEventData| PlayerJumpEvent {
+        player: ffi_string(raw.player),
+        x: raw.x,
+        y: raw.y,
+        z: raw.z,
+    }
+);
+
+impl Cancellable for PlayerJumpEvent {}
+
+impl Server {
+    /**
+    Calls `handler` when a player jumps: their client presses jump while they stand on the ground.
+
+    Returning `true` changes nothing.
+
+    See [`PlayerJumpEvent`].
+    */
+    pub fn on_player_jump(
+        &self,
+        handler: impl Fn(&Server, &PlayerJumpEvent) -> bool + Send + Sync + 'static,
+    ) {
+        register::<player_jump>(handler);
+    }
+}
+
+hook!(
+    player_effect_add,
+    PlayerEffectAddEventData => PlayerEffectAddEvent,
+    |raw: &PlayerEffectAddEventData| PlayerEffectAddEvent {
+        player: ffi_string(raw.player),
+        effect: ffi_string(raw.effect),
+        amplifier: std::cell::Cell::new(raw.amplifier),
+        duration: std::cell::Cell::new(raw.duration),
+    },
+    |safe: PlayerEffectAddEvent, raw: &mut PlayerEffectAddEventData| {
+        raw.amplifier = safe.amplifier.get();
+        raw.duration = safe.duration.get();
+    }
+);
+
+impl Cancellable for PlayerEffectAddEvent {}
+
+impl Server {
+    /**
+    Calls `handler` when a player is about to get a potion effect, from a potion, food, a totem, a command or a plugin; `effect` is its name, such as `speed`.
+
+    Returning `true` from a handler keeps the player from getting the effect.
+
+    See [`PlayerEffectAddEvent`].
+    */
+    pub fn on_player_effect_add(
+        &self,
+        handler: impl Fn(&Server, &PlayerEffectAddEvent) -> bool + Send + Sync + 'static,
+    ) {
+        register::<player_effect_add>(handler);
+    }
+}
+
+hook!(
+    player_effect_remove,
+    PlayerEffectRemoveEventData => PlayerEffectRemoveEvent,
+    |raw: &PlayerEffectRemoveEventData| PlayerEffectRemoveEvent {
+        player: ffi_string(raw.player),
+        effect: ffi_string(raw.effect),
+        amplifier: raw.amplifier,
+    }
+);
+
+impl Cancellable for PlayerEffectRemoveEvent {}
+
+impl Server {
+    /**
+    Calls `handler` when a player loses a potion effect: it ran out, milk or a command cleared it, or a totem replaced it.
+
+    Returning `true` changes nothing: the effect is removed anyway.
+
+    See [`PlayerEffectRemoveEvent`].
+    */
+    pub fn on_player_effect_remove(
+        &self,
+        handler: impl Fn(&Server, &PlayerEffectRemoveEvent) -> bool + Send + Sync + 'static,
+    ) {
+        register::<player_effect_remove>(handler);
     }
 }

@@ -112,6 +112,32 @@ impl Server {
         }
     }
 
+    /**
+    Adds a recipe of another station than the crafting table: `furnace`, `blast_furnace`,
+    `smoker`, `campfire`, `soul_campfire` or `stonecutter`, which take a single input, or
+    `crafting_table`. Returns `false` when the server is older than ABI 1.5 and cannot take it.
+
+    ```
+    use bss_api::prelude::*;
+
+    fn register(server: &Server) {
+        // Smelting a ruby ore gives a ruby, in a furnace and in a blast furnace.
+        for station in ["furnace", "blast_furnace"] {
+            server.register_recipe_at(station, &RecipeDef::shapeless(&["shop:ruby_ore"], "shop:ruby", 1));
+        }
+    }
+    ```
+    */
+    pub fn register_recipe_at(&self, station: &str, def: &RecipeDef) -> bool {
+        let Some(f) = self.host().recipe_register_at else {
+            return false;
+        };
+        let mut json = serde_json::to_value(def).unwrap_or_default();
+        json["station"] = serde_json::Value::String(station.to_string());
+        f.call((FfiStr::new(&json.to_string()),));
+        true
+    }
+
     /// Adds a crafting table recipe. See the [`content`](crate::content) module.
     pub fn register_recipe(&self, def: &RecipeDef) {
         if let Some(f) = self.host().recipe_register {

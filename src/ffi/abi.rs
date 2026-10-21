@@ -88,6 +88,7 @@ pub struct FfiSlice<T> {
 }
 
 pub type FormCallback = Option<unsafe extern "C" fn(response_json: FfiStr, user_data: *mut c_void)>;
+pub type HttpCallback = Option<unsafe extern "C" fn(answer_json: FfiStr, user_data: *mut c_void)>;
 pub type InventoryCallback =
     Option<unsafe extern "C" fn(inventory: InventoryHandle, user_data: *mut c_void)>;
 pub type VirtualChestCallback =

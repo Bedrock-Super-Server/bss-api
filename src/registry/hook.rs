@@ -253,12 +253,27 @@ pub(crate) fn register<H: Hook>(
     );
 }
 
-/// What the server calls for an event of `H`, with the bucket the subscription was made for.
+/// What the server calls for an event of `H`, with the bucket the subscription was made for. The
+/// handlers already catch their own panics; this also catches one while the event is read or
+/// written back, which would otherwise unwind out of an `extern "C"` function and abort the server.
 unsafe extern "C" fn entry<H: Hook>(
     host: *const HostApi,
     header: *mut EventHeader,
     user_data: *mut c_void,
 ) {
+    // SAFETY: the arguments are the server's, passed on unchanged.
+    let delivered = catch_unwind(AssertUnwindSafe(|| unsafe {
+        deliver::<H>(host, header, user_data)
+    }));
+    if delivered.is_err() {
+        eprintln!(
+            "[bss-api] a panic while an event was read or written back; the event is left as the server sent it"
+        );
+    }
+}
+
+/// The body of [`entry`], with the same contract.
+unsafe fn deliver<H: Hook>(host: *const HostApi, header: *mut EventHeader, user_data: *mut c_void) {
     if header.is_null() || user_data.is_null() || !set_host(host) {
         return;
     }

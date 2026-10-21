@@ -167,6 +167,69 @@ pub struct OffhandChangeEventData {
     pub count: u32,
 }
 
+#[repr(C)]
+pub struct PlayerBedEnterEventData {
+    pub header: EventHeader,
+    pub player: FfiStr,
+    pub x: i32,
+    pub y: i32,
+    pub z: i32,
+    pub world: u32,
+}
+
+#[repr(C)]
+pub struct PlayerBedLeaveEventData {
+    pub header: EventHeader,
+    pub player: FfiStr,
+    pub x: i32,
+    pub y: i32,
+    pub z: i32,
+    pub cause: FfiStr,
+    pub world: u32,
+}
+
+#[repr(C)]
+pub struct PlayerViewDistanceChangeEventData {
+    pub header: EventHeader,
+    pub player: FfiStr,
+    pub requested: i32,
+    pub old_radius: i32,
+    pub radius: i32,
+}
+
+#[repr(C)]
+pub struct PlayerKickEventData {
+    pub header: EventHeader,
+    pub player: FfiStr,
+    pub reason: FfiStr,
+}
+
+#[repr(C)]
+pub struct PlayerJumpEventData {
+    pub header: EventHeader,
+    pub player: FfiStr,
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+}
+
+#[repr(C)]
+pub struct PlayerEffectAddEventData {
+    pub header: EventHeader,
+    pub player: FfiStr,
+    pub effect: FfiStr,
+    pub amplifier: u32,
+    pub duration: i32,
+}
+
+#[repr(C)]
+pub struct PlayerEffectRemoveEventData {
+    pub header: EventHeader,
+    pub player: FfiStr,
+    pub effect: FfiStr,
+    pub amplifier: u32,
+}
+
 crate::event_data! {
     PlayerDamageEventData = 1048, "player_damage";
     PlayerHealEventData = 1049, "player_heal";
@@ -188,4 +251,11 @@ crate::event_data! {
     HornBlowEventData = 1065, "horn_blow";
     BookEditEventData = 1066, "book_edit";
     OffhandChangeEventData = 1067, "offhand_change";
+    PlayerBedEnterEventData = 1099, "player_bed_enter";
+    PlayerBedLeaveEventData = 1100, "player_bed_leave";
+    PlayerViewDistanceChangeEventData = 1101, "player_view_distance_change";
+    PlayerKickEventData = 1102, "player_kick";
+    PlayerJumpEventData = 1103, "player_jump";
+    PlayerEffectAddEventData = 1104, "player_effect_add";
+    PlayerEffectRemoveEventData = 1105, "player_effect_remove";
 }

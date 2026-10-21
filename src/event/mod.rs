@@ -81,3 +81,6 @@ pub(crate) mod mob;
 pub use mob::*;
 pub(crate) mod villager;
 pub use villager::*;
+
+pub(crate) mod lifecycle;
+pub use lifecycle::*;
