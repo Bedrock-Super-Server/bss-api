@@ -1,6 +1,5 @@
 # Behaviour events
 
-
 Every gameplay behaviour raises one of these events. Implement the matching method of
 the `Event` trait (or register a closure with `server.on_<name>`) and return `true` to
 cancel it. Fields listed as editable can be changed with `set_<field>`, and the server
@@ -49,6 +48,8 @@ impl Event for Guard {
 | `on_rain_change` | It starts or stops raining in a world. `duration` is how many ticks the new weather lasts before it changes again. | `raining: bool`, `world: u32` | `duration: u32` |
 | `on_thunder_change` | A thunderstorm starts or ends in a world; thunder only rumbles while it also rains. `duration` is how many ticks it lasts. | `thundering: bool`, `world: u32` | `duration: u32` |
 | `on_weather_effect` | Rain or snow changes a block: filling a cauldron, putting out a fire, freezing water, laying snow, watering farmland. | `x: i32`, `y: i32`, `z: i32`, `block: u32`, `cause: String`, `world: u32` | `new_block: u32` |
+| `on_spawn_change` | The spawn point of a world is about to move, with `/setworldspawn` or a plugin. Set another position to move it there instead. Cancelled, it stays where it is. | `world: u32` | `x: i32`, `y: i32`, `z: i32` |
+| `on_world_load` | A world finishes loading and is ready for players and plugins. Cancelling changes nothing. | `world: u32`, `name: String` | --- |
 | `on_tick_rate_change` | The game's pace changes by /tick or a plugin: how many ticks run a second, and whether worlds stand frozen. Cancelled, it keeps its pace. | --- | `rate: f32`, `frozen: bool` |
 
 ## Redstone (`event::redstone`)
@@ -112,6 +113,13 @@ impl Event for Guard {
 | `on_horn_blow` | A player blows a goat horn. | `player: String` | `variant: i32` |
 | `on_book_edit` | A player writes in, signs or tears a page from a book. | `player: String`, `slot: u32`, `action: String`, `page: i32`, `text: String` | --- |
 | `on_offhand_change` | An item goes into or out of a player's off hand. | `player: String`, `item: i16`, `count: u32` | --- |
+| `on_player_bed_enter` | A player lies down in a bed: it is night or a thunderstorm, no monster is near and nobody else lies there. Cancelled, the bed still becomes their respawn point but they stay standing. | `player: String`, `x: i32`, `y: i32`, `z: i32`, `world: u32` | --- |
+| `on_player_bed_leave` | A player gets out of bed. `cause` is `morning` when the world woke everyone up, `manual` when the player left by themselves, `damage`, `gamemode` or `travel` when something forced them out, and `bed_destroyed` when the bed is gone. Cancelling changes nothing. | `player: String`, `x: i32`, `y: i32`, `z: i32`, `cause: String`, `world: u32` | --- |
+| `on_player_view_distance_change` | A player's client asks for another view distance, in chunks. `radius` is what the server grants, within its own `view_distance`; set another one to grant that instead. Cancelled, the player keeps the view distance they have. | `player: String`, `requested: i32`, `old_radius: i32` | `radius: i32` |
+| `on_player_kick` | Something asks to disconnect a player: a plugin, the `/kick` command or the server's own protections. Cancelled, the player stays connected. | `player: String`, `reason: String` | --- |
+| `on_player_jump` | A player presses the jump key, once for each press, unless they are flying. Cancelling changes nothing. | `player: String`, `x: f32`, `y: f32`, `z: f32` | --- |
+| `on_player_effect_add` | A player is about to get a potion effect from what they drink, eat or use: a potion, food, a totem of undying; `effect` is its name, such as `minecraft:speed`. Effects given by a command, a beacon or a plugin are not asked. Cancelled, they do not get it. | `player: String`, `effect: String` | `amplifier: u32`, `duration: i32` |
+| `on_player_effect_remove` | A player loses a potion effect: it ran out, milk or a command cleared it, or a totem replaced it. Cancelling changes nothing. | `player: String`, `effect: String`, `amplifier: u32` | --- |
 
 ## Crafting and stations (`event::inventory`)
 
@@ -166,3 +174,13 @@ impl Event for Guard {
 | `on_villager_profession` | A villager takes up the profession of the job site block at `x`, `y`, `z`, or loses its profession, `profession` then empty, when the block goes before it ever traded. Cancelled, it stays as it was. | `entity: u64`, `profession: String`, `x: i32`, `y: i32`, `z: i32`, `world: u32` | --- |
 | `on_villager_trade` | A player trades with a villager or wandering trader: `times` trades of the offer at `offer` in its list, for `item`; `experience` is what the player earns. Cancelled, the trade does not happen. | `player: String`, `entity: u64`, `offer: u32`, `times: u32`, `item: i16` | `experience: i32` |
 | `on_villager_level_up` | A villager reaches a new level from trading, 2 for apprentice up to 5 for master, and learns new trades. | `entity: u64`, `level: u32`, `profession: String`, `world: u32` | --- |
+
+## The server and its plugins (`event::lifecycle`)
+
+| Event | When | Fields | Editable |
+| --- | --- | --- | --- |
+| `on_server_started` | The server finished starting and now accepts players. `worlds` is how many worlds are loaded. Cancelling changes nothing. | `worlds: u32` | --- |
+| `on_server_stop` | The server begins to stop, before it disconnects the players, unloads the plugins and saves the worlds. `players` is how many are online. Cancelling does not keep it from stopping. | `players: u32` | --- |
+| `on_console_command` | A line is typed in the server console, before it runs. Change `command` to run something else. Cancelled, nothing runs. | --- | `command: String` |
+| `on_plugin_enable` | A plugin finished loading and is now enabled, itself included. Cancelling changes nothing. | `name: String`, `version: String` | --- |
+| `on_plugin_disable` | A plugin is about to be disabled, by a reload, an unload or the server stopping. Cancelling does not keep it loaded. | `name: String`, `version: String` | --- |
