@@ -12,11 +12,11 @@ impl Command for Example2 {
     }
 
     fn subcommands(&self) -> Vec<Box<dyn SubCommand>> {
-        vec![Box::new(Plugin), Box::new(Say)]
+        vec![Box::new(Plugin)]
     }
 
     fn execute(&self, _ctx: &CommandContext) -> CommandResult {
-        Err("Usage: /example2 <plugin|say>".into())
+        Err("Usage: /example2 <plugin>".into())
     }
 }
 
