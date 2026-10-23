@@ -8,7 +8,7 @@ A plugin is a WebAssembly module, one `.wasm` file for every system and processo
 
 | bss-api | Bedrock Super Server | Minecraft |
 |---|---|---|
-| 1.8 | 2.2.4 | Bedrock 1.26.52 |
+| 1.8 | 0.2.24 | Bedrock 1.26.52 |
 
 A plugin and the server share a versioned ABI, `major.minor`, and the major version of `bss-api` is the major version of the ABI. The server reads the version a plugin was built with before anything else, refuses another major version with a message in its console, and loads a plugin of any minor version: what one side added since the other was built reads as absent. A plugin built with `bss-api` 1.x therefore keeps working on every server of ABI 1, older or newer, without being rebuilt.
 
