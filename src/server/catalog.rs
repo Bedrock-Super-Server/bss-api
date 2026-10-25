@@ -1,0 +1,696 @@
+/*!
+Names of the sounds and particles the Bedrock client knows.
+
+The constants are named after their value, so `sound::BLOCK_BELL_HIT` is `"block.bell.hit"`. They exist so that a typo becomes a compile error instead of a silent client.
+*/
+
+/**
+Sound names, for the `sound_event` field of a `LevelSoundEvent` packet.
+
+# Example
+
+Play the level-up sound to a player, at their position:
+
+```
+use bss_api::prelude::*;
+
+fn ding(player: &Player) -> Result<(), String> {
+    let (x, y, z, _, _) = player.position();
+    player.send_packet(
+        "LevelSoundEvent",
+        &json!({
+            "sound_event": sound::LEVELUP,
+            "position": { "x": x, "y": y, "z": z },
+            "data": -1,
+            "actor_identifier": "",
+            "is_baby": false,
+            "is_global": false,
+            "actor_unique_id": -1,
+            "fire_at_position": null
+        }),
+    )
+}
+```
+*/
+#[allow(missing_docs)]
+pub mod sound {
+    pub const ITEM_USE_ON: &str = "item.use.on";
+    pub const HIT: &str = "hit";
+    pub const STEP: &str = "step";
+    pub const STEP_BABY: &str = "step.baby";
+    pub const FLY: &str = "fly";
+    pub const JUMP: &str = "jump";
+    pub const JUMP_PREVENT: &str = "jump.prevent";
+    pub const BREAK: &str = "break";
+    pub const PLACE: &str = "place";
+    pub const HEAVY_STEP: &str = "heavy.step";
+    pub const GALLOP: &str = "gallop";
+    pub const FALL: &str = "fall";
+    pub const HURT: &str = "hurt";
+    pub const HURT_BABY: &str = "hurt.baby";
+    pub const HURT_IN_WATER: &str = "hurt.in.water";
+    pub const DEATH: &str = "death";
+    pub const DEATH_BABY: &str = "death.baby";
+    pub const DEATH_IN_WATER: &str = "death.in.water";
+    pub const DEATH_TO_ZOMBIE: &str = "death.to.zombie";
+    pub const AMBIENT: &str = "ambient";
+    pub const AMBIENT_BABY: &str = "ambient.baby";
+    pub const AMBIENT_IN_WATER: &str = "ambient.in.water";
+    pub const AMBIENT_IN_AIR: &str = "ambient.in.air";
+    pub const AMBIENT_TAME: &str = "ambient.tame";
+    pub const AMBIENT_POLLINATE: &str = "ambient.pollinate";
+    pub const BREATHE: &str = "breathe";
+    pub const MAD: &str = "mad";
+    pub const BOOST: &str = "boost";
+    pub const BOW: &str = "bow";
+    pub const SQUISH_BIG: &str = "squish.big";
+    pub const SQUISH_SMALL: &str = "squish.small";
+    pub const FALL_BIG: &str = "fall.big";
+    pub const FALL_SMALL: &str = "fall.small";
+    pub const SPLASH: &str = "splash";
+    pub const FIZZ: &str = "fizz";
+    pub const FLAP: &str = "flap";
+    pub const SWIM: &str = "swim";
+    pub const DRINK: &str = "drink";
+    pub const DRINK_HONEY: &str = "drink.honey";
+    pub const DRINK_MILK: &str = "drink.milk";
+    pub const EAT: &str = "eat";
+    pub const TAKEOFF: &str = "takeoff";
+    pub const SHAKE: &str = "shake";
+    pub const PLOP: &str = "plop";
+    pub const LAND: &str = "land";
+    pub const SADDLE: &str = "saddle";
+    pub const ARMOR: &str = "armor";
+    pub const MOB_ARMOR_STAND_PLACE: &str = "mob.armor_stand.place";
+    pub const ADD_CHEST: &str = "add.chest";
+    pub const THROW: &str = "throw";
+    pub const ATTACK: &str = "attack";
+    pub const ATTACK_NODAMAGE: &str = "attack.nodamage";
+    pub const ATTACK_STRONG: &str = "attack.strong";
+    pub const WARN: &str = "warn";
+    pub const SHEAR: &str = "shear";
+    pub const MILK: &str = "milk";
+    pub const THUNDER: &str = "thunder";
+    pub const EXPLODE: &str = "explode";
+    pub const FIRE: &str = "fire";
+    pub const IGNITE: &str = "ignite";
+    pub const FUSE: &str = "fuse";
+    pub const STARE: &str = "stare";
+    pub const SPAWN: &str = "spawn";
+    pub const BORN: &str = "born";
+    pub const SHOOT: &str = "shoot";
+    pub const BREAK_BLOCK: &str = "break.block";
+    pub const LAUNCH: &str = "launch";
+    pub const BLAST: &str = "blast";
+    pub const LARGE_BLAST: &str = "large.blast";
+    pub const TWINKLE: &str = "twinkle";
+    pub const REMEDY: &str = "remedy";
+    pub const UNFECT: &str = "unfect";
+    pub const CONVERT_TO_DROWNED: &str = "convert_to_drowned";
+    pub const LEVELUP: &str = "levelup";
+    pub const BOW_HIT: &str = "bow.hit";
+    pub const BULLET_HIT: &str = "bullet.hit";
+    pub const EXTINGUISH_FIRE: &str = "extinguish.fire";
+    pub const ITEM_FIZZ: &str = "item.fizz";
+    pub const CHEST_OPEN: &str = "chest.open";
+    pub const CHEST_CLOSED: &str = "chest.closed";
+    pub const SHULKERBOX_OPEN: &str = "shulkerbox.open";
+    pub const SHULKERBOX_CLOSED: &str = "shulkerbox.closed";
+    pub const ENDERCHEST_OPEN: &str = "enderchest.open";
+    pub const ENDERCHEST_CLOSED: &str = "enderchest.closed";
+    pub const POWER_ON: &str = "power.on";
+    pub const POWER_OFF: &str = "power.off";
+    pub const ATTACH: &str = "attach";
+    pub const DETACH: &str = "detach";
+    pub const DENY: &str = "deny";
+    pub const TRIPOD: &str = "tripod";
+    pub const POP: &str = "pop";
+    pub const DROP_SLOT: &str = "drop.slot";
+    pub const NOTE: &str = "note";
+    pub const THORNS: &str = "thorns";
+    pub const PISTON_IN: &str = "piston.in";
+    pub const PISTON_OUT: &str = "piston.out";
+    pub const PORTAL: &str = "portal";
+    pub const WATER: &str = "water";
+    pub const LAVA_POP: &str = "lava.pop";
+    pub const LAVA: &str = "lava";
+    pub const BEACON_ACTIVATE: &str = "beacon.activate";
+    pub const BEACON_AMBIENT: &str = "beacon.ambient";
+    pub const BEACON_DEACTIVATE: &str = "beacon.deactivate";
+    pub const BEACON_POWER: &str = "beacon.power";
+    pub const CONDUIT_ACTIVATE: &str = "conduit.activate";
+    pub const CONDUIT_AMBIENT: &str = "conduit.ambient";
+    pub const CONDUIT_ATTACK: &str = "conduit.attack";
+    pub const CONDUIT_DEACTIVATE: &str = "conduit.deactivate";
+    pub const CONDUIT_SHORT: &str = "conduit.short";
+    pub const BUBBLE_POP: &str = "bubble.pop";
+    pub const BUBBLE_UP: &str = "bubble.up";
+    pub const BUBBLE_UPINSIDE: &str = "bubble.upinside";
+    pub const BUBBLE_DOWN: &str = "bubble.down";
+    pub const BUBBLE_DOWNINSIDE: &str = "bubble.downinside";
+    pub const BURP: &str = "burp";
+    pub const BUCKET_FILL_WATER: &str = "bucket.fill.water";
+    pub const BUCKET_EMPTY_WATER: &str = "bucket.empty.water";
+    pub const BUCKET_FILL_LAVA: &str = "bucket.fill.lava";
+    pub const BUCKET_EMPTY_LAVA: &str = "bucket.empty.lava";
+    pub const BUCKET_FILL_FISH: &str = "bucket.fill.fish";
+    pub const BUCKET_EMPTY_FISH: &str = "bucket.empty.fish";
+    pub const ARMOR_EQUIP_CHAIN: &str = "armor.equip_chain";
+    pub const ARMOR_EQUIP_DIAMOND: &str = "armor.equip_diamond";
+    pub const ARMOR_EQUIP_ELYTRA: &str = "armor.equip_elytra";
+    pub const ARMOR_EQUIP_GENERIC: &str = "armor.equip_generic";
+    pub const ARMOR_EQUIP_GOLD: &str = "armor.equip_gold";
+    pub const ARMOR_EQUIP_IRON: &str = "armor.equip_iron";
+    pub const ARMOR_EQUIP_LEATHER: &str = "armor.equip_leather";
+    pub const ARMOR_EQUIP_NETHERITE: &str = "armor.equip_netherite";
+    pub const RECORD_13: &str = "record.13";
+    pub const RECORD_CAT: &str = "record.cat";
+    pub const RECORD_BLOCKS: &str = "record.blocks";
+    pub const RECORD_CHIRP: &str = "record.chirp";
+    pub const RECORD_CREATOR: &str = "record.creator";
+    pub const RECORD_CREATOR_MUSIC_BOX: &str = "record.creator_music_box";
+    pub const RECORD_FAR: &str = "record.far";
+    pub const RECORD_MALL: &str = "record.mall";
+    pub const RECORD_MELLOHI: &str = "record.mellohi";
+    pub const RECORD_STAL: &str = "record.stal";
+    pub const RECORD_STRAD: &str = "record.strad";
+    pub const RECORD_WARD: &str = "record.ward";
+    pub const RECORD_11: &str = "record.11";
+    pub const RECORD_WAIT: &str = "record.wait";
+    pub const RECORD_NULL: &str = "record.null";
+    pub const RECORD_PIGSTEP: &str = "record.pigstep";
+    pub const RECORD_PRECIPICE: &str = "record.precipice";
+    pub const RECORD_RELIC: &str = "record.relic";
+    pub const RECORD_OTHERSIDE: &str = "record.otherside";
+    pub const RECORD_5: &str = "record.5";
+    pub const RECORD_TEARS: &str = "record.tears";
+    pub const RECORD_LAVA_CHICKEN: &str = "record.lava_chicken";
+    pub const FLOP: &str = "flop";
+    pub const ELDERGUARDIAN_CURSE: &str = "elderguardian.curse";
+    pub const TELEPORT: &str = "teleport";
+    pub const SHULKER_OPEN: &str = "shulker.open";
+    pub const SHULKER_CLOSE: &str = "shulker.close";
+    pub const MOB_WARNING: &str = "mob.warning";
+    pub const MOB_WARNING_BABY: &str = "mob.warning.baby";
+    pub const HAGGLE: &str = "haggle";
+    pub const HAGGLE_YES: &str = "haggle.yes";
+    pub const HAGGLE_NO: &str = "haggle.no";
+    pub const HAGGLE_IDLE: &str = "haggle.idle";
+    pub const DISAPPEARED: &str = "disappeared";
+    pub const REAPPEARED: &str = "reappeared";
+    pub const CHORUSGROW: &str = "chorusgrow";
+    pub const CHORUSDEATH: &str = "chorusdeath";
+    pub const GLASS: &str = "glass";
+    pub const POTION_BREWED: &str = "potion.brewed";
+    pub const CAST_SPELL: &str = "cast.spell";
+    pub const PREPARE_ATTACK: &str = "prepare.attack";
+    pub const PREPARE_SUMMON: &str = "prepare.summon";
+    pub const PREPARE_WOLOLO: &str = "prepare.wololo";
+    pub const FANG: &str = "fang";
+    pub const CHARGE: &str = "charge";
+    pub const CAMERA_TAKE_PICTURE: &str = "camera.take_picture";
+    pub const LEASHKNOT_BREAK: &str = "leashknot.break";
+    pub const LEASHKNOT_PLACE: &str = "leashknot.place";
+    pub const GROWL: &str = "growl";
+    pub const WHINE: &str = "whine";
+    pub const PANT: &str = "pant";
+    pub const PURR: &str = "purr";
+    pub const PURREOW: &str = "purreow";
+    pub const DEATH_MIN_VOLUME: &str = "death.min.volume";
+    pub const DEATH_MID_VOLUME: &str = "death.mid.volume";
+    pub const IMITATE_BLAZE: &str = "imitate.blaze";
+    pub const IMITATE_CAVE_SPIDER: &str = "imitate.cave_spider";
+    pub const IMITATE_CREEPER: &str = "imitate.creeper";
+    pub const IMITATE_ELDER_GUARDIAN: &str = "imitate.elder_guardian";
+    pub const IMITATE_ENDER_DRAGON: &str = "imitate.ender_dragon";
+    pub const IMITATE_ENDERMAN: &str = "imitate.enderman";
+    pub const IMITATE_ENDERMITE: &str = "imitate.endermite";
+    pub const IMITATE_EVOCATION_ILLAGER: &str = "imitate.evocation_illager";
+    pub const IMITATE_GHAST: &str = "imitate.ghast";
+    pub const IMITATE_HUSK: &str = "imitate.husk";
+    pub const IMITATE_MAGMA_CUBE: &str = "imitate.magma_cube";
+    pub const IMITATE_POLAR_BEAR: &str = "imitate.polar_bear";
+    pub const IMITATE_SHULKER: &str = "imitate.shulker";
+    pub const IMITATE_SILVERFISH: &str = "imitate.silverfish";
+    pub const IMITATE_SKELETON: &str = "imitate.skeleton";
+    pub const IMITATE_SLIME: &str = "imitate.slime";
+    pub const IMITATE_SPIDER: &str = "imitate.spider";
+    pub const IMITATE_STRAY: &str = "imitate.stray";
+    pub const IMITATE_VEX: &str = "imitate.vex";
+    pub const IMITATE_VINDICATION_ILLAGER: &str = "imitate.vindication_illager";
+    pub const IMITATE_WITCH: &str = "imitate.witch";
+    pub const IMITATE_WITHER: &str = "imitate.wither";
+    pub const IMITATE_WITHER_SKELETON: &str = "imitate.wither_skeleton";
+    pub const IMITATE_WOLF: &str = "imitate.wolf";
+    pub const IMITATE_ZOMBIE: &str = "imitate.zombie";
+    pub const IMITATE_ZOMBIE_PIGMAN: &str = "imitate.zombie_pigman";
+    pub const IMITATE_ZOMBIE_VILLAGER: &str = "imitate.zombie_villager";
+    pub const BLOCK_END_PORTAL_FRAME_FILL: &str = "block.end_portal_frame.fill";
+    pub const BLOCK_END_PORTAL_SPAWN: &str = "block.end_portal.spawn";
+    pub const RANDOM_ANVIL_USE: &str = "random.anvil_use";
+    pub const BOTTLE_DRAGONBREATH: &str = "bottle.dragonbreath";
+    pub const BALLOONPOP: &str = "balloonpop";
+    pub const SPARKLER_ACTIVE: &str = "sparkler.active";
+    pub const ITEM_TRIDENT_HIT: &str = "item.trident.hit";
+    pub const ITEM_TRIDENT_HIT_GROUND: &str = "item.trident.hit_ground";
+    pub const ITEM_TRIDENT_RETURN: &str = "item.trident.return";
+    pub const ITEM_TRIDENT_RIPTIDE_1: &str = "item.trident.riptide_1";
+    pub const ITEM_TRIDENT_RIPTIDE_2: &str = "item.trident.riptide_2";
+    pub const ITEM_TRIDENT_RIPTIDE_3: &str = "item.trident.riptide_3";
+    pub const ITEM_TRIDENT_THROW: &str = "item.trident.throw";
+    pub const ITEM_TRIDENT_THUNDER: &str = "item.trident.thunder";
+    pub const BLOCK_FLETCHING_TABLE_USE: &str = "block.fletching_table.use";
+    pub const ELEMCONSTRUCT_OPEN: &str = "elemconstruct.open";
+    pub const ICEBOMB_HIT: &str = "icebomb.hit";
+    pub const LT_REACTION_ICEBOMB: &str = "lt.reaction.icebomb";
+    pub const LT_REACTION_BLEACH: &str = "lt.reaction.bleach";
+    pub const LT_REACTION_EPASTE: &str = "lt.reaction.epaste";
+    pub const LT_REACTION_EPASTE2: &str = "lt.reaction.epaste2";
+    pub const LT_REACTION_FERTILIZER: &str = "lt.reaction.fertilizer";
+    pub const LT_REACTION_FIREBALL: &str = "lt.reaction.fireball";
+    pub const LT_REACTION_MGSALT: &str = "lt.reaction.mgsalt";
+    pub const LT_REACTION_MISCFIRE: &str = "lt.reaction.miscfire";
+    pub const LT_REACTION_FIRE: &str = "lt.reaction.fire";
+    pub const LT_REACTION_MISCEXPLOSION: &str = "lt.reaction.miscexplosion";
+    pub const LT_REACTION_MISCMYSTICAL: &str = "lt.reaction.miscmystical";
+    pub const LT_REACTION_MISCMYSTICAL2: &str = "lt.reaction.miscmystical2";
+    pub const LT_REACTION_PRODUCT: &str = "lt.reaction.product";
+    pub const SPARKLER_USE: &str = "sparkler.use";
+    pub const GLOWSTICK_USE: &str = "glowstick.use";
+    pub const BLOCK_TURTLE_EGG_BREAK: &str = "block.turtle_egg.break";
+    pub const BLOCK_TURTLE_EGG_CRACK: &str = "block.turtle_egg.crack";
+    pub const BLOCK_TURTLE_EGG_HATCH: &str = "block.turtle_egg.hatch";
+    pub const BLOCK_TURTLE_EGG_ATTACK: &str = "block.turtle_egg.attack";
+    pub const BLOCK_SNIFFER_EGG_CRACK: &str = "block.sniffer_egg.crack";
+    pub const BLOCK_SNIFFER_EGG_HATCH: &str = "block.sniffer_egg.hatch";
+    pub const BLOCK_FROG_SPAWN_HATCH: &str = "block.frog_spawn.hatch";
+    pub const BLOCK_FROG_SPAWN_BREAK: &str = "block.frog_spawn.break";
+    pub const SWOOP: &str = "swoop";
+    pub const PRESNEEZE: &str = "presneeze";
+    pub const SNEEZE: &str = "sneeze";
+    pub const SCARED: &str = "scared";
+    pub const AMBIENT_AGGRESSIVE: &str = "ambient.aggressive";
+    pub const AMBIENT_WORRIED: &str = "ambient.worried";
+    pub const CANT_BREED: &str = "cant_breed";
+    pub const BLOCK_SCAFFOLDING_CLIMB: &str = "block.scaffolding.climb";
+    pub const BLOCK_BAMBOO_SAPLING_PLACE: &str = "block.bamboo_sapling.place";
+    pub const CROSSBOW_LOADING_START: &str = "crossbow.loading.start";
+    pub const CROSSBOW_LOADING_MIDDLE: &str = "crossbow.loading.middle";
+    pub const CROSSBOW_LOADING_END: &str = "crossbow.loading.end";
+    pub const CROSSBOW_SHOOT: &str = "crossbow.shoot";
+    pub const CROSSBOW_QUICK_CHARGE_START: &str = "crossbow.quick_charge.start";
+    pub const CROSSBOW_QUICK_CHARGE_MIDDLE: &str = "crossbow.quick_charge.middle";
+    pub const CROSSBOW_QUICK_CHARGE_END: &str = "crossbow.quick_charge.end";
+    pub const ITEM_SHIELD_BLOCK: &str = "item.shield.block";
+    pub const PORTAL_TRAVEL: &str = "portal.travel";
+    pub const ITEM_BOOK_PUT: &str = "item.book.put";
+    pub const BLOCK_GRINDSTONE_USE: &str = "block.grindstone.use";
+    pub const BLOCK_BELL_HIT: &str = "block.bell.hit";
+    pub const BLOCK_CAMPFIRE_CRACKLE: &str = "block.campfire.crackle";
+    pub const BLOCK_SWEET_BERRY_BUSH_HURT: &str = "block.sweet_berry_bush.hurt";
+    pub const BLOCK_SWEET_BERRY_BUSH_PICK: &str = "block.sweet_berry_bush.pick";
+    pub const BLOCK_STONECUTTER_USE: &str = "block.stonecutter.use";
+    pub const BLOCK_CARTOGRAPHY_TABLE_USE: &str = "block.cartography_table.use";
+    pub const BLOCK_COMPOSTER_EMPTY: &str = "block.composter.empty";
+    pub const BLOCK_COMPOSTER_FILL: &str = "block.composter.fill";
+    pub const BLOCK_COMPOSTER_FILL_SUCCESS: &str = "block.composter.fill_success";
+    pub const BLOCK_COMPOSTER_READY: &str = "block.composter.ready";
+    pub const ROAR: &str = "roar";
+    pub const STUN: &str = "stun";
+    pub const BLOCK_BARREL_OPEN: &str = "block.barrel.open";
+    pub const BLOCK_BARREL_CLOSE: &str = "block.barrel.close";
+    pub const RAID_HORN: &str = "raid.horn";
+    pub const UI_STONECUTTER_TAKE_RESULT: &str = "ui.stonecutter.take_result";
+    pub const UI_CARTOGRAPHY_TABLE_TAKE_RESULT: &str = "ui.cartography_table.take_result";
+    pub const UI_LOOM_TAKE_RESULT: &str = "ui.loom.take_result";
+    pub const BLOCK_SMOKER_SMOKE: &str = "block.smoker.smoke";
+    pub const BLOCK_BLASTFURNACE_FIRE_CRACKLE: &str = "block.blastfurnace.fire_crackle";
+    pub const BLOCK_SMITHING_TABLE_USE: &str = "block.smithing_table.use";
+    pub const BLOCK_LOOM_USE: &str = "block.loom.use";
+    pub const AMBIENT_IN_RAID: &str = "ambient.in.raid";
+    pub const SCREECH: &str = "screech";
+    pub const SLEEP: &str = "sleep";
+    pub const BLOCK_FURNACE_LIT: &str = "block.furnace.lit";
+    pub const CONVERT_MOOSHROOM: &str = "convert_mooshroom";
+    pub const MILK_SUSPICIOUSLY: &str = "milk_suspiciously";
+    pub const CELEBRATE: &str = "celebrate";
+    pub const BLOCK_BEEHIVE_ENTER: &str = "block.beehive.enter";
+    pub const BLOCK_BEEHIVE_EXIT: &str = "block.beehive.exit";
+    pub const BLOCK_BEEHIVE_SHEAR: &str = "block.beehive.shear";
+    pub const BLOCK_BEEHIVE_WORK: &str = "block.beehive.work";
+    pub const BLOCK_BEEHIVE_DRIP: &str = "block.beehive.drip";
+    pub const AMBIENT_CAVE: &str = "ambient.cave";
+    pub const ANGRY: &str = "angry";
+    pub const RETREAT: &str = "retreat";
+    pub const CONVERTED_TO_ZOMBIFIED: &str = "converted_to_zombified";
+    pub const STEP_LAVA: &str = "step_lava";
+    pub const TEMPT: &str = "tempt";
+    pub const PANIC: &str = "panic";
+    pub const ADMIRE: &str = "admire";
+    pub const PARTICLE_SOUL_ESCAPE_QUIET: &str = "particle.soul_escape.quiet";
+    pub const PARTICLE_SOUL_ESCAPE_LOUD: &str = "particle.soul_escape.loud";
+    pub const RESPAWN_ANCHOR_CHARGE: &str = "respawn_anchor.charge";
+    pub const RESPAWN_ANCHOR_DEPLETE: &str = "respawn_anchor.deplete";
+    pub const RESPAWN_ANCHOR_SET_SPAWN: &str = "respawn_anchor.set_spawn";
+    pub const RESPAWN_ANCHOR_AMBIENT: &str = "respawn_anchor.ambient";
+    pub const AMBIENT_CRIMSON_FOREST_MOOD: &str = "ambient.crimson_forest.mood";
+    pub const AMBIENT_WARPED_FOREST_MOOD: &str = "ambient.warped_forest.mood";
+    pub const AMBIENT_SOULSAND_VALLEY_MOOD: &str = "ambient.soulsand_valley.mood";
+    pub const AMBIENT_NETHER_WASTES_MOOD: &str = "ambient.nether_wastes.mood";
+    pub const AMBIENT_CRIMSON_FOREST_ADDITIONS: &str = "ambient.crimson_forest.additions";
+    pub const AMBIENT_WARPED_FOREST_ADDITIONS: &str = "ambient.warped_forest.additions";
+    pub const AMBIENT_SOULSAND_VALLEY_ADDITIONS: &str = "ambient.soulsand_valley.additions";
+    pub const AMBIENT_NETHER_WASTES_ADDITIONS: &str = "ambient.nether_wastes.additions";
+    pub const AMBIENT_BASALT_DELTAS_ADDITIONS: &str = "ambient.basalt_deltas.additions";
+    pub const AMBIENT_CRIMSON_FOREST_LOOP: &str = "ambient.crimson_forest.loop";
+    pub const AMBIENT_WARPED_FOREST_LOOP: &str = "ambient.warped_forest.loop";
+    pub const AMBIENT_SOULSAND_VALLEY_LOOP: &str = "ambient.soulsand_valley.loop";
+    pub const AMBIENT_NETHER_WASTES_LOOP: &str = "ambient.nether_wastes.loop";
+    pub const AMBIENT_BASALT_DELTAS_LOOP: &str = "ambient.basalt_deltas.loop";
+    pub const LODESTONE_COMPASS_LINK_COMPASS_TO_LODESTONE: &str =
+        "lodestone_compass.link_compass_to_lodestone";
+    pub const AMBIENT_BASALT_DELTAS_MOOD: &str = "ambient.basalt_deltas.mood";
+    pub const POWER_ON_SCULK_SENSOR: &str = "power.on.sculk_sensor";
+    pub const POWER_OFF_SCULK_SENSOR: &str = "power.off.sculk_sensor";
+    pub const SMITHING_TABLE_USE: &str = "smithing_table.use";
+    pub const DEFAULT: &str = "default";
+    pub const LAY_EGG: &str = "lay_egg";
+    pub const LAY_SPAWN: &str = "lay_spawn";
+    pub const BUCKET_FILL_POWDER_SNOW: &str = "bucket.fill.powder_snow";
+    pub const BUCKET_EMPTY_POWDER_SNOW: &str = "bucket.empty.powder_snow";
+    pub const CAULDRON_DRIP_WATER_POINTED_DRIPSTONE: &str = "cauldron_drip.water.pointed_dripstone";
+    pub const CAULDRON_DRIP_LAVA_POINTED_DRIPSTONE: &str = "cauldron_drip.lava.pointed_dripstone";
+    pub const TILT_DOWN_BIG_DRIPLEAF: &str = "tilt_down.big_dripleaf";
+    pub const TILT_UP_BIG_DRIPLEAF: &str = "tilt_up.big_dripleaf";
+    pub const DRIP_WATER_POINTED_DRIPSTONE: &str = "drip.water.pointed_dripstone";
+    pub const PICK_BERRIES_CAVE_VINES: &str = "pick_berries.cave_vines";
+    pub const DRIP_LAVA_POINTED_DRIPSTONE: &str = "drip.lava.pointed_dripstone";
+    pub const COPPER_WAX_ON: &str = "copper.wax.on";
+    pub const COPPER_WAX_OFF: &str = "copper.wax.off";
+    pub const SCRAPE: &str = "scrape";
+    pub const ITEM_SPYGLASS_USE: &str = "item.spyglass.use";
+    pub const ITEM_SPYGLASS_STOP_USING: &str = "item.spyglass.stop_using";
+    pub const CHIME_AMETHYST_BLOCK: &str = "chime.amethyst_block";
+    pub const MOB_PLAYER_HURT_DROWN: &str = "mob.player.hurt_drown";
+    pub const MOB_PLAYER_HURT_ON_FIRE: &str = "mob.player.hurt_on_fire";
+    pub const MOB_PLAYER_HURT_FREEZE: &str = "mob.player.hurt_freeze";
+    pub const AMBIENT_SCREAMER: &str = "ambient.screamer";
+    pub const HURT_SCREAMER: &str = "hurt.screamer";
+    pub const DEATH_SCREAMER: &str = "death.screamer";
+    pub const MILK_SCREAMER: &str = "milk.screamer";
+    pub const JUMP_TO_BLOCK: &str = "jump_to_block";
+    pub const PRE_RAM: &str = "pre_ram";
+    pub const PRE_RAM_SCREAMER: &str = "pre_ram.screamer";
+    pub const RAM_IMPACT: &str = "ram_impact";
+    pub const RAM_IMPACT_SCREAMER: &str = "ram_impact.screamer";
+    pub const SQUID_INK_SQUIRT: &str = "squid.ink_squirt";
+    pub const GLOW_SQUID_INK_SQUIRT: &str = "glow_squid.ink_squirt";
+    pub const CONVERT_TO_STRAY: &str = "convert_to_stray";
+    pub const CAKE_ADD_CANDLE: &str = "cake.add_candle";
+    pub const EXTINGUISH_CANDLE: &str = "extinguish.candle";
+    pub const AMBIENT_CANDLE: &str = "ambient.candle";
+    pub const BLOCK_CLICK: &str = "block.click";
+    pub const BLOCK_CLICK_FAIL: &str = "block.click.fail";
+    pub const BLOCK_SCULK_CATALYST_BLOOM: &str = "block.sculk_catalyst.bloom";
+    pub const BLOCK_SCULK_SHRIEKER_SHRIEK: &str = "block.sculk_shrieker.shriek";
+    pub const NEARBY_CLOSE: &str = "nearby_close";
+    pub const NEARBY_CLOSER: &str = "nearby_closer";
+    pub const NEARBY_CLOSEST: &str = "nearby_closest";
+    pub const AGITATED: &str = "agitated";
+    pub const LISTENING: &str = "listening";
+    pub const HEARTBEAT: &str = "heartbeat";
+    pub const TONGUE: &str = "tongue";
+    pub const ITEM_GIVEN: &str = "item_given";
+    pub const ITEM_TAKEN: &str = "item_taken";
+    pub const ITEM_THROWN: &str = "item_thrown";
+    pub const IRONGOLEM_CRACK: &str = "irongolem.crack";
+    pub const IRONGOLEM_REPAIR: &str = "irongolem.repair";
+    pub const HORN_BREAK: &str = "horn_break";
+    pub const HORN_CALL0: &str = "horn_call0";
+    pub const HORN_CALL1: &str = "horn_call1";
+    pub const HORN_CALL2: &str = "horn_call2";
+    pub const HORN_CALL3: &str = "horn_call3";
+    pub const HORN_CALL4: &str = "horn_call4";
+    pub const HORN_CALL5: &str = "horn_call5";
+    pub const HORN_CALL6: &str = "horn_call6";
+    pub const HORN_CALL7: &str = "horn_call7";
+    pub const IMITATE_WARDEN: &str = "imitate.warden";
+    pub const LISTENING_ANGRY: &str = "listening_angry";
+    pub const SONIC_BOOM: &str = "sonic_boom";
+    pub const SONIC_CHARGE: &str = "sonic_charge";
+    pub const CONVERT_TO_FROG: &str = "convert_to_frog";
+    pub const BLOCK_SCULK_SPREAD: &str = "block.sculk.spread";
+    pub const CHARGE_SCULK: &str = "charge.sculk";
+    pub const BLOCK_SCULK_SENSOR_PLACE: &str = "block.sculk_sensor.place";
+    pub const BLOCK_SCULK_SHRIEKER_PLACE: &str = "block.sculk_shrieker.place";
+    pub const BLOCK_ENCHANTING_TABLE_USE: &str = "block.enchanting_table.use";
+    pub const BUNDLE_DROP_CONTENTS: &str = "bundle.drop_contents";
+    pub const BUNDLE_INSERT: &str = "bundle.insert";
+    pub const BUNDLE_INSERT_FAIL: &str = "bundle.insert_fail";
+    pub const BUNDLE_REMOVE_ONE: &str = "bundle.remove_one";
+    pub const STEP_SAND: &str = "step_sand";
+    pub const DASH_READY: &str = "dash_ready";
+    pub const PRESSURE_PLATE_CLICK_OFF: &str = "pressure_plate.click_off";
+    pub const PRESSURE_PLATE_CLICK_ON: &str = "pressure_plate.click_on";
+    pub const BUTTON_CLICK_OFF: &str = "button.click_off";
+    pub const BUTTON_CLICK_ON: &str = "button.click_on";
+    pub const DOOR_OPEN: &str = "door.open";
+    pub const DOOR_CLOSE: &str = "door.close";
+    pub const TRAPDOOR_OPEN: &str = "trapdoor.open";
+    pub const TRAPDOOR_CLOSE: &str = "trapdoor.close";
+    pub const FENCE_GATE_OPEN: &str = "fence_gate.open";
+    pub const FENCE_GATE_CLOSE: &str = "fence_gate.close";
+    pub const INSERT: &str = "insert";
+    pub const PICKUP: &str = "pickup";
+    pub const INSERT_ENCHANTED: &str = "insert_enchanted";
+    pub const PICKUP_ENCHANTED: &str = "pickup_enchanted";
+    pub const SHATTER_POT: &str = "shatter_pot";
+    pub const BREAK_POT: &str = "break_pot";
+    pub const BRUSH: &str = "brush";
+    pub const BRUSH_COMPLETED: &str = "brush_completed";
+    pub const BLOCK_SIGN_WAXED_INTERACT_FAIL: &str = "block.sign.waxed_interact_fail";
+    pub const NOTE_BASS: &str = "note.bass";
+    pub const PUMPKIN_CARVE: &str = "pumpkin.carve";
+    pub const MOB_HUSK_CONVERT_TO_ZOMBIE: &str = "mob.husk.convert_to_zombie";
+    pub const MOB_PIG_DEATH: &str = "mob.pig.death";
+    pub const MOB_HOGLIN_CONVERTED_TO_ZOMBIFIED: &str = "mob.hoglin.converted_to_zombified";
+    pub const AMBIENT_UNDERWATER_ENTER: &str = "ambient.underwater.enter";
+    pub const AMBIENT_UNDERWATER_EXIT: &str = "ambient.underwater.exit";
+    pub const BOTTLE_FILL: &str = "bottle.fill";
+    pub const BOTTLE_EMPTY: &str = "bottle.empty";
+    pub const BLOCK_DECORATED_POT_INSERT: &str = "block.decorated_pot.insert";
+    pub const BLOCK_DECORATED_POT_INSERT_FAIL: &str = "block.decorated_pot.insert_fail";
+    pub const CRAFTER_CRAFT: &str = "crafter.craft";
+    pub const CRAFTER_FAIL: &str = "crafter.fail";
+    pub const CRAFTER_DISABLE_SLOT: &str = "crafter.disable_slot";
+    pub const BLOCK_COPPER_BULB_TURN_ON: &str = "block.copper_bulb.turn_on";
+    pub const BLOCK_COPPER_BULB_TURN_OFF: &str = "block.copper_bulb.turn_off";
+    pub const BREEZE_WIND_CHARGE_BURST: &str = "breeze_wind_charge.burst";
+    pub const IMITATE_BREEZE: &str = "imitate.breeze";
+    pub const TRIAL_SPAWNER_OPEN_SHUTTER: &str = "trial_spawner.open_shutter";
+    pub const TRIAL_SPAWNER_DETECT_PLAYER: &str = "trial_spawner.detect_player";
+    pub const TRIAL_SPAWNER_CLOSE_SHUTTER: &str = "trial_spawner.close_shutter";
+    pub const TRIAL_SPAWNER_SPAWN_MOB: &str = "trial_spawner.spawn_mob";
+    pub const TRIAL_SPAWNER_EJECT_ITEM: &str = "trial_spawner.eject_item";
+    pub const TRIAL_SPAWNER_AMBIENT: &str = "trial_spawner.ambient";
+    pub const MOB_ARMADILLO_BRUSH: &str = "mob.armadillo.brush";
+    pub const MOB_ARMADILLO_SCUTE_DROP: &str = "mob.armadillo.scute_drop";
+    pub const ARMOR_EQUIP_WOLF: &str = "armor.equip_wolf";
+    pub const ARMOR_UNEQUIP_WOLF: &str = "armor.unequip_wolf";
+    pub const REFLECT: &str = "reflect";
+    pub const VAULT_OPEN_SHUTTER: &str = "vault.open_shutter";
+    pub const VAULT_CLOSE_SHUTTER: &str = "vault.close_shutter";
+    pub const VAULT_EJECT_ITEM: &str = "vault.eject_item";
+    pub const VAULT_INSERT_ITEM: &str = "vault.insert_item";
+    pub const VAULT_INSERT_ITEM_FAIL: &str = "vault.insert_item_fail";
+    pub const VAULT_AMBIENT: &str = "vault.ambient";
+    pub const VAULT_ACTIVATE: &str = "vault.activate";
+    pub const VAULT_DEACTIVATE: &str = "vault.deactivate";
+    pub const HURT_REDUCED: &str = "hurt.reduced";
+    pub const WIND_CHARGE_BURST: &str = "wind_charge.burst";
+    pub const ARMOR_BREAK_WOLF: &str = "armor.break_wolf";
+    pub const ARMOR_CRACK_WOLF: &str = "armor.crack_wolf";
+    pub const ARMOR_REPAIR_WOLF: &str = "armor.repair_wolf";
+    pub const MACE_SMASH_AIR: &str = "mace.smash_air";
+    pub const MACE_SMASH_GROUND: &str = "mace.smash_ground";
+    pub const MACE_HEAVY_SMASH_GROUND: &str = "mace.heavy_smash_ground";
+    pub const TRIAL_SPAWNER_CHARGE_ACTIVATE: &str = "trial_spawner.charge_activate";
+    pub const TRIAL_SPAWNER_AMBIENT_OMINOUS: &str = "trial_spawner.ambient_ominous";
+    pub const APPLY_EFFECT_BAD_OMEN: &str = "apply_effect.bad_omen";
+    pub const APPLY_EFFECT_RAID_OMEN: &str = "apply_effect.raid_omen";
+    pub const APPLY_EFFECT_TRIAL_OMEN: &str = "apply_effect.trial_omen";
+    pub const OMINOUS_ITEM_SPAWNER_SPAWN_ITEM: &str = "ominous_item_spawner.spawn_item";
+    pub const OMINOUS_BOTTLE_END_USE: &str = "ominous_bottle.end_use";
+    pub const OMINOUS_ITEM_SPAWNER_SPAWN_ITEM_BEGIN: &str = "ominous_item_spawner.spawn_item_begin";
+    pub const OMINOUS_ITEM_SPAWNER_ABOUT_TO_SPAWN_ITEM: &str =
+        "ominous_item_spawner.about_to_spawn_item";
+    pub const IMITATE_BOGGED: &str = "imitate.bogged";
+    pub const VAULT_REJECT_REWARDED_PLAYER: &str = "vault.reject_rewarded_player";
+    pub const IMITATE_DROWNED: &str = "imitate.drowned";
+    pub const SPONGE_ABSORB: &str = "sponge.absorb";
+    pub const IMITATE_CREAKING: &str = "imitate.creaking";
+    pub const BLOCK_CREAKING_HEART_TRAIL: &str = "block.creaking_heart.trail";
+    pub const CREAKING_HEART_SPAWN: &str = "creaking_heart_spawn";
+    pub const ACTIVATE: &str = "activate";
+    pub const DEACTIVATE: &str = "deactivate";
+    pub const FREEZE: &str = "freeze";
+    pub const UNFREEZE: &str = "unfreeze";
+    pub const OPEN: &str = "open";
+    pub const OPEN_LONG: &str = "open_long";
+    pub const CLOSE: &str = "close";
+    pub const CLOSE_LONG: &str = "close_long";
+    pub const IMITATE_PHANTOM: &str = "imitate.phantom";
+    pub const IMITATE_ZOGLIN: &str = "imitate.zoglin";
+    pub const IMITATE_GUARDIAN: &str = "imitate.guardian";
+    pub const IMITATE_RAVAGER: &str = "imitate.ravager";
+    pub const IMITATE_PILLAGER: &str = "imitate.pillager";
+    pub const PLACE_IN_WATER: &str = "place_in_water";
+    pub const STATE_CHANGE: &str = "state_change";
+    pub const IMITATE_HAPPY_GHAST: &str = "imitate.happy_ghast";
+    pub const ARMOR_UNEQUIP_GENERIC: &str = "armor.unequip_generic";
+    pub const AMBIENT_WEATHER_THE_END_LIGHT_FLASH: &str = "ambient.weather.the_end_light_flash";
+    pub const LEAD_LEASH: &str = "lead.leash";
+    pub const LEAD_UNLEASH: &str = "lead.unleash";
+    pub const LEAD_BREAK: &str = "lead.break";
+    pub const UNSADDLE: &str = "unsaddle";
+    pub const ARMOR_EQUIP_COPPER: &str = "armor.equip_copper";
+    pub const PLACE_ITEM: &str = "place_item";
+    pub const SINGLE_SWAP: &str = "single_swap";
+    pub const MULTI_SWAP: &str = "multi_swap";
+    pub const ITEM_ENCHANT_LUNGE1: &str = "item.enchant.lunge1";
+    pub const ITEM_ENCHANT_LUNGE2: &str = "item.enchant.lunge2";
+    pub const ITEM_ENCHANT_LUNGE3: &str = "item.enchant.lunge3";
+    pub const ATTACK_CRITICAL: &str = "attack.critical";
+    pub const ITEM_SPEAR_ATTACK_HIT: &str = "item.spear.attack_hit";
+    pub const ITEM_SPEAR_ATTACK_MISS: &str = "item.spear.attack_miss";
+    pub const ITEM_WOODEN_SPEAR_ATTACK_HIT: &str = "item.wooden_spear.attack_hit";
+    pub const ITEM_WOODEN_SPEAR_ATTACK_MISS: &str = "item.wooden_spear.attack_miss";
+    pub const IMITATE_PARCHED: &str = "imitate.parched";
+    pub const IMITATE_CAMEL_HUSK: &str = "imitate.camel_husk";
+    pub const ITEM_SPEAR_USE: &str = "item.spear.use";
+    pub const ITEM_WOODEN_SPEAR_USE: &str = "item.wooden_spear.use";
+    pub const SADDLE_IN_WATER: &str = "saddle_in_water";
+    pub const ITEM_STONE_SPEAR_ATTACK_HIT: &str = "item.stone_spear.attack_hit";
+    pub const ITEM_IRON_SPEAR_ATTACK_HIT: &str = "item.iron_spear.attack_hit";
+    pub const ITEM_COPPER_SPEAR_ATTACK_HIT: &str = "item.copper_spear.attack_hit";
+    pub const ITEM_GOLDEN_SPEAR_ATTACK_HIT: &str = "item.golden_spear.attack_hit";
+    pub const ITEM_DIAMOND_SPEAR_ATTACK_HIT: &str = "item.diamond_spear.attack_hit";
+    pub const ITEM_NETHERITE_SPEAR_ATTACK_HIT: &str = "item.netherite_spear.attack_hit";
+    pub const ITEM_STONE_SPEAR_ATTACK_MISS: &str = "item.stone_spear.attack_miss";
+    pub const ITEM_IRON_SPEAR_ATTACK_MISS: &str = "item.iron_spear.attack_miss";
+    pub const ITEM_COPPER_SPEAR_ATTACK_MISS: &str = "item.copper_spear.attack_miss";
+    pub const ITEM_GOLDEN_SPEAR_ATTACK_MISS: &str = "item.golden_spear.attack_miss";
+    pub const ITEM_DIAMOND_SPEAR_ATTACK_MISS: &str = "item.diamond_spear.attack_miss";
+    pub const ITEM_NETHERITE_SPEAR_ATTACK_MISS: &str = "item.netherite_spear.attack_miss";
+    pub const ITEM_STONE_SPEAR_USE: &str = "item.stone_spear.use";
+    pub const ITEM_IRON_SPEAR_USE: &str = "item.iron_spear.use";
+    pub const ITEM_COPPER_SPEAR_USE: &str = "item.copper_spear.use";
+    pub const ITEM_GOLDEN_SPEAR_USE: &str = "item.golden_spear.use";
+    pub const ITEM_DIAMOND_SPEAR_USE: &str = "item.diamond_spear.use";
+    pub const ITEM_NETHERITE_SPEAR_USE: &str = "item.netherite_spear.use";
+    pub const PAUSE_GROWTH: &str = "pause_growth";
+    pub const RESET_GROWTH: &str = "reset_growth";
+    pub const PUSHED_BY_PLAYER: &str = "pushed_by_player";
+    pub const BOUNCE: &str = "bounce";
+    pub const SLIME_LANDING: &str = "slime_landing";
+    pub const ABSORB_BLOCK: &str = "absorb_block";
+    pub const EJECT_BLOCK: &str = "eject_block";
+    pub const GEYSER_ERUPTION_START: &str = "geyser_eruption_start";
+    pub const GEYSER_ERUPTION_ACTIVE: &str = "geyser_eruption_active";
+    pub const RECORD_BOUNCE: &str = "record.bounce";
+    pub const BUCKET_FILL_LAND_ANIMAL: &str = "bucket.fill.land_animal";
+    pub const BUCKET_EMPTY_LAND_ANIMAL: &str = "bucket.empty.land_animal";
+    pub const GEYSER_CONTINUOUS_ERUPTION_START: &str = "geyser_continuous_eruption_start";
+    pub const GEYSER_CONTINUOUS_ERUPTION_ACTIVE: &str = "geyser_continuous_eruption_active";
+    pub const MOUNT: &str = "mount";
+    pub const DISMOUNT: &str = "dismount";
+    pub const STRAW_BED_BREAK_LEAVE: &str = "straw_bed.break_leave";
+    pub const UNDEFINED: &str = "undefined";
+}
+
+/**
+Particle effect names, for the `effect_name` field of a `SpawnParticleEffect` packet.
+
+# Example
+
+Show music notes above a block to every player:
+
+```
+use bss_api::prelude::*;
+
+fn notes(server: &Server, x: i32, y: i32, z: i32) -> Result<(), String> {
+    server.broadcast_packet(
+        "SpawnParticleEffect",
+        &json!({
+            "dimension_id": 0,
+            "actor_id": -1,
+            "position": { "x": x as f32 + 0.5, "y": y as f32 + 1.2, "z": z as f32 + 0.5 },
+            "effect_name": particle::NOTE_PARTICLE,
+            "molang_variables": null
+        }),
+    )
+}
+```
+*/
+#[allow(missing_docs)]
+pub mod particle {
+    pub const ARROW_SPELL_EMITTER: &str = "minecraft:arrow_spell_emitter";
+    pub const BASIC_BUBBLE_PARTICLE: &str = "minecraft:basic_bubble_particle";
+    pub const BIOME_TINTED_LEAVES_PARTICLE: &str = "minecraft:biome_tinted_leaves_particle";
+    pub const CAULDRON_SPELL_EMITTER: &str = "minecraft:cauldron_spell_emitter";
+    pub const CHERRY_LEAVES_PARTICLE: &str = "minecraft:cherry_leaves_particle";
+    pub const CONDUIT_ABSORB_PARTICLE: &str = "minecraft:conduit_absorb_particle";
+    pub const CONDUIT_ATTACK_EMITTER: &str = "minecraft:conduit_attack_emitter";
+    pub const DEATH_EXPLOSION_EMITTER: &str = "minecraft:death_explosion_emitter";
+    pub const ELEPHANT_TOOTH_PASTE_VAPOR_PARTICLE: &str =
+        "minecraft:elephant_tooth_paste_vapor_particle";
+    pub const EYE_OF_ENDER_BUBBLE_PARTICLE: &str = "minecraft:eye_of_ender_bubble_particle";
+    pub const FALLING_DUST_CONCRETE_POWDER_PARTICLE: &str =
+        "minecraft:falling_dust_concrete_powder_particle";
+    pub const FALLING_DUST_DRAGON_EGG_PARTICLE: &str = "minecraft:falling_dust_dragon_egg_particle";
+    pub const FALLING_DUST_GRAVEL_PARTICLE: &str = "minecraft:falling_dust_gravel_particle";
+    pub const FALLING_DUST_RED_SAND_PARTICLE: &str = "minecraft:falling_dust_red_sand_particle";
+    pub const FALLING_DUST_SAND_PARTICLE: &str = "minecraft:falling_dust_sand_particle";
+    pub const FALLING_DUST_SCAFFOLDING_PARTICLE: &str =
+        "minecraft:falling_dust_scaffolding_particle";
+    pub const FALLING_DUST_TOP_SNOW_PARTICLE: &str = "minecraft:falling_dust_top_snow_particle";
+    pub const FIREFLY_PARTICLE: &str = "minecraft:firefly_particle";
+    pub const FISH_HOOK_PARTICLE: &str = "minecraft:fish_hook_particle";
+    pub const FISH_POS_PARTICLE: &str = "minecraft:fish_pos_particle";
+    pub const GLOW_PARTICLE: &str = "minecraft:glow_particle";
+    pub const GUARDIAN_ATTACK_PARTICLE: &str = "minecraft:guardian_attack_particle";
+    pub const GUARDIAN_WATER_MOVE_PARTICLE: &str = "minecraft:guardian_water_move_particle";
+    pub const HUGE_EXPLOSION_LAB_MISC_EMITTER: &str = "minecraft:huge_explosion_lab_misc_emitter";
+    pub const INFESTED_EMITTER: &str = "minecraft:infested_emitter";
+    pub const INK_EMITTER: &str = "minecraft:ink_emitter";
+    pub const LAB_TABLE_HEATBLOCK_DUST_PARTICLE: &str =
+        "minecraft:lab_table_heatblock_dust_particle";
+    pub const LAB_TABLE_MISC_MYSTICAL_PARTICLE: &str = "minecraft:lab_table_misc_mystical_particle";
+    pub const MAGNESIUM_SALTS_EMITTER: &str = "minecraft:magnesium_salts_emitter";
+    pub const MISC_FIRE_VAPOR_PARTICLE: &str = "minecraft:misc_fire_vapor_particle";
+    pub const MOBSPELL_EMITTER: &str = "minecraft:mobspell_emitter";
+    pub const NOTE_PARTICLE: &str = "minecraft:note_particle";
+    pub const NOXIOUS_GAS_PARTICLE: &str = "minecraft:noxious_gas_particle";
+    pub const OBSIDIAN_GLOW_DUST_PARTICLE: &str = "minecraft:obsidian_glow_dust_particle";
+    pub const OMINOUS_SPAWNING_PARTICLE: &str = "minecraft:ominous_spawning_particle";
+    pub const OOZING_EMITTER: &str = "minecraft:oozing_emitter";
+    pub const RAID_OMEN_EMITTER: &str = "minecraft:raid_omen_emitter";
+    pub const REDSTONE_ORE_DUST_PARTICLE: &str = "minecraft:redstone_ore_dust_particle";
+    pub const REDSTONE_REPEATER_DUST_PARTICLE: &str = "minecraft:redstone_repeater_dust_particle";
+    pub const REDSTONE_TORCH_DUST_PARTICLE: &str = "minecraft:redstone_torch_dust_particle";
+    pub const REDSTONE_WIRE_DUST_PARTICLE: &str = "minecraft:redstone_wire_dust_particle";
+    pub const SILVERFISH_GRIEF_EMITTER: &str = "minecraft:silverfish_grief_emitter";
+    pub const SMALL_FLAME_PARTICLE: &str = "minecraft:small_flame_particle";
+    pub const SPONGE_ABSORB_WATER_PARTICLE: &str = "minecraft:sponge_absorb_water_particle";
+    pub const SQUID_FLEE_PARTICLE: &str = "minecraft:squid_flee_particle";
+    pub const SQUID_MOVE_PARTICLE: &str = "minecraft:squid_move_particle";
+    pub const SULFUR_BUBBLE_PARTICLE: &str = "minecraft:sulfur_bubble_particle";
+    pub const TRIAL_OMEN_EMITTER: &str = "minecraft:trial_omen_emitter";
+    pub const UNDERWATER_TORCH_PARTICLE: &str = "minecraft:underwater_torch_particle";
+    pub const WATER_EVAPORATION_BUCKET_EMITTER: &str = "minecraft:water_evaporation_bucket_emitter";
+    pub const WATER_SPLASH_PARTICLE: &str = "minecraft:water_splash_particle";
+    pub const WATER_WAKE_PARTICLE: &str = "minecraft:water_wake_particle";
+    pub const WEAVING_EMITTER: &str = "minecraft:weaving_emitter";
+    pub const WIND_CHARGED_EMITTER: &str = "minecraft:wind_charged_emitter";
+    pub const WITCHSPELL_EMITTER: &str = "minecraft:witchspell_emitter";
+}

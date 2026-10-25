@@ -1,0 +1,142 @@
+mod block;
+mod dragon;
+mod entity;
+mod inventory;
+mod lifecycle;
+mod mob;
+mod player;
+mod portal;
+mod projectile;
+mod redstone;
+mod villager;
+mod world;
+
+pub use block::*;
+pub use dragon::*;
+pub use entity::*;
+pub use inventory::*;
+pub use lifecycle::*;
+pub use mob::*;
+pub use player::*;
+pub use portal::*;
+pub use projectile::*;
+pub use redstone::*;
+pub use villager::*;
+pub use world::*;
+
+/// The stable number and name of every behaviour event.
+pub const BEHAVIOUR_EVENTS: &[(u32, &str)] = &[
+    (1000, "sign_change"),
+    (1001, "block_use"),
+    (1002, "block_grow"),
+    (1003, "tree_grow"),
+    (1004, "block_fall"),
+    (1005, "block_land"),
+    (1006, "block_form"),
+    (1007, "block_ignite"),
+    (1008, "tnt_prime"),
+    (1009, "note_play"),
+    (1010, "jukebox_change"),
+    (1011, "lectern_change"),
+    (1012, "lectern_page"),
+    (1013, "item_cook"),
+    (1014, "fuel_burn"),
+    (1015, "brew"),
+    (1016, "beacon_effect"),
+    (1017, "liquid_flow"),
+    (1018, "sculk_shriek"),
+    (1019, "explosion"),
+    (1020, "explosion_blocks"),
+    (1021, "lightning_strike"),
+    (1022, "rain_change"),
+    (1023, "thunder_change"),
+    (1024, "weather_effect"),
+    (1097, "spawn_change"),
+    (1098, "world_load"),
+    (1025, "tick_rate_change"),
+    (1026, "redstone_power"),
+    (1027, "piston_move"),
+    (1028, "piston_push"),
+    (1029, "minecart_activate"),
+    (1030, "minecart_transfer"),
+    (1031, "minecart_pickup"),
+    (1032, "block_dispense"),
+    (1033, "item_transfer"),
+    (1034, "hopper_pickup"),
+    (1035, "tripwire"),
+    (1036, "detector_rail"),
+    (1037, "sculk_vibration"),
+    (1038, "crafter_craft"),
+    (1039, "dispenser_equip"),
+    (1040, "pressure_plate"),
+    (1041, "portal_create"),
+    (1042, "player_portal"),
+    (1043, "entity_portal"),
+    (1044, "end_gateway"),
+    (1045, "dragon_spawn"),
+    (1046, "dragon_phase"),
+    (1047, "dragon_death"),
+    (1048, "player_damage"),
+    (1049, "player_heal"),
+    (1050, "player_combust"),
+    (1051, "food_change"),
+    (1052, "experience_change"),
+    (1053, "experience_pickup"),
+    (1054, "item_mend"),
+    (1055, "item_damage"),
+    (1056, "item_break"),
+    (1057, "shield_block"),
+    (1058, "totem_use"),
+    (1059, "player_warp"),
+    (1060, "player_mount"),
+    (1061, "vehicle_move"),
+    (1062, "crossbow_load"),
+    (1063, "trident_riptide"),
+    (1064, "fish"),
+    (1065, "horn_blow"),
+    (1066, "book_edit"),
+    (1067, "offhand_change"),
+    (1099, "player_bed_enter"),
+    (1100, "player_bed_leave"),
+    (1101, "player_view_distance_change"),
+    (1102, "player_kick"),
+    (1103, "player_jump"),
+    (1104, "player_effect_add"),
+    (1105, "player_effect_remove"),
+    (1111, "ddui_response"),
+    (1112, "ddui_close"),
+    (1068, "craft_item"),
+    (1069, "enchant_item"),
+    (1070, "anvil_use"),
+    (1071, "grindstone_use"),
+    (1072, "smithing_use"),
+    (1073, "beacon_change"),
+    (1074, "projectile_launch"),
+    (1075, "projectile_hit"),
+    (1076, "projectile_pickup"),
+    (1077, "potion_splash"),
+    (1078, "entity_place"),
+    (1079, "entity_touch"),
+    (1080, "entity_hurt"),
+    (1081, "entity_killed"),
+    (1082, "armor_stand_change"),
+    (1083, "entity_combust"),
+    (1084, "item_spawn"),
+    (1085, "item_despawn"),
+    (1086, "mob_spawn"),
+    (1087, "mob_despawn"),
+    (1088, "mob_target"),
+    (1089, "mob_attack"),
+    (1090, "mob_breed"),
+    (1091, "mob_interact"),
+    (1092, "mob_tame"),
+    (1093, "mob_leash"),
+    (1094, "villager_profession"),
+    (1095, "villager_trade"),
+    (1096, "villager_level_up"),
+    (1106, "server_started"),
+    (1107, "server_stop"),
+    (1108, "console_command"),
+    (1109, "plugin_enable"),
+    (1110, "plugin_disable"),
+];
