@@ -120,6 +120,8 @@ impl Event for Guard {
 | `on_player_jump` | A player presses the jump key, once for each press, unless they are flying. Cancelling changes nothing. | `player: String`, `x: f32`, `y: f32`, `z: f32` | --- |
 | `on_player_effect_add` | A player is about to get a potion effect from what they drink, eat or use: a potion, food, a totem of undying; `effect` is its name, such as `minecraft:speed`. Effects given by a command, a beacon or a plugin are not asked. Cancelled, they do not get it. | `player: String`, `effect: String` | `amplifier: u32`, `duration: i32` |
 | `on_player_effect_remove` | A player loses a potion effect: it ran out, milk or a command cleared it, or a totem replaced it. Cancelling changes nothing. | `player: String`, `effect: String`, `amplifier: u32` | --- |
+| `on_ddui_response` | A player used a control of a data-driven screen: pressed a button, switched a toggle, moved a slider, chose an option or typed in a text field. The server has checked the value. Cancelled, the control goes back to what it was and the handler of the screen does not see it. | `player: String`, `form_id: u32`, `element: String`, `kind: String`, `number: i32`, `flag: bool`, `text: String` | --- |
+| `on_ddui_close` | A data-driven screen closed. Cancelling changes nothing. | `player: String`, `form_id: u32`, `reason: String` | --- |
 
 ## Crafting and stations (`event::inventory`)
 
@@ -184,3 +186,78 @@ impl Event for Guard {
 | `on_console_command` | A line is typed in the server console, before it runs. Change `command` to run something else. Cancelled, nothing runs. | --- | `command: String` |
 | `on_plugin_enable` | A plugin finished loading and is now enabled, itself included. Cancelling changes nothing. | `name: String`, `version: String` | --- |
 | `on_plugin_disable` | A plugin is about to be disabled, by a reload, an unload or the server stopping. Cancelling does not keep it loaded. | `name: String`, `version: String` | --- |
+
+# Core events
+
+The first events of the `Event` trait, written by hand in `registry/events/handler.rs`. Those
+marked as cancellable return `bool`: `true` cancels them. Editable fields have a `set_<field>`.
+
+## Players (`event::player`)
+
+| Event | When | Fields | Editable | Cancellable |
+| --- | --- | --- | --- | --- |
+| `on_join` | A player has finished joining and spawns in the world. | `name: String` | `message: String` | no |
+| `on_quit` | A player leaves the server. | `name: String` | `message: String` | no |
+| `on_login` | A client has logged in, before it joins the world. | `name: String`, `xuid: String`, `uuid: String`, `ip: String`, `authenticated: bool`, `client_data: ClientData`, `protocol: u32`, `negotiated_protocol: u32`, `auth_info: AuthInfo`, `token: Jwt`, `client_data_token: ClientDataJwt` | --- | no |
+| `on_death` | A player dies. | `name: String`, `killer: String` | `message: String`, `keep_inventory: bool` | no |
+| `on_respawn` | A player respawns after death. | `name: String` | `position: (f32, f32, f32)` | no |
+| `on_toggle` | A player starts or stops sneaking, sprinting, swimming or gliding. | `name: String`, `kind: ToggleKind`, `active: bool` | --- | no |
+| `on_chat` | A player sends a chat message. | `name: String`, `source_name: String`, `message: String`, `message_type: u8`, `xbox_user_id: String`, `platform_chat_id: String` | `formatted: String` | yes |
+| `on_move` | A player moves or turns. | `name: String`, `from: (f32, f32, f32)`, `to: (f32, f32, f32)`, `pitch: f32`, `yaw: f32`, `sneaking: bool`, `sprinting: bool` | --- | yes |
+| `on_command` | A player sends a command, before the server runs it. | `name: String`, `command: String` | --- | yes |
+| `on_interact` | A player interacts with the world: clicks a block, starts or stops breaking it, uses an item in the air... | `name: String`, `action: u32`, `x: i32`, `y: i32`, `z: i32`, `face: u32`, `item_id: i16`, `block_runtime_id: u32`, `hotbar_slot: i32`, `click_x: f32`, `click_y: f32`, `click_z: f32` | --- | yes |
+| `on_animation` | A player plays an animation, such as swinging their arm. | `name: String`, `action: u32`, `data: f32` | --- | yes |
+| `on_item_held` | A player selects another hotbar slot. | `name: String`, `old_slot: u32`, `new_slot: u32`, `item_id: i16` | --- | yes |
+| `on_item_use` | A player uses the item in their hand, on a block or in the air. | `name: String`, `item_id: i16`, `block_runtime_id: u32`, `action: u32`, `x: i32`, `y: i32`, `z: i32`, `face: u8`, `hotbar_slot: i32`, `click_x: f32`, `click_y: f32`, `click_z: f32` | --- | yes |
+| `on_drop_item` | A player drops an item from their inventory. | `name: String`, `item_id: i16`, `block_runtime_id: u32`, `count: u8`, `source_slot: u32` | --- | yes |
+| `on_pickup_item` | A player picks up an item from the ground. | `name: String`, `item_id: i16`, `block_runtime_id: u32`, `count: u8`, `entity_id: u64` | --- | yes |
+| `on_consume` | A player finishes eating or drinking an item. | `name: String`, `item_id: i16` | `food_points: u32`, `saturation: f32` | yes |
+| `on_teleport` | A player is about to be teleported. | `name: String`, `from: (f32, f32, f32)`, `to: (f32, f32, f32)` | --- | yes |
+| `on_gamemode_change` | A player's game mode is about to change. | `name: String`, `from: i32`, `to: i32` | --- | yes |
+| `on_armor_equip` | A player equips a piece of armor. | `name: String`, `item_id: i16`, `count: u8`, `block_runtime_id: u32`, `source_slot: u32`, `armor_slot: u32` | --- | yes |
+| `on_bucket_use` | A player fills or empties a bucket. | `name: String`, `item_id: i16`, `x: i32`, `y: i32`, `z: i32`, `filling: bool` | --- | no |
+| `on_emote` | A player plays an emote. | `name: String`, `entity_id: u64`, `duration: u32`, `xuid: String`, `platform_id: String`, `flags: u8` | `emote_id: String` | yes |
+| `on_skin_change` | A player changes skin while in game. | `name: String`, `skin: Vec<u8>`, `new_skin_name: String`, `old_skin_name: String` | --- | yes |
+| `on_form_response` | A player answers or closes a form. | `name: String`, `form_id: u32`, `response: Option<String>` | --- | yes |
+
+## Blocks and the world (`event::world`)
+
+| Event | When | Fields | Editable | Cancellable |
+| --- | --- | --- | --- | --- |
+| `on_block_break` | A player breaks a block. | `name: String`, `x: i32`, `y: i32`, `z: i32`, `runtime_id: u32`, `item_id: i16`, `held_item: i16`, `held_uid: u64`, `held_damage: u16`, `final_break: bool` | `drop: bool`, `drop_item: i16`, `drop_count: u8` | yes |
+| `on_block_place` | A player places a block. | `name: String`, `x: i32`, `y: i32`, `z: i32`, `runtime_id: u32`, `face: crate::math::BlockFace`, `item_id: i16` | --- | yes |
+| `on_block_pick` | A player picks a block with the middle mouse button. | `name: String`, `x: i32`, `y: i32`, `z: i32`, `runtime_id: u32`, `item_id: i16`, `hotbar_slot: u32` | --- | yes |
+| `on_block_break_progress` | A player starts, continues or stops breaking a block. | `name: String`, `x: i32`, `y: i32`, `z: i32`, `runtime_id: u32`, `stage: u32` | --- | yes |
+| `on_furnace_smelt` | A furnace finishes smelting an item. | `x: i32`, `y: i32`, `z: i32`, `input_item_id: i16`, `result_item_id: i16` | --- | no |
+| `on_random_tick` | A block receives a random tick, which drives slow changes such as crop growth or leaf decay. | `x: i32`, `y: i32`, `z: i32`, `runtime_id: u32` | --- | yes |
+| `on_chunk_load` | A chunk is loaded into memory. | `cx: i32`, `cz: i32`, `generated: bool` | --- | no |
+| `on_chunk_unload` | A chunk is unloaded from memory. | `cx: i32`, `cz: i32` | --- | no |
+| `on_weather_change` | The weather changes. | `kind: u8`, `level: f32` | --- | no |
+| `on_world_save` | A world is saved to disk. | `name: String` | --- | no |
+
+## Entities (`event::entity`)
+
+| Event | When | Fields | Editable | Cancellable |
+| --- | --- | --- | --- | --- |
+| `on_entity_spawn` | An entity appears in the world, whatever the reason. | `entity_id: u64`, `identifier: String`, `x: f32`, `y: f32`, `z: f32`, `world_id: u32` | --- | no |
+| `on_entity_despawn` | An entity is removed from the world, whatever the reason. | `entity_id: u64`, `identifier: String` | --- | no |
+| `on_entity_damage` | A player attacks an entity in melee. | `attacker: String`, `attacker_entity_id: u64`, `target_entity_id: u64`, `weapon_item_id: i16` | `damage: f32`, `knockback_force: f32`, `knockback_vertical: f32`, `attack_cooldown: u64` | yes |
+| `on_entity_death` | An entity dies. | `entity_id: u64`, `identifier: String` | --- | yes |
+| `on_entity_interact` | A player attacks or interacts with an entity. | `player_name: String`, `entity_id: u64`, `identifier: String`, `action: u32` | --- | no |
+
+## Inventories (`event::inventory`)
+
+| Event | When | Fields | Editable | Cancellable |
+| --- | --- | --- | --- | --- |
+| `on_inventory_open` | A container window is about to open for a player. | `name: String`, `window_id: u8`, `window_type: u8` | --- | yes |
+| `on_inventory_close` | A container window closes. | `name: String`, `window_id: u8`, `window_type: u8`, `server: bool` | --- | no |
+| `on_inventory_transaction` | A player moves, swaps, drops or uses items in an inventory. | `name: String`, `request_id: i32`, `action_count: u32`, `actions: Vec<TransactionAction>` | --- | yes |
+
+## The server and the network (`event::server`)
+
+| Event | When | Fields | Editable | Cancellable |
+| --- | --- | --- | --- | --- |
+| `on_tick` | The server runs a game tick, twenty times per second. | `tick: u64` | --- | no |
+| `on_server_settings_request` | A player opens the server settings page of their game settings. | `name: String` | --- | no |
+| `on_server_bound` | A player sends a game packet to the server, before the server reads it. | `entity_id: u64`, `name: String`, `packet_id: u32`, `data: Vec<u8>`, `player: String` | --- | yes |
+| `on_client_bound` | The server sends a game packet to a player, before it goes out. | `entity_id: u64`, `name: String`, `packet_id: u32`, `data: Vec<u8>`, `player: String` | --- | yes |
