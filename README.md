@@ -1,4 +1,4 @@
-# bss-api 1.10
+# bss-api 1.12
 
 The plugin API of Bedrock Super Server
 
@@ -8,6 +8,7 @@ A plugin is a WebAssembly module, one `.wasm` file for every system and processo
 
 | bss-api | Bedrock Super Server | Minecraft |
 |---|---|---|
+| 1.12 | 0.2.40 | Bedrock 1.26.60 |
 | 1.10 | 0.2.30 | Bedrock 1.26.52 |
 | 1.8 | 0.2.24 | Bedrock 1.26.52 |
 

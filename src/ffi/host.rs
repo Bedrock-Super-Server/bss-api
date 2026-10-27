@@ -500,6 +500,14 @@ pub struct HostApi {
     /// that name has the state at that value.
     pub block_with_state:
         Option<unsafe extern "C" fn(runtime_id: u32, key: FfiStr, value: FfiStr) -> u32>,
+    /// Returns the view distance the player has now, in chunks.
+    pub player_view_distance: Option<unsafe extern "C" fn(handle: u64) -> i32>,
+    /// Returns the view distance the player's client asked for last, in chunks: the most it can be given.
+    pub player_requested_view_distance: Option<unsafe extern "C" fn(handle: u64) -> i32>,
+    /// Lets the player see at most `chunks` chunks, more or less than the server's `view_distance`; zero or less gives the server's own limit back. The player gets the view distance they asked for within it: it grows or shrinks at once, and is granted the same way when their client asks again. Returns whether the player was found.
+    pub player_set_view_distance: Option<unsafe extern "C" fn(handle: u64, chunks: i32) -> bool>,
+    /// Returns the `view_distance` of the server, in chunks.
+    pub server_view_distance: Option<unsafe extern "C" fn() -> i32>,
 }
 
 #[repr(C)]

@@ -188,6 +188,25 @@ impl Player {
         host_call!(self.host, player_ping(self.handle)).unwrap_or(0)
     }
 
+    /// Returns the view distance the player has now, in chunks.
+    pub fn view_distance(&self) -> i32 {
+        host_call!(self.host, player_view_distance(self.handle)).unwrap_or(0)
+    }
+
+    /// Returns the view distance the player's client asked for last, in chunks. It is the most they can be given, whatever the limit.
+    pub fn requested_view_distance(&self) -> i32 {
+        host_call!(self.host, player_requested_view_distance(self.handle)).unwrap_or(0)
+    }
+
+    /**
+    Lets the player see at most `chunks` chunks, more or less than the `view_distance` of the server.
+
+    They get the view distance they asked for within that limit, never more than their client asked: it changes at once, with the chunks sent or dropped, and the same limit answers every later request of their client. Zero or less gives the server's own limit back. The limit is not kept when the player leaves.
+    */
+    pub fn set_view_distance(&self, chunks: i32) -> bool {
+        host_call!(self.host, player_set_view_distance(self.handle, chunks)).unwrap_or(false)
+    }
+
     /// Returns the IP address and port the player connects from.
     pub fn ip(&self) -> String {
         host_call!(self.host, player_ip(self.handle))

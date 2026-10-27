@@ -19,7 +19,7 @@ only reads what the other one wrote. Those headers never change.
 pub const ABI_MAJOR: u16 = 1;
 
 /// Grows with every addition to the ABI.
-pub const ABI_MINOR: u16 = 10;
+pub const ABI_MINOR: u16 = 12;
 
 /// The value [`HostHeader::magic`] holds: `BSSHOST1` in ASCII.
 pub const HOST_MAGIC: u64 = u64::from_be_bytes(*b"BSSHOST1");

@@ -266,7 +266,7 @@ impl Server {
         .unwrap_or(false)
     }
 
-    /// Bans a player, by name or XUID, or an IP address for `duration_secs` seconds; `0` bans for ever. The ban follows the player's XUID, recorded at once for an online player and at their next login otherwise. Banning an online player also bans their IP, unless it is a proxy or a trusted address, and kicks them with `reason`.
+    /// Bans a player, by name or XUID, or an IP address for `duration_secs` seconds; `0` bans for ever. The ban follows the player's XUID, recorded at once for an online player and at their next login otherwise. Banning an online player also bans their IP, unless it is a trusted address, and kicks them with `reason`.
     pub fn ban(&self, target: &str, duration_secs: u64, reason: &str) {
         host_call!(
             self.host,
@@ -292,6 +292,11 @@ impl Server {
     /// Turns the whitelist on or off. Returns `false` when it already was.
     pub fn whitelist_enabled(&self, enabled: bool) -> bool {
         host_call!(self.host, server_whitelist_set(enabled)).unwrap_or(false)
+    }
+
+    /// Returns the `view_distance` of the server, in chunks: what a player gets unless a plugin sets another limit with [`Player::set_view_distance`](crate::player::Player::set_view_distance).
+    pub fn view_distance(&self) -> i32 {
+        host_call!(self.host, server_view_distance()).unwrap_or(0)
     }
 
     /// Makes a player, by name or XUID, an operator; the entry follows their XUID. Returns `false` when they already were.
