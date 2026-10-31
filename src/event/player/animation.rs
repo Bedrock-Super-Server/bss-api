@@ -1,7 +1,7 @@
 /**
 A player plays an animation, such as swinging their arm.
 
-Returning `true` from a handler hides the animation from other players.
+`event.cancel()` hides the animation from other players.
 
 Handled by [`Event::on_animation`](crate::prelude::Event::on_animation).
 */
@@ -12,4 +12,11 @@ pub struct AnimationEvent {
     pub action: u32,
     /// Extra value sent with the animation.
     pub data: f32,
+}
+
+impl AnimationEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
+    }
 }

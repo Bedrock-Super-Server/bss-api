@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A player takes the result out of an anvil.
 
-Returning `true` from a handler cancels the operation.
+`event.cancel()` cancels the operation.
 
 Handled by [`Event::on_anvil_use`](crate::prelude::Event::on_anvil_use) and [`Server::on_anvil_use`](crate::server::Server::on_anvil_use).
 */
@@ -15,6 +15,13 @@ pub struct AnvilUseEvent {
     /// New name given to the item, or an empty string when it is not renamed.
     pub name: String,
     pub(crate) levels: Cell<i32>,
+}
+
+impl AnvilUseEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl AnvilUseEvent {

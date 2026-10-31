@@ -14,5 +14,5 @@ pub mod wasm;
 pub use abi::*;
 pub use events::*;
 pub use host::HostApi;
-pub use version::{ABI_MAJOR, ABI_MINOR};
+pub use version::{ABI_MAJOR, ABI_MINOR, GRANTS};
 pub use vtable::{PluginDescribe, PluginVtable};

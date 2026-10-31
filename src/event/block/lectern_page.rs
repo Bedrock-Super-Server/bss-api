@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A player turns the page of a book on a lectern.
 
-Returning `true` from a handler keeps the current page.
+`event.cancel()` keeps the current page.
 
 Handled by [`Event::on_lectern_page`](crate::prelude::Event::on_lectern_page) and [`Server::on_lectern_page`](crate::server::Server::on_lectern_page).
 */
@@ -17,6 +17,13 @@ pub struct LecternPageEvent {
     /// Z coordinate of the block.
     pub z: i32,
     pub(crate) page: Cell<i32>,
+}
+
+impl LecternPageEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl LecternPageEvent {

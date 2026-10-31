@@ -1,7 +1,7 @@
 /**
 A block receives a random tick, which drives slow changes such as crop growth or leaf decay.
 
-Returning `true` from a handler skips this tick.
+`event.cancel()` skips this tick.
 
 Handled by [`Event::on_random_tick`](crate::prelude::Event::on_random_tick).
 */

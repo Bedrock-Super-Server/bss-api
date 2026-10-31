@@ -11,7 +11,7 @@ use crate::ffi::behaviour::{
     LiquidFlowEventData, NotePlayEventData, SculkShriekEventData, SignChangeEventData,
     TntPrimeEventData, TreeGrowEventData,
 };
-use crate::registry::hook::{Cancellable, hook, register};
+use crate::registry::hook::{Cancellable, Verdict, hook, register};
 use crate::server::{Server, ffi_string};
 
 thread_local! {
@@ -36,19 +36,19 @@ hook!(
 
 impl Cancellable for SignChangeEvent {}
 
+impl SignChangeEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player finishes editing the text of a sign.
-
-    Returning `true` leaves the sign unchanged.
-
-    See [`SignChangeEvent`].
-    */
-    pub fn on_sign_change(
+    pub fn on_sign_change<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &SignChangeEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &SignChangeEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<sign_change>(handler);
+        register::<sign_change, V>(handler);
     }
 }
 
@@ -68,19 +68,19 @@ hook!(
 
 impl Cancellable for BlockUseEvent {}
 
+impl BlockUseEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player uses a block: opens a door or a container, presses a button, flips a lever, rings a bell...
-
-    Returning `true` cancels the use: the block does not react.
-
-    See [`BlockUseEvent`].
-    */
-    pub fn on_block_use(
+    pub fn on_block_use<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &BlockUseEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &BlockUseEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<block_use>(handler);
+        register::<block_use, V>(handler);
     }
 }
 
@@ -103,19 +103,19 @@ hook!(
 
 impl Cancellable for BlockGrowEvent {}
 
+impl BlockGrowEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a plant grows a stage: crops, stems, sweet berries, cocoa, cactus, sugar cane...
-
-    Returning `true` stops this growth step.
-
-    See [`BlockGrowEvent`].
-    */
-    pub fn on_block_grow(
+    pub fn on_block_grow<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &BlockGrowEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &BlockGrowEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<block_grow>(handler);
+        register::<block_grow, V>(handler);
     }
 }
 
@@ -133,19 +133,19 @@ hook!(
 
 impl Cancellable for TreeGrowEvent {}
 
+impl TreeGrowEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a sapling or a fungus grows into a tree.
-
-    Returning `true` keeps the sapling as it is.
-
-    See [`TreeGrowEvent`].
-    */
-    pub fn on_tree_grow(
+    pub fn on_tree_grow<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &TreeGrowEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &TreeGrowEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<tree_grow>(handler);
+        register::<tree_grow, V>(handler);
     }
 }
 
@@ -163,19 +163,19 @@ hook!(
 
 impl Cancellable for BlockFallEvent {}
 
+impl BlockFallEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a block affected by gravity, such as sand or an anvil, starts to fall.
-
-    Returning `true` keeps the block in place.
-
-    See [`BlockFallEvent`].
-    */
-    pub fn on_block_fall(
+    pub fn on_block_fall<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &BlockFallEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &BlockFallEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<block_fall>(handler);
+        register::<block_fall, V>(handler);
     }
 }
 
@@ -197,19 +197,19 @@ hook!(
 
 impl Cancellable for BlockLandEvent {}
 
+impl BlockLandEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a falling block lands and is about to become a block again.
-
-    Returning `true` drops the block as an item instead of placing it.
-
-    See [`BlockLandEvent`].
-    */
-    pub fn on_block_land(
+    pub fn on_block_land<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &BlockLandEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &BlockLandEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<block_land>(handler);
+        register::<block_land, V>(handler);
     }
 }
 
@@ -231,19 +231,19 @@ hook!(
 
 impl Cancellable for BlockFormEvent {}
 
+impl BlockFormEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a block forms in the world on its own: lava and water make obsidian or cobblestone, snow piles up, ice freezes...
-
-    Returning `true` prevents the block from forming.
-
-    See [`BlockFormEvent`].
-    */
-    pub fn on_block_form(
+    pub fn on_block_form<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &BlockFormEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &BlockFormEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<block_form>(handler);
+        register::<block_form, V>(handler);
     }
 }
 
@@ -262,19 +262,19 @@ hook!(
 
 impl Cancellable for BlockIgniteEvent {}
 
+impl BlockIgniteEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a block is set on fire, or a block that can be lit is lit: fire, a campfire, a candle, TNT...
-
-    Returning `true` prevents the ignition.
-
-    See [`BlockIgniteEvent`].
-    */
-    pub fn on_block_ignite(
+    pub fn on_block_ignite<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &BlockIgniteEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &BlockIgniteEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<block_ignite>(handler);
+        register::<block_ignite, V>(handler);
     }
 }
 
@@ -297,19 +297,19 @@ hook!(
 
 impl Cancellable for TntPrimeEvent {}
 
+impl TntPrimeEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when tNT is primed and starts its fuse.
-
-    Returning `true` keeps the TNT block unprimed.
-
-    See [`TntPrimeEvent`].
-    */
-    pub fn on_tnt_prime(
+    pub fn on_tnt_prime<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &TntPrimeEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &TntPrimeEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<tnt_prime>(handler);
+        register::<tnt_prime, V>(handler);
     }
 }
 
@@ -332,19 +332,19 @@ hook!(
 
 impl Cancellable for NotePlayEvent {}
 
+impl NotePlayEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a note block plays a note, because a player hit it or it received a redstone signal.
-
-    Returning `true` keeps the note block silent.
-
-    See [`NotePlayEvent`].
-    */
-    pub fn on_note_play(
+    pub fn on_note_play<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &NotePlayEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &NotePlayEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<note_play>(handler);
+        register::<note_play, V>(handler);
     }
 }
 
@@ -363,19 +363,19 @@ hook!(
 
 impl Cancellable for JukeboxChangeEvent {}
 
+impl JukeboxChangeEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player inserts a music disc into a jukebox or takes it out.
-
-    Returning `true` leaves the jukebox as it was.
-
-    See [`JukeboxChangeEvent`].
-    */
-    pub fn on_jukebox_change(
+    pub fn on_jukebox_change<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &JukeboxChangeEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &JukeboxChangeEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<jukebox_change>(handler);
+        register::<jukebox_change, V>(handler);
     }
 }
 
@@ -394,19 +394,19 @@ hook!(
 
 impl Cancellable for LecternChangeEvent {}
 
+impl LecternChangeEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player places a book on a lectern or takes it.
-
-    Returning `true` leaves the lectern as it was.
-
-    See [`LecternChangeEvent`].
-    */
-    pub fn on_lectern_change(
+    pub fn on_lectern_change<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &LecternChangeEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &LecternChangeEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<lectern_change>(handler);
+        register::<lectern_change, V>(handler);
     }
 }
 
@@ -427,19 +427,19 @@ hook!(
 
 impl Cancellable for LecternPageEvent {}
 
+impl LecternPageEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player turns the page of a book on a lectern.
-
-    Returning `true` keeps the current page.
-
-    See [`LecternPageEvent`].
-    */
-    pub fn on_lectern_page(
+    pub fn on_lectern_page<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &LecternPageEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &LecternPageEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<lectern_page>(handler);
+        register::<lectern_page, V>(handler);
     }
 }
 
@@ -462,19 +462,19 @@ hook!(
 
 impl Cancellable for ItemCookEvent {}
 
+impl ItemCookEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a furnace, smoker, blast furnace or campfire finishes cooking an item.
-
-    Returning `true` cancels the result: the input stays in place.
-
-    See [`ItemCookEvent`].
-    */
-    pub fn on_item_cook(
+    pub fn on_item_cook<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ItemCookEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ItemCookEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<item_cook>(handler);
+        register::<item_cook, V>(handler);
     }
 }
 
@@ -497,19 +497,19 @@ hook!(
 
 impl Cancellable for FuelBurnEvent {}
 
+impl FuelBurnEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a furnace, smoker or blast furnace starts burning a fuel item.
-
-    Returning `true` keeps the fuel unburnt.
-
-    See [`FuelBurnEvent`].
-    */
-    pub fn on_fuel_burn(
+    pub fn on_fuel_burn<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &FuelBurnEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &FuelBurnEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<fuel_burn>(handler);
+        register::<fuel_burn, V>(handler);
     }
 }
 
@@ -527,16 +527,19 @@ hook!(
 
 impl Cancellable for BrewEvent {}
 
+impl BrewEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a brewing stand finishes brewing.
-
-    Returning `true` cancels the brew.
-
-    See [`BrewEvent`].
-    */
-    pub fn on_brew(&self, handler: impl Fn(&Server, &BrewEvent) -> bool + Send + Sync + 'static) {
-        register::<brew>(handler);
+    pub fn on_brew<V: Verdict>(
+        &self,
+        handler: impl Fn(&Server, &BrewEvent) -> V + Send + Sync + 'static,
+    ) {
+        register::<brew, V>(handler);
     }
 }
 
@@ -561,19 +564,19 @@ hook!(
 
 impl Cancellable for BeaconEffectEvent {}
 
+impl BeaconEffectEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a beacon is about to give its effect to a player in range.
-
-    Returning `true` withholds the effect this time.
-
-    See [`BeaconEffectEvent`].
-    */
-    pub fn on_beacon_effect(
+    pub fn on_beacon_effect<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &BeaconEffectEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &BeaconEffectEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<beacon_effect>(handler);
+        register::<beacon_effect, V>(handler);
     }
 }
 
@@ -591,19 +594,19 @@ hook!(
 
 impl Cancellable for LiquidFlowEvent {}
 
+impl LiquidFlowEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when water or lava is about to flow into a block.
-
-    Returning `true` stops the liquid from flowing into this block.
-
-    See [`LiquidFlowEvent`].
-    */
-    pub fn on_liquid_flow(
+    pub fn on_liquid_flow<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &LiquidFlowEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &LiquidFlowEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<liquid_flow>(handler);
+        register::<liquid_flow, V>(handler);
     }
 }
 
@@ -625,18 +628,18 @@ hook!(
 
 impl Cancellable for SculkShriekEvent {}
 
+impl SculkShriekEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a sculk shrieker shrieks because a player stepped near it or made a vibration it heard.
-
-    Returning `true` keeps the shrieker silent.
-
-    See [`SculkShriekEvent`].
-    */
-    pub fn on_sculk_shriek(
+    pub fn on_sculk_shriek<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &SculkShriekEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &SculkShriekEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<sculk_shriek>(handler);
+        register::<sculk_shriek, V>(handler);
     }
 }

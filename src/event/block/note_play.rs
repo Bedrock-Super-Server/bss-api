@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A note block plays a note, because a player hit it or it received a redstone signal.
 
-Returning `true` from a handler keeps the note block silent.
+`event.cancel()` keeps the note block silent.
 
 Handled by [`Event::on_note_play`](crate::prelude::Event::on_note_play) and [`Server::on_note_play`](crate::server::Server::on_note_play).
 */
@@ -18,6 +18,13 @@ pub struct NotePlayEvent {
     pub z: i32,
     pub(crate) instrument: Cell<i32>,
     pub(crate) pitch: Cell<i32>,
+}
+
+impl NotePlayEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl NotePlayEvent {

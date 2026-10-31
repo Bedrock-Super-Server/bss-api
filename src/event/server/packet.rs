@@ -3,7 +3,7 @@ A game packet passes between a player and the server.
 
 Only packets of the directions a plugin subscribed to are reported.
 
-Returning `true` from a handler drops the packet.
+`event.cancel()` drops the packet.
 
 Handled by [`Event::on_client_bound`](crate::prelude::Event::on_client_bound).
 */
@@ -32,13 +32,12 @@ impl PacketEvent {
     struct Spy;
 
     impl Event for Spy {
-        fn on_server_bound(&self, _server: &Server, event: &PacketEvent) -> bool {
+        fn on_server_bound(&self, _server: &Server, event: &PacketEvent) {
             if event.name == "Text" {
                 if let Ok(fields) = event.fields() {
                     println!("{} wrote {}", event.entity_id, fields["body"]);
                 }
             }
-            false
         }
     }
     ```
@@ -62,5 +61,12 @@ impl PacketEvent {
             return Err(error.to_string());
         }
         Ok(packet["fields"].take())
+    }
+}
+
+impl PacketEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
     }
 }

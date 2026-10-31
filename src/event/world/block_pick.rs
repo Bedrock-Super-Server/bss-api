@@ -1,7 +1,7 @@
 /**
 A player picks a block with the middle mouse button.
 
-Returning `true` from a handler cancels the pick.
+`event.cancel()` cancels the pick.
 
 Handled by [`Event::on_block_pick`](crate::prelude::Event::on_block_pick).
 */
@@ -20,4 +20,11 @@ pub struct BlockPickEvent {
     pub item_id: i16,
     /// Hotbar slot the item goes to.
     pub hotbar_slot: u32,
+}
+
+impl BlockPickEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
+    }
 }

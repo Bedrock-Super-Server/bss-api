@@ -1,7 +1,7 @@
 /**
 A minecart passes over a powered activator rail.
 
-Returning `true` from a handler ignores the rail.
+`event.cancel()` ignores the rail.
 
 Handled by [`Event::on_minecart_activate`](crate::prelude::Event::on_minecart_activate) and [`Server::on_minecart_activate`](crate::server::Server::on_minecart_activate).
 */

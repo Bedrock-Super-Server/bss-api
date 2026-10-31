@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A tool, weapon or piece of armor is about to lose durability.
 
-Returning `true` from a handler prevents the loss.
+`event.cancel()` prevents the loss.
 
 Handled by [`Event::on_item_damage`](crate::prelude::Event::on_item_damage) and [`Server::on_item_damage`](crate::server::Server::on_item_damage).
 */
@@ -15,6 +15,13 @@ pub struct ItemDamageEvent {
     /// Inventory slot of the item; armor pieces use `100` plus their armor slot.
     pub slot: u32,
     pub(crate) damage: Cell<u32>,
+}
+
+impl ItemDamageEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl ItemDamageEvent {

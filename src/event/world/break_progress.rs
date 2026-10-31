@@ -1,7 +1,7 @@
 /**
 A player starts, continues or stops breaking a block.
 
-Returning `true` from a handler stops the progress.
+`event.cancel()` stops the progress.
 
 Handled by [`Event::on_block_break_progress`](crate::prelude::Event::on_block_break_progress).
 */
@@ -29,5 +29,12 @@ impl BlockBreakProgressEvent {
     /// Returns `true` when the player stops before the block breaks.
     pub fn is_abort(&self) -> bool {
         self.stage == 1
+    }
+}
+
+impl BlockBreakProgressEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
     }
 }

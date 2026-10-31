@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 The weather changes a block: snow piles up, water freezes, rain puts a fire out...
 
-Returning `true` from a handler leaves the block as it is.
+`event.cancel()` leaves the block as it is.
 
 Handled by [`Event::on_weather_effect`](crate::prelude::Event::on_weather_effect) and [`Server::on_weather_effect`](crate::server::Server::on_weather_effect).
 */

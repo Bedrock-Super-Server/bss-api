@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 An entity other than a player goes through a portal.
 
-Returning `true` from a handler keeps the entity where it is.
+`event.cancel()` keeps the entity where it is.
 
 Handled by [`Event::on_entity_portal`](crate::prelude::Event::on_entity_portal) and [`Server::on_entity_portal`](crate::server::Server::on_entity_portal).
 */

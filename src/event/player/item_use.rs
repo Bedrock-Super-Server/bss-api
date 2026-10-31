@@ -1,7 +1,7 @@
 /**
 A player uses the item in their hand, on a block or in the air.
 
-Returning `true` from a handler cancels the use.
+`event.cancel()` cancels the use.
 
 Handled by [`Event::on_item_use`](crate::prelude::Event::on_item_use).
 */
@@ -46,5 +46,12 @@ impl ItemUseEvent {
     /// Returns `true` when the item is used in the air.
     pub fn is_air(&self) -> bool {
         self.action == Self::CLICK_AIR
+    }
+}
+
+impl ItemUseEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
     }
 }

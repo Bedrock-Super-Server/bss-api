@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A mob attacks its target.
 
-Returning `true` from a handler cancels the attack.
+`event.cancel()` cancels the attack.
 
 Handled by [`Event::on_mob_attack`](crate::prelude::Event::on_mob_attack) and [`Server::on_mob_attack`](crate::server::Server::on_mob_attack).
 */

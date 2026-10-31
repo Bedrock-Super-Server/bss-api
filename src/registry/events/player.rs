@@ -268,7 +268,7 @@ impl Server {
     See [`DeathEvent`](crate::event::DeathEvent).
     */
     pub(crate) fn on_death(&self, handler: impl Fn(&Server, &DeathEvent) + Send + Sync + 'static) {
-        crate::registry::hook::register::<death>(move |server, event| {
+        crate::registry::hook::register::<death, _>(move |server, event| {
             handler(server, event);
             false
         });
@@ -283,7 +283,7 @@ impl Server {
         &self,
         handler: impl Fn(&Server, &RespawnEvent) + Send + Sync + 'static,
     ) {
-        crate::registry::hook::register::<respawn>(move |server, event| {
+        crate::registry::hook::register::<respawn, _>(move |server, event| {
             handler(server, event);
             false
         });

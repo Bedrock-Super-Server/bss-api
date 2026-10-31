@@ -26,3 +26,10 @@ impl RespawnEvent {
         self.z.set(z);
     }
 }
+
+impl RespawnEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
+    }
+}

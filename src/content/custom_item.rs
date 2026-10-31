@@ -1,4 +1,4 @@
-use super::{ArmorSlot, ItemDef, Material, ToolType};
+use super::{ArmorSlot, GroupRef, ItemDef, Material, ToolType};
 use crate::server::Server;
 
 /**
@@ -75,6 +75,11 @@ pub trait CustomItem: Send + Sync + 'static {
     fn show_uid(&self) -> bool {
         false
     }
+
+    /// The creative inventory group the item is in: one that a plugin defines with [`CustomGroup`](super::CustomGroup), or one of the game, see [`VanillaGroup`](super::VanillaGroup). Without one the item is not in the creative inventory.
+    fn group(&self) -> Option<GroupRef> {
+        None
+    }
 }
 
 impl Server {
@@ -103,6 +108,7 @@ impl Server {
             fast_blocks: item.fast_blocks(),
             indestructible: item.indestructible(),
             show_uid: item.show_uid(),
+            group: item.group(),
         });
     }
 }

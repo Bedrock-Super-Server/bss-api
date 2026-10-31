@@ -35,3 +35,10 @@ impl DeathEvent {
         self.keep_inventory.set(value);
     }
 }
+
+impl DeathEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
+    }
+}

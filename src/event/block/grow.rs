@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A plant grows a stage: crops, stems, sweet berries, cocoa, cactus, sugar cane...
 
-Returning `true` from a handler stops this growth step.
+`event.cancel()` stops this growth step.
 
 Handled by [`Event::on_block_grow`](crate::prelude::Event::on_block_grow) and [`Server::on_block_grow`](crate::server::Server::on_block_grow).
 */

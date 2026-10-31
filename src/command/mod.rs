@@ -39,8 +39,8 @@ impl SubCommand for SetHome {
 
     fn execute(&self, ctx: &CommandContext) -> CommandResult {
         let player = ctx.player().ok_or("Only players have a home")?;
-        let (x, y, z, _, _) = player.position();
-        ctx.reply(&format!("Home set at {x:.0} {y:.0} {z:.0}"));
+        let at = player.location();
+        ctx.reply(&format!("Home set at {:.0} {:.0} {:.0}", at.x, at.y, at.z));
         Ok(())
     }
 }

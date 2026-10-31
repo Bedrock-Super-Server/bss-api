@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 An entity other than a player takes damage from any source.
 
-Returning `true` from a handler cancels the damage.
+`event.cancel()` cancels the damage.
 
 Handled by [`Event::on_entity_hurt`](crate::prelude::Event::on_entity_hurt) and [`Server::on_entity_hurt`](crate::server::Server::on_entity_hurt).
 */

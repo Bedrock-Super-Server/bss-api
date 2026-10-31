@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A player's hunger bar changes.
 
-Returning `true` from a handler keeps the previous values.
+`event.cancel()` keeps the previous values.
 
 Handled by [`Event::on_food_change`](crate::prelude::Event::on_food_change) and [`Server::on_food_change`](crate::server::Server::on_food_change).
 */
@@ -14,6 +14,13 @@ pub struct FoodChangeEvent {
     pub old_food: i32,
     pub(crate) food: Cell<i32>,
     pub(crate) saturation: Cell<f32>,
+}
+
+impl FoodChangeEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl FoodChangeEvent {

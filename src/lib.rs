@@ -17,7 +17,7 @@ edition = "2024"
 crate-type = ["cdylib"]
 
 [dependencies]
-bss-api = "1"
+bss-api = "2"
 ```
 
 Then implement [`Plugin`](sdk::Plugin) and export it with [`export_plugin!`]:
@@ -116,6 +116,7 @@ pub mod ffi;
 
 pub mod command;
 pub mod content;
+pub mod error;
 pub mod event;
 pub mod math;
 pub mod player;
@@ -123,6 +124,7 @@ pub mod player;
 pub mod registry;
 pub mod sdk;
 pub mod server;
+pub mod types;
 
 pub use ffi::abi::{HeldItem, ItemStack};
 
@@ -137,13 +139,14 @@ pub mod prelude {
     pub use crate::command::{Command, CommandContext, CommandResult, Param, SubCommand};
     pub use crate::content::{
         ArmorSlot, BlockPermutation, BlockShape, BlockSound, BlockState, Category, Condition,
-        CustomBlock, CustomItem, GroupDef, Material, RecipeDef, StateValue, StateValues, ToolType,
+        CustomBlock, CustomGroup, CustomItem, GroupDef, GroupRef, Material, RecipeDef, StateValue,
+        StateValues, ToolType, VanillaGroup,
     };
+    pub use crate::error::{ApiError, ApiResult};
     pub use crate::event::*;
     pub use crate::export_plugin;
     pub use crate::ffi::abi::ItemStack;
     pub use crate::math::BlockFace;
-    pub use crate::player::Player;
     pub use crate::player::client_data::ClientData;
     pub use crate::player::ddui::{DduiClose, DduiEvent, DduiHandle, DduiScreen};
     pub use crate::player::form::{
@@ -152,14 +155,16 @@ pub mod prelude {
     pub use crate::player::inventory::{Inventory, VirtualItem};
     pub use crate::player::jwt::{AuthInfo, ClientDataJwt, Jwt, JwtClaims, JwtHeader, LoginJwt};
     pub use crate::player::uuid::{Uuid, Variant, Version};
+    pub use crate::player::{Damage, Player};
     pub use crate::registry::events::handler::Event;
-    pub use crate::registry::hook::{Cancellable, EventOptions, Priority};
+    pub use crate::registry::hook::{Cancellable, EventOptions, Priority, Verdict};
     pub use crate::sdk::Plugin;
     pub use crate::server::catalog::{particle, sound};
     pub use crate::server::effect::Effect;
     pub use crate::server::entity::{ActorFlag, Entity};
     pub use crate::server::scheduler::TaskId;
     pub use crate::server::world::{Block, Chunk, Pos, Weather, World};
-    pub use crate::server::{Dimension, PacketInfo, PluginInfo, PluginUsage, Server};
+    pub use crate::server::{PacketInfo, PluginInfo, PluginUsage, Server};
+    pub use crate::types::{BlockId, Dimension, GameMode, ItemId, Location};
     pub use serde_json::{Value, json};
 }

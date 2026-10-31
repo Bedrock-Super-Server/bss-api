@@ -1,4 +1,6 @@
-use super::{BlockDef, BlockPermutation, BlockShape, BlockSound, BlockState, Condition, ToolType};
+use super::{
+    BlockDef, BlockPermutation, BlockShape, BlockSound, BlockState, Condition, GroupRef, ToolType,
+};
 use crate::server::Server;
 
 /**
@@ -81,6 +83,11 @@ pub trait CustomBlock: Send + Sync + 'static {
     fn slab(&self) -> bool {
         false
     }
+
+    /// The creative inventory group the block is in: one that a plugin defines with [`CustomGroup`](super::CustomGroup), or one of the game, see [`VanillaGroup`](super::VanillaGroup). Without one the block is not in the creative inventory.
+    fn group(&self) -> Option<GroupRef> {
+        None
+    }
 }
 
 /// What the server is told about a block.
@@ -103,6 +110,7 @@ fn definition<C: CustomBlock>(block: &C) -> BlockDef {
         bone_visibility: block.bone_visibility(),
         custom_sound: sound == BlockSound::Custom,
         slab: block.slab(),
+        group: block.group(),
     }
 }
 

@@ -15,12 +15,12 @@ Play the level-up sound to a player, at their position:
 use bss_api::prelude::*;
 
 fn ding(player: &Player) -> Result<(), String> {
-    let (x, y, z, _, _) = player.position();
+    let at = player.location();
     player.send_packet(
         "LevelSoundEvent",
         &json!({
             "sound_event": sound::LEVELUP,
-            "position": { "x": x, "y": y, "z": z },
+            "position": { "x": at.x, "y": at.y, "z": at.z },
             "data": -1,
             "actor_identifier": "",
             "is_baby": false,

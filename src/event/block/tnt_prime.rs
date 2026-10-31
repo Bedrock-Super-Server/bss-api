@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 TNT is primed and starts its fuse.
 
-Returning `true` from a handler keeps the TNT block unprimed.
+`event.cancel()` keeps the TNT block unprimed.
 
 Handled by [`Event::on_tnt_prime`](crate::prelude::Event::on_tnt_prime) and [`Server::on_tnt_prime`](crate::server::Server::on_tnt_prime).
 */

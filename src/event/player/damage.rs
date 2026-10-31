@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A player takes damage.
 
-Returning `true` from a handler cancels the damage.
+`event.cancel()` cancels the damage.
 
 Handled by [`Event::on_player_damage`](crate::prelude::Event::on_player_damage) and [`Server::on_player_damage`](crate::server::Server::on_player_damage).
 */
@@ -15,6 +15,13 @@ pub struct PlayerDamageEvent {
     pub(crate) damage: Cell<f32>,
     /// Name of the player or type of the entity responsible, or an empty string.
     pub attacker: String,
+}
+
+impl PlayerDamageEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl PlayerDamageEvent {

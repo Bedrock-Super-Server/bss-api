@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A beacon is about to give its effect to a player in range.
 
-Returning `true` from a handler withholds the effect this time.
+`event.cancel()` withholds the effect this time.
 
 Handled by [`Event::on_beacon_effect`](crate::prelude::Event::on_beacon_effect) and [`Server::on_beacon_effect`](crate::server::Server::on_beacon_effect).
 */
@@ -19,6 +19,13 @@ pub struct BeaconEffectEvent {
     pub(crate) effect: Cell<i32>,
     pub(crate) amplifier: Cell<i32>,
     pub(crate) ticks: Cell<i32>,
+}
+
+impl BeaconEffectEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl BeaconEffectEvent {

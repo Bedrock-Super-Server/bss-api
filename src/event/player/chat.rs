@@ -3,7 +3,7 @@ use std::cell::RefCell;
 /**
 A player sends a chat message.
 
-Returning `true` from a handler cancels the message: nobody sees it.
+`event.cancel()` cancels the message: nobody sees it.
 
 Handled by [`Event::on_chat`](crate::prelude::Event::on_chat).
 */
@@ -32,5 +32,12 @@ impl ChatEvent {
     /// Sets the line shown to other players.
     pub fn set_formatted(&self, message: &str) {
         *self.formatted.borrow_mut() = message.to_string();
+    }
+}
+
+impl ChatEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
     }
 }

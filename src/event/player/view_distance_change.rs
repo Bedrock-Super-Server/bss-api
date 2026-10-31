@@ -1,9 +1,9 @@
 use std::cell::Cell;
 
 /**
-A player's client asks for another view distance, in chunks. `radius` is what the server grants, within its own `view_distance`; set another one to grant that instead.
+A player's client asks for another view distance, in chunks. `radius` is what the server grants, within the limit the player has: the `view_distance` of the server, or the one a plugin set with `Player::set_view_distance`; set another one to grant that instead, within the same limit.
 
-Returning `true` from a handler keeps the view distance the player has.
+`event.cancel()` keeps the view distance the player has.
 
 Handled by [`Event::on_player_view_distance_change`](crate::prelude::Event::on_player_view_distance_change) and [`Server::on_player_view_distance_change`](crate::server::Server::on_player_view_distance_change).
 */
@@ -16,6 +16,13 @@ pub struct PlayerViewDistanceChangeEvent {
     pub old_radius: i32,
     /// View distance the server grants, in chunks.
     pub(crate) radius: Cell<i32>,
+}
+
+impl PlayerViewDistanceChangeEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl PlayerViewDistanceChangeEvent {

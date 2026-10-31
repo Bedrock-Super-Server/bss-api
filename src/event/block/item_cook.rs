@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A furnace, smoker, blast furnace or campfire finishes cooking an item.
 
-Returning `true` from a handler cancels the result: the input stays in place.
+`event.cancel()` cancels the result: the input stays in place.
 
 Handled by [`Event::on_item_cook`](crate::prelude::Event::on_item_cook) and [`Server::on_item_cook`](crate::server::Server::on_item_cook).
 */

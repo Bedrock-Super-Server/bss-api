@@ -2,6 +2,7 @@
 
 mod attribute;
 pub mod client_data;
+mod damage;
 pub mod ddui;
 pub mod form;
 pub(crate) mod inventory;
@@ -10,6 +11,7 @@ pub mod jwt;
 pub mod uuid;
 
 pub use attribute::Attribute;
+pub use damage::Damage;
 pub use inventory::{Inventory, VirtualItem};
 pub use item::{Enchant, Item, ItemMeta};
 
@@ -19,8 +21,10 @@ use crate::ffi::call::HostFn;
 use crate::ffi::host::{HostApi, VirtualSlot};
 use crate::player::client_data::ClientData;
 
+use crate::error::ApiResult;
 use crate::registry::callbacks as ui;
 use crate::server::ffi_string;
+use crate::types::{Dimension, GameMode, Location};
 
 fn virtual_lore_json(item: &Option<VirtualItem>) -> String {
     item.as_ref()
@@ -42,8 +46,8 @@ use bss_api::prelude::*;
 
 fn reward(player: &Player) {
     player.message("§6You found a treasure!");
-    if let Some(diamond) = player.server().item_id("minecraft:diamond") {
-        player.give(diamond, 0, 3);
+    if let Some(diamond) = player.server().items().id("minecraft:diamond") {
+        player.give(diamond.0, 0, 3);
     }
     player.set_health(20.0);
 }
@@ -120,7 +124,14 @@ impl Player {
             .unwrap_or_default()
     }
 
-    /// Returns the game mode: `0` survival, `1` creative, `2` adventure, `6` spectator.
+    /// Returns the game mode of the player.
+    pub fn game_mode(&self) -> GameMode {
+        let id = host_call!(self.host, player_gamemode(self.handle)).unwrap_or(0);
+        GameMode::from_id(id).unwrap_or(GameMode::Survival)
+    }
+
+    /// Returns the game mode as the number the game gives it: `0` survival, `1` creative, `2` adventure, `6` spectator.
+    #[deprecated(note = "use `game_mode()`, which returns a `GameMode`")]
     pub fn gamemode(&self) -> i32 {
         host_call!(self.host, player_gamemode(self.handle)).unwrap_or(0)
     }
@@ -135,7 +146,14 @@ impl Player {
         host_call!(self.host, player_held(self.handle)).unwrap_or_default()
     }
 
+    /// Returns where the player stands, feet and look, angles in degrees.
+    pub fn location(&self) -> Location {
+        #[allow(deprecated)]
+        Location::from(self.position())
+    }
+
     /// Returns the position of the player's feet and the direction they look at, as `(x, y, z, pitch, yaw)`, angles in degrees.
+    #[deprecated(note = "use `location()`, which returns a `Location`")]
     pub fn position(&self) -> (f32, f32, f32, f32, f32) {
         let (mut x, mut y, mut z, mut pitch, mut yaw) = (0.0, 0.0, 0.0, 0.0, 0.0);
         host_call!(
@@ -169,11 +187,41 @@ impl Player {
     }
     ```
     */
+    #[deprecated(note = "use `teleport_to(Location)`")]
     pub fn teleport(&self, x: f32, y: f32, z: f32, pitch: f32, yaw: f32) {
         host_call!(self.host, player_teleport(self.handle, x, y, z, pitch, yaw));
     }
 
+    /**
+    Moves the player to `location`, facing the way it says.
+
+    ```
+    # use bss_api::prelude::*;
+    fn to_spawn(player: &Player) {
+        if let Some((x, y, z)) = player.server().worlds().spawn() {
+            player.teleport_to(Location::new(x as f32 + 0.5, y as f32, z as f32 + 0.5));
+        }
+    }
+    ```
+    */
+    pub fn teleport_to(&self, location: Location) {
+        let Location {
+            x,
+            y,
+            z,
+            pitch,
+            yaw,
+        } = location;
+        host_call!(self.host, player_teleport(self.handle, x, y, z, pitch, yaw));
+    }
+
+    /// Changes the game mode.
+    pub fn set_game_mode(&self, mode: GameMode) {
+        host_call!(self.host, player_set_gamemode(self.handle, mode.id()));
+    }
+
     /// Changes the game mode, numbered as in [`gamemode`](Self::gamemode).
+    #[deprecated(note = "use `set_game_mode(GameMode)`")]
     pub fn set_gamemode(&self, mode: i32) {
         host_call!(self.host, player_set_gamemode(self.handle, mode));
     }
@@ -221,9 +269,10 @@ impl Player {
             .unwrap_or_default()
     }
 
-    /// Returns the dimension the player is in: `0` overworld, `1` Nether, `2` End.
-    pub fn dimension(&self) -> i32 {
-        host_call!(self.host, player_dimension(self.handle)).unwrap_or(0)
+    /// Returns the dimension the player is in.
+    pub fn dimension(&self) -> Dimension {
+        let id = host_call!(self.host, player_dimension(self.handle)).unwrap_or(0);
+        Dimension::from_id(id).unwrap_or(Dimension::Overworld)
     }
 
     /// Moves the player to the loaded world named `name`. Returns `false` when no such world is loaded.
@@ -285,6 +334,7 @@ impl Player {
 
     Returns `false` without hurting a player in creative mode.
     */
+    #[deprecated(note = "use `damage(Damage)`")]
     pub fn hurt(
         &self,
         amount: f32,
@@ -307,6 +357,34 @@ impl Player {
             )
         )
         .unwrap_or(false)
+    }
+
+    /**
+    Damages the player with `damage`: armor reduces it as for a melee hit, the player is knocked back when the hit comes
+    from somewhere, and dies with the killer named in the death message when their health runs out.
+
+    Answers `false` without hurting a player in creative mode.
+    */
+    pub fn damage(&self, damage: Damage) -> ApiResult<bool> {
+        let (from_x, from_z, force, vertical) = match damage.from {
+            Some((x, z)) => (x, z, damage.force, damage.vertical),
+            None => {
+                let at = self.location();
+                (at.x, at.z, 0.0, 0.0)
+            }
+        };
+        host_try!(
+            self.host,
+            player_hurt(
+                self.handle,
+                damage.amount,
+                from_x,
+                from_z,
+                force,
+                vertical,
+                FfiStr::new(&damage.killer)
+            )
+        )
     }
 
     /// Sets the name shown above the player's head.
@@ -361,7 +439,7 @@ impl Player {
     /// The 36 slots of the player's inventory, hotbar first, with their name, lore and
     /// enchantments, as the server last saw them: at most a tick old, and read at once from any
     /// thread, unlike [`request_inventory`](Self::request_inventory). An empty slot has `count`
-    /// `0`. Empty when the player is gone or the server is older than ABI 1.5.
+    /// `0`. Empty when the player is gone.
     pub fn inventory_snapshot(&self) -> Vec<(crate::ItemStack, ItemMeta)> {
         #[derive(serde::Deserialize)]
         struct Slot {
@@ -416,7 +494,7 @@ impl Player {
     # use bss_api::prelude::*;
     # use bss_api::player::{Enchant, Item};
     fn starter_sword(player: &Player) {
-        let Some(id) = player.server().item_id("minecraft:iron_sword") else { return };
+        let Some(id) = player.server().items().id("minecraft:iron_sword") else { return };
         player.give_item(&Item::new(id).name("§bStarter Sword").enchant(Enchant::Sharpness, 2));
     }
     ```
@@ -585,8 +663,7 @@ impl Player {
     /**
     Shows a form written as the JSON of the game's `ModalFormRequest` packet, and calls `handler`
     once with the player's raw answer, the JSON of `ModalFormResponse`, or `None` when they close
-    it. A player in another screen, such as the chat, answers `"busy"` on servers of ABI 1.5 or
-    newer. Use it for what [`Form`](crate::player::form::Form) does not describe, such as the headers,
+    it. A player in another screen, such as the chat, answers `"busy"`. Use it for what [`Form`](crate::player::form::Form) does not describe, such as the headers,
     labels and dividers of newer forms.
     */
     pub fn send_form_json(&self, json: &str, handler: impl FnOnce(Option<&str>) + Send + 'static) {
@@ -617,10 +694,10 @@ impl Player {
     ```
     # use bss_api::prelude::*;
     fn count_diamonds(player: &Player) {
-        let Some(diamond) = player.server().item_id("minecraft:diamond") else { return };
+        let Some(diamond) = player.server().items().id("minecraft:diamond") else { return };
         let who = *player;
         player.request_inventory(move |inventory| {
-            let total: u32 = (0..inventory.size()).map(|slot| inventory.get(slot)).filter(|stack| stack.item_id == diamond).map(|stack| u32::from(stack.count)).sum();
+            let total: u32 = (0..inventory.size()).map(|slot| inventory.get(slot)).filter(|stack| stack.item_id == diamond.0).map(|stack| u32::from(stack.count)).sum();
             who.message(&format!("You have {total} diamonds."));
         });
     }

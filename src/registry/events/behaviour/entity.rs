@@ -6,7 +6,7 @@ use crate::ffi::behaviour::{
     ArmorStandChangeEventData, EntityCombustEventData, EntityHurtEventData, EntityKilledEventData,
     EntityPlaceEventData, EntityTouchEventData, ItemDespawnEventData, ItemSpawnEventData,
 };
-use crate::registry::hook::{Cancellable, hook, register};
+use crate::registry::hook::{Cancellable, Verdict, hook, register};
 use crate::server::{Server, ffi_string};
 
 hook!(
@@ -23,19 +23,19 @@ hook!(
 
 impl Cancellable for EntityPlaceEvent {}
 
+impl EntityPlaceEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player places an entity from an item: an armor stand, a boat, a minecart, an end crystal...
-
-    Returning `true` cancels the placement and keeps the item.
-
-    See [`EntityPlaceEvent`].
-    */
-    pub fn on_entity_place(
+    pub fn on_entity_place<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &EntityPlaceEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &EntityPlaceEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<entity_place>(handler);
+        register::<entity_place, V>(handler);
     }
 }
 
@@ -52,19 +52,19 @@ hook!(
 
 impl Cancellable for EntityTouchEvent {}
 
+impl EntityTouchEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player touches or hits an entity that has no behaviour of its own, such as a plugin entity.
-
-    Returning `true` ignores the touch.
-
-    See [`EntityTouchEvent`].
-    */
-    pub fn on_entity_touch(
+    pub fn on_entity_touch<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &EntityTouchEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &EntityTouchEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<entity_touch>(handler);
+        register::<entity_touch, V>(handler);
     }
 }
 
@@ -84,19 +84,19 @@ hook!(
 
 impl Cancellable for EntityHurtEvent {}
 
+impl EntityHurtEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when an entity other than a player takes damage from any source.
-
-    Returning `true` cancels the damage.
-
-    See [`EntityHurtEvent`].
-    */
-    pub fn on_entity_hurt(
+    pub fn on_entity_hurt<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &EntityHurtEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &EntityHurtEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<entity_hurt>(handler);
+        register::<entity_hurt, V>(handler);
     }
 }
 
@@ -118,19 +118,19 @@ hook!(
 
 impl Cancellable for EntityKilledEvent {}
 
+impl EntityKilledEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when an entity other than a player is killed.
-
-    Returning `true` keeps the entity alive, with one health point.
-
-    See [`EntityKilledEvent`].
-    */
-    pub fn on_entity_killed(
+    pub fn on_entity_killed<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &EntityKilledEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &EntityKilledEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<entity_killed>(handler);
+        register::<entity_killed, V>(handler);
     }
 }
 
@@ -147,19 +147,19 @@ hook!(
 
 impl Cancellable for ArmorStandChangeEvent {}
 
+impl ArmorStandChangeEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player puts an item on an armor stand or takes one off.
-
-    Returning `true` leaves the armor stand as it was.
-
-    See [`ArmorStandChangeEvent`].
-    */
-    pub fn on_armor_stand_change(
+    pub fn on_armor_stand_change<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ArmorStandChangeEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ArmorStandChangeEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<armor_stand_change>(handler);
+        register::<armor_stand_change, V>(handler);
     }
 }
 
@@ -180,19 +180,19 @@ hook!(
 
 impl Cancellable for EntityCombustEvent {}
 
+impl EntityCombustEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when an entity other than a player catches fire.
-
-    Returning `true` keeps the entity from burning.
-
-    See [`EntityCombustEvent`].
-    */
-    pub fn on_entity_combust(
+    pub fn on_entity_combust<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &EntityCombustEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &EntityCombustEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<entity_combust>(handler);
+        register::<entity_combust, V>(handler);
     }
 }
 
@@ -212,19 +212,19 @@ hook!(
 
 impl Cancellable for ItemSpawnEvent {}
 
+impl ItemSpawnEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when an item entity appears in the world: a drop, a broken block, a dispenser throw...
-
-    Returning `true` prevents the item from appearing.
-
-    See [`ItemSpawnEvent`].
-    */
-    pub fn on_item_spawn(
+    pub fn on_item_spawn<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ItemSpawnEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ItemSpawnEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<item_spawn>(handler);
+        register::<item_spawn, V>(handler);
     }
 }
 
@@ -240,18 +240,18 @@ hook!(
 
 impl Cancellable for ItemDespawnEvent {}
 
+impl ItemDespawnEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a dropped item disappears after lying on the ground for five minutes.
-
-    The value returned is ignored: this event cannot be cancelled.
-
-    See [`ItemDespawnEvent`].
-    */
-    pub fn on_item_despawn(
+    pub fn on_item_despawn<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ItemDespawnEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ItemDespawnEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<item_despawn>(handler);
+        register::<item_despawn, V>(handler);
     }
 }

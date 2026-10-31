@@ -3,7 +3,7 @@ use std::cell::RefCell;
 /**
 A line is typed in the server console, before it runs. Change `command` to run something else.
 
-Returning `true` from a handler keeps the line from running.
+`event.cancel()` keeps the line from running.
 
 Handled by [`Event::on_console_command`](crate::prelude::Event::on_console_command) and [`Server::on_console_command`](crate::server::Server::on_console_command).
 */

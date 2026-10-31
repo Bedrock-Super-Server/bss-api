@@ -1,7 +1,7 @@
 /**
 A brewing stand finishes brewing.
 
-Returning `true` from a handler cancels the brew.
+`event.cancel()` cancels the brew.
 
 Handled by [`Event::on_brew`](crate::prelude::Event::on_brew) and [`Server::on_brew`](crate::server::Server::on_brew).
 */

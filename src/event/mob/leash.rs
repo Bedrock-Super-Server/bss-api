@@ -1,7 +1,7 @@
 /**
 A mob is leashed or unleashed.
 
-Returning `true` from a handler leaves the leash as it was.
+`event.cancel()` leaves the leash as it was.
 
 Handled by [`Event::on_mob_leash`](crate::prelude::Event::on_mob_leash) and [`Server::on_mob_leash`](crate::server::Server::on_mob_leash).
 */
@@ -24,4 +24,11 @@ pub struct MobLeashEvent {
     pub z: i32,
     /// Id of the world, in load order: the default world is `0`.
     pub world: u32,
+}
+
+impl MobLeashEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }

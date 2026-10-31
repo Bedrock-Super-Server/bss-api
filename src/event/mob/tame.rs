@@ -1,7 +1,7 @@
 /**
 A player tames a mob.
 
-Returning `true` from a handler makes this taming attempt fail.
+`event.cancel()` makes this taming attempt fail.
 
 Handled by [`Event::on_mob_tame`](crate::prelude::Event::on_mob_tame) and [`Server::on_mob_tame`](crate::server::Server::on_mob_tame).
 */
@@ -14,4 +14,11 @@ pub struct MobTameEvent {
     pub identifier: String,
     /// Id of the world, in load order: the default world is `0`.
     pub world: u32,
+}
+
+impl MobTameEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }

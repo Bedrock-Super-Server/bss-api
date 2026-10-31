@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A crafter crafts an item.
 
-Returning `true` from a handler cancels the craft.
+`event.cancel()` cancels the craft.
 
 Handled by [`Event::on_crafter_craft`](crate::prelude::Event::on_crafter_craft) and [`Server::on_crafter_craft`](crate::server::Server::on_crafter_craft).
 */

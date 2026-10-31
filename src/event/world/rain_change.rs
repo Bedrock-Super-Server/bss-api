@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 Rain starts or stops.
 
-Returning `true` from a handler keeps the current weather.
+`event.cancel()` keeps the current weather.
 
 Handled by [`Event::on_rain_change`](crate::prelude::Event::on_rain_change) and [`Server::on_rain_change`](crate::server::Server::on_rain_change).
 */

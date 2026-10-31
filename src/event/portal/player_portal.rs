@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A player goes through a portal.
 
-Returning `true` from a handler keeps the player where they are.
+`event.cancel()` keeps the player where they are.
 
 Handled by [`Event::on_player_portal`](crate::prelude::Event::on_player_portal) and [`Server::on_player_portal`](crate::server::Server::on_player_portal).
 */
@@ -19,6 +19,13 @@ pub struct PlayerPortalEvent {
     pub(crate) x: Cell<f32>,
     pub(crate) y: Cell<f32>,
     pub(crate) z: Cell<f32>,
+}
+
+impl PlayerPortalEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl PlayerPortalEvent {

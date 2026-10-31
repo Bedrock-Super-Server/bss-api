@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 An explosion is about to happen.
 
-Returning `true` from a handler cancels the explosion.
+`event.cancel()` cancels the explosion.
 
 Handled by [`Event::on_explosion`](crate::prelude::Event::on_explosion) and [`Server::on_explosion`](crate::server::Server::on_explosion).
 */

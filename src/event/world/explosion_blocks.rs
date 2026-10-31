@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 An explosion is about to destroy blocks.
 
-Returning `true` from a handler keeps every block in place.
+`event.cancel()` keeps every block in place.
 
 Handled by [`Event::on_explosion_blocks`](crate::prelude::Event::on_explosion_blocks) and [`Server::on_explosion_blocks`](crate::server::Server::on_explosion_blocks).
 */

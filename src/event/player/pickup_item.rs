@@ -1,7 +1,7 @@
 /**
 A player picks up an item from the ground.
 
-Returning `true` from a handler leaves the item on the ground.
+`event.cancel()` leaves the item on the ground.
 
 Handled by [`Event::on_pickup_item`](crate::prelude::Event::on_pickup_item).
 */
@@ -16,4 +16,11 @@ pub struct PickupItemEvent {
     pub count: u8,
     /// Runtime id of the item entity.
     pub entity_id: u64,
+}
+
+impl PickupItemEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
+    }
 }

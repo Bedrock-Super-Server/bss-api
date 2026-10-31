@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 Lightning is about to strike.
 
-Returning `true` from a handler cancels the strike.
+`event.cancel()` cancels the strike.
 
 Handled by [`Event::on_lightning_strike`](crate::prelude::Event::on_lightning_strike) and [`Server::on_lightning_strike`](crate::server::Server::on_lightning_strike).
 */

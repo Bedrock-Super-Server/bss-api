@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A player finishes eating or drinking an item.
 
-Returning `true` from a handler cancels the food the item gives.
+`event.cancel()` cancels the food the item gives.
 
 Handled by [`Event::on_consume`](crate::prelude::Event::on_consume).
 */
@@ -35,5 +35,12 @@ impl ConsumeEvent {
     /// Sets the saturation the item gives.
     pub fn set_saturation(&self, saturation: f32) {
         self.saturation.set(saturation);
+    }
+}
+
+impl ConsumeEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
     }
 }

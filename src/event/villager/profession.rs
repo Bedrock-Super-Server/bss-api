@@ -1,7 +1,7 @@
 /**
 A villager takes a profession by claiming a workstation.
 
-Returning `true` from a handler keeps the villager unemployed.
+`event.cancel()` keeps the villager unemployed.
 
 Handled by [`Event::on_villager_profession`](crate::prelude::Event::on_villager_profession) and [`Server::on_villager_profession`](crate::server::Server::on_villager_profession).
 */

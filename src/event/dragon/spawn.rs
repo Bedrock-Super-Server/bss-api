@@ -1,7 +1,7 @@
 /**
 An ender dragon is about to spawn in the End.
 
-Returning `true` from a handler prevents the dragon from spawning.
+`event.cancel()` prevents the dragon from spawning.
 
 Handled by [`Event::on_dragon_spawn`](crate::prelude::Event::on_dragon_spawn) and [`Server::on_dragon_spawn`](crate::server::Server::on_dragon_spawn).
 */

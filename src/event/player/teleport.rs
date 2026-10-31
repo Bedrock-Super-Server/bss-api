@@ -1,7 +1,7 @@
 /**
 A player is about to be teleported.
 
-Returning `true` from a handler cancels the teleport.
+`event.cancel()` cancels the teleport.
 
 Handled by [`Event::on_teleport`](crate::prelude::Event::on_teleport).
 */
@@ -12,4 +12,11 @@ pub struct TeleportEvent {
     pub from: (f32, f32, f32),
     /// Position after the teleport.
     pub to: (f32, f32, f32),
+}
+
+impl TeleportEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
+    }
 }

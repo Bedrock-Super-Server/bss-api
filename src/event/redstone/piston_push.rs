@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A piston pushes an entity.
 
-Returning `true` from a handler leaves the entity where it is.
+`event.cancel()` leaves the entity where it is.
 
 Handled by [`Event::on_piston_push`](crate::prelude::Event::on_piston_push) and [`Server::on_piston_push`](crate::server::Server::on_piston_push).
 */
@@ -23,6 +23,13 @@ pub struct PistonPushEvent {
     pub(crate) motion_z: Cell<f32>,
     /// Id of the world, in load order: the default world is `0`.
     pub world: u32,
+}
+
+impl PistonPushEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl PistonPushEvent {

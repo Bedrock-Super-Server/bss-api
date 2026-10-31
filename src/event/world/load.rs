@@ -1,7 +1,7 @@
 /**
 A world finishes loading and is ready for players and plugins.
 
-Returning `true` changes nothing.
+`event.cancel()` changes nothing.
 
 Handled by [`Event::on_world_load`](crate::prelude::Event::on_world_load) and [`Server::on_world_load`](crate::server::Server::on_world_load).
 */

@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A projectile hits a block or an entity.
 
-Returning `true` from a handler cancels the hit.
+`event.cancel()` cancels the hit.
 
 Handled by [`Event::on_projectile_hit`](crate::prelude::Event::on_projectile_hit) and [`Server::on_projectile_hit`](crate::server::Server::on_projectile_hit).
 */

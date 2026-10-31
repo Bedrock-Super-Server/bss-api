@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 Two mobs breed and a baby is about to be born.
 
-Returning `true` from a handler prevents the birth.
+`event.cancel()` prevents the birth.
 
 Handled by [`Event::on_mob_breed`](crate::prelude::Event::on_mob_breed) and [`Server::on_mob_breed`](crate::server::Server::on_mob_breed).
 */

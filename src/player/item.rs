@@ -123,9 +123,9 @@ pub struct Item {
 
 impl Item {
     /// One item of `item_id`, with no name, lore or enchantment.
-    pub fn new(item_id: i16) -> Self {
+    pub fn new(item_id: impl Into<crate::types::ItemId>) -> Self {
         Self {
-            item_id,
+            item_id: item_id.into().0,
             block_runtime_id: 0,
             count: 1,
             damage: 0,
@@ -137,9 +137,12 @@ impl Item {
     }
 
     /// One item that places the block `block_runtime_id`.
-    pub fn block(item_id: i16, block_runtime_id: u32) -> Self {
+    pub fn block(
+        item_id: impl Into<crate::types::ItemId>,
+        block_runtime_id: impl Into<crate::types::BlockId>,
+    ) -> Self {
         Self {
-            block_runtime_id,
+            block_runtime_id: block_runtime_id.into().0,
             ..Self::new(item_id)
         }
     }

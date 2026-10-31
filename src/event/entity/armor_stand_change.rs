@@ -1,7 +1,7 @@
 /**
 A player puts an item on an armor stand or takes one off.
 
-Returning `true` from a handler leaves the armor stand as it was.
+`event.cancel()` leaves the armor stand as it was.
 
 Handled by [`Event::on_armor_stand_change`](crate::prelude::Event::on_armor_stand_change) and [`Server::on_armor_stand_change`](crate::server::Server::on_armor_stand_change).
 */
@@ -14,4 +14,11 @@ pub struct ArmorStandChangeEvent {
     pub slot: u32,
     /// Numeric id of the item placed, or `0` when the slot is emptied.
     pub item: i16,
+}
+
+impl ArmorStandChangeEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }

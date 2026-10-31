@@ -1,7 +1,7 @@
 /**
 A player answers or closes a form.
 
-Returning `true` from a handler stops other handlers and the form callback from seeing the answer.
+`event.cancel()` stops other handlers and the form callback from seeing the answer.
 
 Handled by [`Event::on_form_response`](crate::prelude::Event::on_form_response).
 */
@@ -18,5 +18,12 @@ impl FormResponseEvent {
     /// Returns `true` when the player closed the form without answering.
     pub fn closed(&self) -> bool {
         self.response.is_none()
+    }
+}
+
+impl FormResponseEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
     }
 }

@@ -1,7 +1,7 @@
 /**
 A player picks up an arrow or a trident stuck in the world.
 
-Returning `true` from a handler leaves it in place.
+`event.cancel()` leaves it in place.
 
 Handled by [`Event::on_projectile_pickup`](crate::prelude::Event::on_projectile_pickup) and [`Server::on_projectile_pickup`](crate::server::Server::on_projectile_pickup).
 */
@@ -12,4 +12,11 @@ pub struct ProjectilePickupEvent {
     pub entity: u64,
     /// Numeric id of the item the player receives.
     pub item: i16,
+}
+
+impl ProjectilePickupEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }

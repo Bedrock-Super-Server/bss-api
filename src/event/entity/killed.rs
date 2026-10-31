@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 An entity other than a player is killed.
 
-Returning `true` from a handler keeps the entity alive, with one health point.
+`event.cancel()` keeps the entity alive, with one health point.
 
 Handled by [`Event::on_entity_killed`](crate::prelude::Event::on_entity_killed) and [`Server::on_entity_killed`](crate::server::Server::on_entity_killed).
 */

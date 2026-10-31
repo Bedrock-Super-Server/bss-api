@@ -9,15 +9,18 @@ These entities are kept with the world and come back after a restart. Mobs that 
 use bss_api::prelude::*;
 
 fn spawn_guide(server: &Server) -> u64 {
-    let id = server.next_entity_id();
-    server.add_entity(id, "minecraft:villager_v2", 0.5, 65.0, 0.5);
-    server.set_entity_nametag(id, "§aGuide\n§7Right-click me");
-    server.set_entity_flag(id, ActorFlag::NoAi, true);
-    server.set_entity_invulnerable(id, true);
+    let entities = server.entities();
+    let id = entities.next_id();
+    let _ = entities.add(id, "minecraft:villager_v2", 0.5, 65.0, 0.5);
+    let _ = entities.set_nametag(id, "§aGuide\n§7Right-click me");
+    let _ = entities.set_flag(id, ActorFlag::NoAi, true);
+    let _ = entities.set_invulnerable(id, true);
     id
 }
 ```
 */
+
+#![allow(deprecated)]
 
 use crate::ffi::abi::FfiStr;
 use crate::ffi::call::HostFn;
@@ -144,6 +147,7 @@ impl Entity {
 
 impl Server {
     /// Makes the client accept a custom entity type, such as one defined in a resource pack. [`add_entity`](Self::add_entity) does it on its own. Returns `false` when the type was already known.
+    #[deprecated(note = "use `server.entities().register_type(identifier)`")]
     pub fn register_entity_type(&self, identifier: &str) -> bool {
         host_call!(self.host(), entity_register_type(FfiStr::new(identifier))).unwrap_or(false)
     }
@@ -152,6 +156,7 @@ impl Server {
     Adds an entity of type `identifier` at `(x, y, z)` in the default world, under `entity_id` from [`next_entity_id`](Self::next_entity_id). See the
     [module documentation](self) for an example.
     */
+    #[deprecated(note = "use `server.entities().add(entity_id, identifier, x, y, z)`")]
     pub fn add_entity(&self, entity_id: u64, identifier: &str, x: f32, y: f32, z: f32) -> bool {
         host_call!(
             self.host(),
@@ -161,11 +166,13 @@ impl Server {
     }
 
     /// Removes an entity. Returns `false` when there is no such entity.
+    #[deprecated(note = "use `server.entities().remove(entity_id)`")]
     pub fn remove_entity(&self, entity_id: u64) -> bool {
         host_call!(self.host(), entity_remove(entity_id)).unwrap_or(false)
     }
 
     /// Moves an entity and turns it to `pitch` and `yaw`, in degrees.
+    #[deprecated(note = "use `server.entities().teleport(entity_id, location)`")]
     pub fn move_entity(
         &self,
         entity_id: u64,
@@ -179,6 +186,7 @@ impl Server {
     }
 
     /// Sets the name tag shown above an entity; `\n` starts a new line.
+    #[deprecated(note = "use `server.entities().set_nametag(entity_id, nametag)`")]
     pub fn set_entity_nametag(&self, entity_id: u64, nametag: &str) -> bool {
         host_call!(
             self.host(),
@@ -188,6 +196,7 @@ impl Server {
     }
 
     /// Returns a snapshot of an entity.
+    #[deprecated(note = "use `server.entities().get(entity_id)`")]
     pub fn entity(&self, entity_id: u64) -> Option<Entity> {
         let f = self.host().entity_get?;
         let data = f.call((entity_id,));
@@ -195,7 +204,7 @@ impl Server {
     }
 
     /// Returns a snapshot of every entity added by plugins.
-    pub fn entities(&self) -> Vec<Entity> {
+    pub(crate) fn all_entities(&self) -> Vec<Entity> {
         let Some(f) = self.host().entity_all else {
             return Vec::new();
         };
@@ -214,6 +223,7 @@ impl Server {
     }
 
     /// Returns a snapshot of every entity of type `identifier`.
+    #[deprecated(note = "use `server.entities().of_type(identifier)`")]
     pub fn entities_of(&self, identifier: &str) -> Vec<Entity> {
         let Some(f) = self.host().entity_all_of else {
             return Vec::new();
@@ -236,6 +246,7 @@ impl Server {
     }
 
     /// Returns the position of an entity as `(x, y, z, pitch, yaw)`.
+    #[deprecated(note = "use `server.entities().location(entity_id)`")]
     pub fn entity_position(&self, entity_id: u64) -> Option<(f32, f32, f32, f32, f32)> {
         let f = self.host().entity_pos?;
         let (mut x, mut y, mut z, mut pitch, mut yaw) = (0.0, 0.0, 0.0, 0.0, 0.0);
@@ -251,6 +262,7 @@ impl Server {
     }
 
     /// Returns the name of the world an entity is in.
+    #[deprecated(note = "use `server.entities().world(entity_id)`")]
     pub fn entity_world(&self, entity_id: u64) -> String {
         host_call!(self.host(), entity_world(entity_id))
             .map(ffi_string)
@@ -258,6 +270,7 @@ impl Server {
     }
 
     /// Moves an entity to the loaded world named `world`, at the same coordinates.
+    #[deprecated(note = "use `server.entities().set_world(entity_id, world)`")]
     pub fn set_entity_world(&self, entity_id: u64, world: &str) -> bool {
         host_call!(self.host(), entity_set_world(entity_id, FfiStr::new(world))).unwrap_or(false)
     }
@@ -265,11 +278,15 @@ impl Server {
 
 impl Server {
     /// Damages an entity by `amount` half-hearts and returns its health left, or `-1.0` when there is no such entity.
+    #[deprecated(note = "use `server.entities().damage(entity_id, amount)`")]
     pub fn damage_entity(&self, entity_id: u64, amount: f32) -> f32 {
         self.damage_entity_from(entity_id, amount, 0.0, 0.0, false)
     }
 
     /// Damages an entity as a hit from `(from_x, from_z)` would, knocking it back when `knockback` is set. Returns its health left, or `-1.0`.
+    #[deprecated(
+        note = "use `server.entities().damage_from(entity_id, amount, from_x, from_z, knockback)`"
+    )]
     pub fn damage_entity_from(
         &self,
         entity_id: u64,
@@ -286,11 +303,13 @@ impl Server {
     }
 
     /// Heals an entity by `amount` half-hearts, up to its maximum, and returns its health, or `-1.0` when there is no such entity.
+    #[deprecated(note = "use `server.entities().heal(entity_id, amount)`")]
     pub fn heal_entity(&self, entity_id: u64, amount: f32) -> f32 {
         host_call!(self.host(), entity_heal(entity_id, amount)).unwrap_or(-1.0)
     }
 
     /// Sets the health and the maximum health of an entity.
+    #[deprecated(note = "use `server.entities().set_health(entity_id, health, max_health)`")]
     pub fn set_entity_health(&self, entity_id: u64, health: f32, max_health: f32) -> bool {
         host_call!(
             self.host(),
@@ -300,26 +319,31 @@ impl Server {
     }
 
     /// Turns a flag of an entity on or off.
+    #[deprecated(note = "use `server.entities().set_flag(entity_id, flag, value)`")]
     pub fn set_entity_flag(&self, entity_id: u64, flag: ActorFlag, value: bool) -> bool {
         host_call!(self.host(), entity_set_flag(entity_id, flag.bit(), value)).unwrap_or(false)
     }
 
     /// Turns a flag on or off by its Bedrock index, for one [`ActorFlag`] does not list. Indexes from `63` up are refused.
+    #[deprecated(note = "use `server.entities().set_flag_raw(entity_id, flag_bit, value)`")]
     pub fn set_entity_flag_raw(&self, entity_id: u64, flag_bit: u32, value: bool) -> bool {
         host_call!(self.host(), entity_set_flag(entity_id, flag_bit, value)).unwrap_or(false)
     }
 
     /// Sets the size of an entity, where `1.0` is the normal size.
+    #[deprecated(note = "use `server.entities().set_scale(entity_id, scale)`")]
     pub fn set_entity_scale(&self, entity_id: u64, scale: f32) -> bool {
         host_call!(self.host(), entity_set_scale(entity_id, scale)).unwrap_or(false)
     }
 
     /// Sets the hitbox of an entity, in blocks.
+    #[deprecated(note = "use `server.entities().set_hitbox(entity_id, width, height)`")]
     pub fn set_entity_hitbox(&self, entity_id: u64, width: f32, height: f32) -> bool {
         host_call!(self.host(), entity_set_hitbox(entity_id, width, height)).unwrap_or(false)
     }
 
     /// Returns the health and the maximum health of an entity, or `(-1.0, 0.0)` when there is no such entity.
+    #[deprecated(note = "use `server.entities().health(entity_id)`")]
     pub fn entity_health(&self, entity_id: u64) -> (f32, f32) {
         let Some(f) = self.host().entity_health else {
             return (-1.0, 0.0);
@@ -330,6 +354,7 @@ impl Server {
     }
 
     /// Makes an entity ignore damage, or not.
+    #[deprecated(note = "use `server.entities().set_invulnerable(entity_id, invulnerable)`")]
     pub fn set_entity_invulnerable(&self, entity_id: u64, invulnerable: bool) -> bool {
         host_call!(
             self.host(),

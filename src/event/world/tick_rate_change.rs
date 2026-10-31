@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 The tick rate of the server is about to change, through `/tick` or a plugin.
 
-Returning `true` from a handler keeps the current rate.
+`event.cancel()` keeps the current rate.
 
 Handled by [`Event::on_tick_rate_change`](crate::prelude::Event::on_tick_rate_change) and [`Server::on_tick_rate_change`](crate::server::Server::on_tick_rate_change).
 */

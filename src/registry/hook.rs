@@ -18,6 +18,44 @@ use crate::ffi::version::copy_sized;
 use crate::registry::{server, set_host};
 use crate::server::Server;
 
+/**
+What a closure given to a `Server::on_*` method answers: nothing, or a `bool`.
+
+A closure cancels the event by calling [`Cancellable::cancel`] on it, or by returning `true`.
+
+```
+use bss_api::prelude::*;
+
+fn register(server: &Server) {
+    // Nothing is returned: the closure cancels the event itself.
+    server.on_tree_grow(|_server, event| {
+        if event.y > 100 {
+            event.cancel();
+        }
+    });
+
+    // Returning `true` cancels it too.
+    server.on_block_fall(|_server, event| event.y < 0);
+}
+```
+*/
+pub trait Verdict {
+    /// Whether the handler cancels the event.
+    fn cancels(self) -> bool;
+}
+
+impl Verdict for () {
+    fn cancels(self) -> bool {
+        false
+    }
+}
+
+impl Verdict for bool {
+    fn cancels(self) -> bool {
+        self
+    }
+}
+
 /// When a handler runs among the handlers of every plugin for the same event.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum Priority {
@@ -60,8 +98,8 @@ use bss_api::prelude::*;
 struct Protect;
 
 impl Event for Protect {
-    fn on_block_break(&self, _server: &Server, _event: &BlockBreakEvent) -> bool {
-        true
+    fn on_block_break(&self, _server: &Server, event: &BlockBreakEvent) {
+        event.cancel();
     }
 }
 
@@ -155,7 +193,7 @@ pub(crate) fn current_options() -> EventOptions {
 /**
 An event that can be cancelled: what the handlers before this one decided, and the way to change it.
 
-Only meaningful while a handler of the event runs. Returning `true` from a handler cancels the
+Only meaningful while a handler of the event runs. `event.cancel()` cancels the
 event too; returning `false` leaves it as it is.
 */
 pub trait Cancellable {
@@ -169,6 +207,11 @@ pub trait Cancellable {
     fn set_cancelled(&self, cancelled: bool) {
         CANCELLED.set(cancelled);
     }
+
+    /// Cancels the event.
+    fn cancel(&self) {
+        self.set_cancelled(true);
+    }
 }
 
 /// Runs a handler that sees the event as `cancelled`, and returns whether the event is cancelled
@@ -179,11 +222,6 @@ pub(crate) fn run_handler(cancelled: bool, handler: impl FnOnce() -> bool) -> bo
         CANCELLED.set(true);
     }
     CANCELLED.replace(outer)
-}
-
-/// Marks the running event cancelled, for handlers that dispatch to several others.
-pub(crate) fn cancel_current() {
-    CANCELLED.set(true);
 }
 
 /// Whether the running event is cancelled.
@@ -223,11 +261,13 @@ pub(crate) trait Hook: 'static {
 }
 
 /// Registers `handler` for the event of `H` with the [current options](current_options).
-pub(crate) fn register<H: Hook>(
-    handler: impl Fn(&Server, &H::Safe) -> bool + Send + Sync + 'static,
+pub(crate) fn register<H: Hook, V: Verdict>(
+    handler: impl Fn(&Server, &H::Safe) -> V + Send + Sync + 'static,
 ) {
     let options = current_options();
-    let handler: Handler<H::Safe> = Box::leak(Box::new(handler));
+    let handler: Handler<H::Safe> = Box::leak(Box::new(move |server: &Server, event: &H::Safe| {
+        handler(server, event).cancels()
+    }));
     let mut buckets = H::buckets().lock();
     if let Some(bucket) = buckets.iter().find(|bucket| bucket.options == options) {
         bucket.handlers.lock().push(handler);

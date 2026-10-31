@@ -44,6 +44,7 @@ fn push(
 
 impl Server {
     /// Runs `task` once, `delay_ticks` ticks from now (at least one), on the thread that runs the world. Twenty ticks make a second.
+    #[deprecated(note = "use `server.scheduler().schedule(delay_ticks, task)`")]
     pub fn schedule(
         &self,
         delay_ticks: u64,
@@ -67,6 +68,7 @@ impl Server {
     }
     ```
     */
+    #[deprecated(note = "use `server.scheduler().schedule_repeating(interval_ticks, task)`")]
     pub fn schedule_repeating(
         &self,
         interval_ticks: u64,
@@ -77,6 +79,7 @@ impl Server {
     }
 
     /// Cancels a task. Returns `false` when it already ran or was cancelled.
+    #[deprecated(note = "use `server.scheduler().cancel(id)`")]
     pub fn cancel_task(&self, id: TaskId) -> bool {
         let mut tasks = TASKS.lock();
         let before = tasks.len();

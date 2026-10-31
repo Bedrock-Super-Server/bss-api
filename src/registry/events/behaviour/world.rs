@@ -7,7 +7,7 @@ use crate::ffi::behaviour::{
     SpawnChangeEventData, ThunderChangeEventData, TickRateChangeEventData, WeatherEffectEventData,
     WorldLoadEventData,
 };
-use crate::registry::hook::{Cancellable, hook, register};
+use crate::registry::hook::{Cancellable, Verdict, hook, register};
 use crate::server::{Server, ffi_string};
 
 hook!(
@@ -32,19 +32,19 @@ hook!(
 
 impl Cancellable for ExplosionEvent {}
 
+impl ExplosionEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when an explosion is about to happen.
-
-    Returning `true` cancels the explosion.
-
-    See [`ExplosionEvent`].
-    */
-    pub fn on_explosion(
+    pub fn on_explosion<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ExplosionEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ExplosionEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<explosion>(handler);
+        register::<explosion, V>(handler);
     }
 }
 
@@ -66,19 +66,19 @@ hook!(
 
 impl Cancellable for ExplosionBlocksEvent {}
 
+impl ExplosionBlocksEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when an explosion is about to destroy blocks.
-
-    Returning `true` keeps every block in place.
-
-    See [`ExplosionBlocksEvent`].
-    */
-    pub fn on_explosion_blocks(
+    pub fn on_explosion_blocks<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ExplosionBlocksEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ExplosionBlocksEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<explosion_blocks>(handler);
+        register::<explosion_blocks, V>(handler);
     }
 }
 
@@ -104,19 +104,19 @@ hook!(
 
 impl Cancellable for LightningStrikeEvent {}
 
+impl LightningStrikeEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when lightning is about to strike.
-
-    Returning `true` cancels the strike.
-
-    See [`LightningStrikeEvent`].
-    */
-    pub fn on_lightning_strike(
+    pub fn on_lightning_strike<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &LightningStrikeEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &LightningStrikeEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<lightning_strike>(handler);
+        register::<lightning_strike, V>(handler);
     }
 }
 
@@ -135,19 +135,19 @@ hook!(
 
 impl Cancellable for RainChangeEvent {}
 
+impl RainChangeEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when rain starts or stops.
-
-    Returning `true` keeps the current weather.
-
-    See [`RainChangeEvent`].
-    */
-    pub fn on_rain_change(
+    pub fn on_rain_change<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &RainChangeEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &RainChangeEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<rain_change>(handler);
+        register::<rain_change, V>(handler);
     }
 }
 
@@ -166,19 +166,19 @@ hook!(
 
 impl Cancellable for ThunderChangeEvent {}
 
+impl ThunderChangeEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a thunderstorm starts or stops.
-
-    Returning `true` keeps the current weather.
-
-    See [`ThunderChangeEvent`].
-    */
-    pub fn on_thunder_change(
+    pub fn on_thunder_change<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ThunderChangeEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ThunderChangeEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<thunder_change>(handler);
+        register::<thunder_change, V>(handler);
     }
 }
 
@@ -201,19 +201,19 @@ hook!(
 
 impl Cancellable for WeatherEffectEvent {}
 
+impl WeatherEffectEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when the weather changes a block: snow piles up, water freezes, rain puts a fire out...
-
-    Returning `true` leaves the block as it is.
-
-    See [`WeatherEffectEvent`].
-    */
-    pub fn on_weather_effect(
+    pub fn on_weather_effect<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &WeatherEffectEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &WeatherEffectEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<weather_effect>(handler);
+        register::<weather_effect, V>(handler);
     }
 }
 
@@ -235,19 +235,19 @@ hook!(
 
 impl Cancellable for SpawnChangeEvent {}
 
+impl SpawnChangeEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when the spawn point of a world is about to move, with `/setworldspawn` or a plugin. Set another position to move it there instead.
-
-    Returning `true` from a handler keeps the spawn point where it is.
-
-    See [`SpawnChangeEvent`].
-    */
-    pub fn on_spawn_change(
+    pub fn on_spawn_change<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &SpawnChangeEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &SpawnChangeEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<spawn_change>(handler);
+        register::<spawn_change, V>(handler);
     }
 }
 
@@ -262,19 +262,19 @@ hook!(
 
 impl Cancellable for WorldLoadEvent {}
 
+impl WorldLoadEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a world finishes loading and is ready for players and plugins.
-
-    Returning `true` changes nothing.
-
-    See [`WorldLoadEvent`].
-    */
-    pub fn on_world_load(
+    pub fn on_world_load<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &WorldLoadEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &WorldLoadEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<world_load>(handler);
+        register::<world_load, V>(handler);
     }
 }
 
@@ -293,18 +293,18 @@ hook!(
 
 impl Cancellable for TickRateChangeEvent {}
 
+impl TickRateChangeEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when the tick rate of the server is about to change, through `/tick` or a plugin.
-
-    Returning `true` keeps the current rate.
-
-    See [`TickRateChangeEvent`].
-    */
-    pub fn on_tick_rate_change(
+    pub fn on_tick_rate_change<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &TickRateChangeEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &TickRateChangeEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<tick_rate_change>(handler);
+        register::<tick_rate_change, V>(handler);
     }
 }

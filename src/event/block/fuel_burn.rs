@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A furnace, smoker or blast furnace starts burning a fuel item.
 
-Returning `true` from a handler keeps the fuel unburnt.
+`event.cancel()` keeps the fuel unburnt.
 
 Handled by [`Event::on_fuel_burn`](crate::prelude::Event::on_fuel_burn) and [`Server::on_fuel_burn`](crate::server::Server::on_fuel_burn).
 */

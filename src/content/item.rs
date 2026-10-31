@@ -1,6 +1,7 @@
 use serde::Serialize;
 
 use super::armor_slot::ArmorSlot;
+use super::group::GroupRef;
 use super::material::Material;
 use super::tool::ToolType;
 
@@ -21,4 +22,6 @@ pub(crate) struct ItemDef {
     pub fast_blocks: Vec<(String, i32)>,
     pub indestructible: bool,
     pub show_uid: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub group: Option<GroupRef>,
 }

@@ -17,3 +17,10 @@ pub struct ArmorEquipEvent {
     /// Armor slot the piece goes to.
     pub armor_slot: u32,
 }
+
+impl ArmorEquipEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
+    }
+}

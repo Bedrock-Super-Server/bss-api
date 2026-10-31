@@ -9,7 +9,7 @@ A player's inventory, lent to the handler of [`Player::request_inventory`](crate
 
 Slots `0` to `8` are the hotbar and `9` to `35` the rest of the inventory, which is what
 [`size`](Self::size) counts. Past them, [`HELMET`](Self::HELMET) to [`BOOTS`](Self::BOOTS) are the
-armor and [`OFFHAND`](Self::OFFHAND) the off hand; a server older than ABI 1.4 reads them as empty.
+armor and [`OFFHAND`](Self::OFFHAND) the off hand.
 */
 pub struct Inventory {
     handle: InventoryHandle,
@@ -82,8 +82,8 @@ use bss_api::prelude::*;
 
 fn shop(player: &Player) {
     let server = player.server();
-    let Some(apple) = server.item_id("minecraft:apple") else { return };
-    let items = vec![Some(VirtualItem::new(apple, "§aApple").lore(vec!["5 coins".into()])), None, None];
+    let Some(apple) = server.items().id("minecraft:apple") else { return };
+    let items = vec![Some(VirtualItem::new(apple.0, "§aApple").lore(vec!["5 coins".into()])), None, None];
     player.open_virtual_chest("Shop", &items, |slot, buyer| {
         if slot == 0 {
             buyer.message("You bought an apple.");

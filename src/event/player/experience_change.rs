@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A player gains or loses experience.
 
-Returning `true` from a handler leaves the experience unchanged.
+`event.cancel()` leaves the experience unchanged.
 
 Handled by [`Event::on_experience_change`](crate::prelude::Event::on_experience_change) and [`Server::on_experience_change`](crate::server::Server::on_experience_change).
 */
@@ -15,6 +15,13 @@ pub struct ExperienceChangeEvent {
     /// Total experience points before the change.
     pub total: i32,
     pub(crate) amount: Cell<i32>,
+}
+
+impl ExperienceChangeEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl ExperienceChangeEvent {

@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A player casts a fishing rod, or reels it in.
 
-Returning `true` from a handler cancels the cast or the catch.
+`event.cancel()` cancels the cast or the catch.
 
 Handled by [`Event::on_fish`](crate::prelude::Event::on_fish) and [`Server::on_fish`](crate::server::Server::on_fish).
 */
@@ -16,6 +16,13 @@ pub struct FishEvent {
     pub(crate) experience: Cell<u32>,
     /// Runtime id of the entity on the hook, or `0`.
     pub hooked: u64,
+}
+
+impl FishEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl FishEvent {

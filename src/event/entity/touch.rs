@@ -1,7 +1,7 @@
 /**
 A player touches or hits an entity that has no behaviour of its own, such as a plugin entity.
 
-Returning `true` from a handler ignores the touch.
+`event.cancel()` ignores the touch.
 
 Handled by [`Event::on_entity_touch`](crate::prelude::Event::on_entity_touch) and [`Server::on_entity_touch`](crate::server::Server::on_entity_touch).
 */
@@ -14,4 +14,11 @@ pub struct EntityTouchEvent {
     pub identifier: String,
     /// `true` for a hit, `false` for a use.
     pub attack: bool,
+}
+
+impl EntityTouchEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }

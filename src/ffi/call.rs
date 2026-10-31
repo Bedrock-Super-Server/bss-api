@@ -52,6 +52,19 @@ impl_host_fn!(A, B, C, D, E, F, G, H, I, J, K);
 impl_host_fn!(A, B, C, D, E, F, G, H, I, J, K, L);
 
 /**
+Calls a function of the host table and says why it could not when the server does not provide it: `host_try!(host, name(a, b))` is `Ok(result)`, or `Err(`[`ApiError`](crate::error::ApiError)`)` that tells an old server from a function the sandbox holds back.
+*/
+macro_rules! host_try {
+    ($host:expr, $name:ident($($arg:expr),* $(,)?)) => {{
+        let args = ($($arg,)*);
+        match $host.$name {
+            Some(function) => Ok($crate::ffi::call::HostFn::call(function, args)),
+            None => Err($crate::error::ApiError::absent(stringify!($name))),
+        }
+    }};
+}
+
+/**
 Calls a function of the host table, if the server provides it.
 
 `host_call!(host, name(a, b))` evaluates to `Some(result)` when `host.name` is set and `None` otherwise, which lets an older server that lacks a newer function answer with a neutral value instead of crashing the plugin:

@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A block forms in the world on its own: lava and water make obsidian or cobblestone, snow piles up, ice freezes...
 
-Returning `true` from a handler prevents the block from forming.
+`event.cancel()` prevents the block from forming.
 
 Handled by [`Event::on_block_form`](crate::prelude::Event::on_block_form) and [`Server::on_block_form`](crate::server::Server::on_block_form).
 */

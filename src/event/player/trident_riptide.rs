@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A player launches with a Riptide trident.
 
-Returning `true` from a handler cancels the launch.
+`event.cancel()` cancels the launch.
 
 Handled by [`Event::on_trident_riptide`](crate::prelude::Event::on_trident_riptide) and [`Server::on_trident_riptide`](crate::server::Server::on_trident_riptide).
 */
@@ -11,6 +11,13 @@ pub struct TridentRiptideEvent {
     /// Name of the player.
     pub player: String,
     pub(crate) strength: Cell<f32>,
+}
+
+impl TridentRiptideEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl TridentRiptideEvent {

@@ -20,7 +20,7 @@ impl Player {
     refused the screen; [`DduiScreen`] lists what it refuses.
 
     A plugin can also follow every screen with the events [`DduiResponseEvent`](crate::event::DduiResponseEvent) and
-    [`DduiCloseEvent`](crate::event::DduiCloseEvent). Returning `true` from the first puts the control the player
+    [`DduiCloseEvent`](crate::event::DduiCloseEvent). `event.cancel()` from the first puts the control the player
     used back as it was, and the handler does not see it.
 
     See [`DduiScreen`] for an example.

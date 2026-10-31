@@ -1,7 +1,7 @@
 /**
 A mob is about to spawn.
 
-Returning `true` from a handler prevents the spawn.
+`event.cancel()` prevents the spawn.
 
 Handled by [`Event::on_mob_spawn`](crate::prelude::Event::on_mob_spawn) and [`Server::on_mob_spawn`](crate::server::Server::on_mob_spawn).
 */

@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A player trades with a villager or a wandering trader.
 
-Returning `true` from a handler cancels the trade.
+`event.cancel()` cancels the trade.
 
 Handled by [`Event::on_villager_trade`](crate::prelude::Event::on_villager_trade) and [`Server::on_villager_trade`](crate::server::Server::on_villager_trade).
 */
@@ -19,6 +19,13 @@ pub struct VillagerTradeEvent {
     /// Numeric id of the item the player receives.
     pub item: i16,
     pub(crate) experience: Cell<i32>,
+}
+
+impl VillagerTradeEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl VillagerTradeEvent {

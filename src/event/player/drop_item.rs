@@ -1,7 +1,7 @@
 /**
 A player drops an item from their inventory.
 
-Returning `true` from a handler keeps the items in the inventory.
+`event.cancel()` keeps the items in the inventory.
 
 Handled by [`Event::on_drop_item`](crate::prelude::Event::on_drop_item).
 */
@@ -16,4 +16,11 @@ pub struct DropItemEvent {
     pub count: u8,
     /// Inventory slot the items come from.
     pub source_slot: u32,
+}
+
+impl DropItemEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
+    }
 }

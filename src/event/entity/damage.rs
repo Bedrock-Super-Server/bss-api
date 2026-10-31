@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A player attacks an entity in melee.
 
-Returning `true` from a handler cancels the hit.
+`event.cancel()` cancels the hit.
 
 Handled by [`Event::on_entity_damage`](crate::prelude::Event::on_entity_damage).
 */

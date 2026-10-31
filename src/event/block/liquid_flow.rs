@@ -1,7 +1,7 @@
 /**
 Water or lava is about to flow into a block.
 
-Returning `true` from a handler stops the liquid from flowing into this block.
+`event.cancel()` stops the liquid from flowing into this block.
 
 Handled by [`Event::on_liquid_flow`](crate::prelude::Event::on_liquid_flow) and [`Server::on_liquid_flow`](crate::server::Server::on_liquid_flow).
 */

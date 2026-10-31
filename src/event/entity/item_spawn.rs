@@ -1,7 +1,7 @@
 /**
 An item entity appears in the world: a drop, a broken block, a dispenser throw...
 
-Returning `true` from a handler prevents the item from appearing.
+`event.cancel()` prevents the item from appearing.
 
 Handled by [`Event::on_item_spawn`](crate::prelude::Event::on_item_spawn) and [`Server::on_item_spawn`](crate::server::Server::on_item_spawn).
 */

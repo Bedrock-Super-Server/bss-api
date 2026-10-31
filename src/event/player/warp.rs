@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A player teleports with an ender pearl or a chorus fruit.
 
-Returning `true` from a handler cancels the teleport.
+`event.cancel()` cancels the teleport.
 
 Handled by [`Event::on_player_warp`](crate::prelude::Event::on_player_warp) and [`Server::on_player_warp`](crate::server::Server::on_player_warp).
 */
@@ -15,6 +15,13 @@ pub struct PlayerWarpEvent {
     pub(crate) x: Cell<f32>,
     pub(crate) y: Cell<f32>,
     pub(crate) z: Cell<f32>,
+}
+
+impl PlayerWarpEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl PlayerWarpEvent {

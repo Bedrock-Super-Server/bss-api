@@ -1,7 +1,7 @@
 /**
 A minecart turns a detector rail on or off.
 
-Returning `true` from a handler leaves the rail as it was.
+`event.cancel()` leaves the rail as it was.
 
 Handled by [`Event::on_detector_rail`](crate::prelude::Event::on_detector_rail) and [`Server::on_detector_rail`](crate::server::Server::on_detector_rail).
 */

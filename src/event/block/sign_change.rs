@@ -3,7 +3,7 @@ use std::cell::RefCell;
 /**
 A player finishes editing the text of a sign.
 
-Returning `true` from a handler leaves the sign unchanged.
+`event.cancel()` leaves the sign unchanged.
 
 Handled by [`Event::on_sign_change`](crate::prelude::Event::on_sign_change) and [`Server::on_sign_change`](crate::server::Server::on_sign_change).
 */
@@ -19,6 +19,13 @@ pub struct SignChangeEvent {
     /// `true` for the front of the sign, `false` for the back.
     pub front: bool,
     pub(crate) text: RefCell<String>,
+}
+
+impl SignChangeEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl SignChangeEvent {

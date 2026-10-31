@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A dispenser or dropper fires an item.
 
-Returning `true` from a handler cancels the shot.
+`event.cancel()` cancels the shot.
 
 Handled by [`Event::on_block_dispense`](crate::prelude::Event::on_block_dispense) and [`Server::on_block_dispense`](crate::server::Server::on_block_dispense).
 */

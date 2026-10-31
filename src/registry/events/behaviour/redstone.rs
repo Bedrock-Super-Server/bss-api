@@ -10,7 +10,7 @@ use crate::ffi::behaviour::{
     MinecartPickupEventData, MinecartTransferEventData, PistonMoveEventData, PistonPushEventData,
     PressurePlateEventData, RedstonePowerEventData, SculkVibrationEventData, TripwireEventData,
 };
-use crate::registry::hook::{Cancellable, hook, register};
+use crate::registry::hook::{Cancellable, Verdict, hook, register};
 use crate::server::{Server, ffi_string};
 
 hook!(
@@ -29,19 +29,19 @@ hook!(
 
 impl Cancellable for RedstonePowerEvent {}
 
+impl RedstonePowerEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when the redstone power of a block changes.
-
-    Returning `true` keeps the previous power.
-
-    See [`RedstonePowerEvent`].
-    */
-    pub fn on_redstone_power(
+    pub fn on_redstone_power<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &RedstonePowerEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &RedstonePowerEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<redstone_power>(handler);
+        register::<redstone_power, V>(handler);
     }
 }
 
@@ -60,19 +60,19 @@ hook!(
 
 impl Cancellable for PistonMoveEvent {}
 
+impl PistonMoveEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a piston extends or retracts.
-
-    Returning `true` keeps the piston still.
-
-    See [`PistonMoveEvent`].
-    */
-    pub fn on_piston_move(
+    pub fn on_piston_move<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PistonMoveEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PistonMoveEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<piston_move>(handler);
+        register::<piston_move, V>(handler);
     }
 }
 
@@ -99,19 +99,19 @@ hook!(
 
 impl Cancellable for PistonPushEvent {}
 
+impl PistonPushEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a piston pushes an entity.
-
-    Returning `true` leaves the entity where it is.
-
-    See [`PistonPushEvent`].
-    */
-    pub fn on_piston_push(
+    pub fn on_piston_push<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PistonPushEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PistonPushEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<piston_push>(handler);
+        register::<piston_push, V>(handler);
     }
 }
 
@@ -131,19 +131,19 @@ hook!(
 
 impl Cancellable for MinecartActivateEvent {}
 
+impl MinecartActivateEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a minecart passes over a powered activator rail.
-
-    Returning `true` ignores the rail.
-
-    See [`MinecartActivateEvent`].
-    */
-    pub fn on_minecart_activate(
+    pub fn on_minecart_activate<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &MinecartActivateEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &MinecartActivateEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<minecart_activate>(handler);
+        register::<minecart_activate, V>(handler);
     }
 }
 
@@ -163,19 +163,19 @@ hook!(
 
 impl Cancellable for MinecartTransferEvent {}
 
+impl MinecartTransferEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a hopper moves an item into or out of a minecart.
-
-    Returning `true` cancels the transfer.
-
-    See [`MinecartTransferEvent`].
-    */
-    pub fn on_minecart_transfer(
+    pub fn on_minecart_transfer<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &MinecartTransferEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &MinecartTransferEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<minecart_transfer>(handler);
+        register::<minecart_transfer, V>(handler);
     }
 }
 
@@ -192,19 +192,19 @@ hook!(
 
 impl Cancellable for MinecartPickupEvent {}
 
+impl MinecartPickupEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a hopper minecart picks up an item entity.
-
-    Returning `true` leaves the item where it is.
-
-    See [`MinecartPickupEvent`].
-    */
-    pub fn on_minecart_pickup(
+    pub fn on_minecart_pickup<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &MinecartPickupEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &MinecartPickupEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<minecart_pickup>(handler);
+        register::<minecart_pickup, V>(handler);
     }
 }
 
@@ -226,19 +226,19 @@ hook!(
 
 impl Cancellable for BlockDispenseEvent {}
 
+impl BlockDispenseEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a dispenser or dropper fires an item.
-
-    Returning `true` cancels the shot.
-
-    See [`BlockDispenseEvent`].
-    */
-    pub fn on_block_dispense(
+    pub fn on_block_dispense<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &BlockDispenseEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &BlockDispenseEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<block_dispense>(handler);
+        register::<block_dispense, V>(handler);
     }
 }
 
@@ -259,19 +259,19 @@ hook!(
 
 impl Cancellable for ItemTransferEvent {}
 
+impl ItemTransferEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a hopper moves an item from one container to another.
-
-    Returning `true` cancels the transfer.
-
-    See [`ItemTransferEvent`].
-    */
-    pub fn on_item_transfer(
+    pub fn on_item_transfer<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ItemTransferEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ItemTransferEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<item_transfer>(handler);
+        register::<item_transfer, V>(handler);
     }
 }
 
@@ -290,19 +290,19 @@ hook!(
 
 impl Cancellable for HopperPickupEvent {}
 
+impl HopperPickupEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a hopper picks up an item entity lying above it.
-
-    Returning `true` leaves the item where it is.
-
-    See [`HopperPickupEvent`].
-    */
-    pub fn on_hopper_pickup(
+    pub fn on_hopper_pickup<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &HopperPickupEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &HopperPickupEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<hopper_pickup>(handler);
+        register::<hopper_pickup, V>(handler);
     }
 }
 
@@ -321,19 +321,19 @@ hook!(
 
 impl Cancellable for TripwireEvent {}
 
+impl TripwireEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a tripwire is triggered or released.
-
-    Returning `true` leaves the tripwire as it was.
-
-    See [`TripwireEvent`].
-    */
-    pub fn on_tripwire(
+    pub fn on_tripwire<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &TripwireEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &TripwireEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<tripwire>(handler);
+        register::<tripwire, V>(handler);
     }
 }
 
@@ -352,19 +352,19 @@ hook!(
 
 impl Cancellable for DetectorRailEvent {}
 
+impl DetectorRailEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a minecart turns a detector rail on or off.
-
-    Returning `true` leaves the rail as it was.
-
-    See [`DetectorRailEvent`].
-    */
-    pub fn on_detector_rail(
+    pub fn on_detector_rail<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &DetectorRailEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &DetectorRailEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<detector_rail>(handler);
+        register::<detector_rail, V>(handler);
     }
 }
 
@@ -390,19 +390,19 @@ hook!(
 
 impl Cancellable for SculkVibrationEvent {}
 
+impl SculkVibrationEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a sculk sensor detects a vibration.
-
-    Returning `true` keeps the sensor from reacting.
-
-    See [`SculkVibrationEvent`].
-    */
-    pub fn on_sculk_vibration(
+    pub fn on_sculk_vibration<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &SculkVibrationEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &SculkVibrationEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<sculk_vibration>(handler);
+        register::<sculk_vibration, V>(handler);
     }
 }
 
@@ -426,19 +426,19 @@ hook!(
 
 impl Cancellable for CrafterCraftEvent {}
 
+impl CrafterCraftEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a crafter crafts an item.
-
-    Returning `true` cancels the craft.
-
-    See [`CrafterCraftEvent`].
-    */
-    pub fn on_crafter_craft(
+    pub fn on_crafter_craft<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &CrafterCraftEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &CrafterCraftEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<crafter_craft>(handler);
+        register::<crafter_craft, V>(handler);
     }
 }
 
@@ -458,19 +458,19 @@ hook!(
 
 impl Cancellable for DispenserEquipEvent {}
 
+impl DispenserEquipEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a dispenser puts armor on a player in front of it.
-
-    Returning `true` keeps the armor in the dispenser.
-
-    See [`DispenserEquipEvent`].
-    */
-    pub fn on_dispenser_equip(
+    pub fn on_dispenser_equip<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &DispenserEquipEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &DispenserEquipEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<dispenser_equip>(handler);
+        register::<dispenser_equip, V>(handler);
     }
 }
 
@@ -492,18 +492,18 @@ hook!(
 
 impl Cancellable for PressurePlateEvent {}
 
+impl PressurePlateEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when something steps on or leaves a pressure plate.
-
-    Returning `true` keeps the plate in its previous state.
-
-    See [`PressurePlateEvent`].
-    */
-    pub fn on_pressure_plate(
+    pub fn on_pressure_plate<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PressurePlateEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PressurePlateEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<pressure_plate>(handler);
+        register::<pressure_plate, V>(handler);
     }
 }

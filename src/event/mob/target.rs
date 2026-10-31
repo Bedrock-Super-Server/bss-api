@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A mob picks a new target.
 
-Returning `true` from a handler leaves the mob without a target.
+`event.cancel()` leaves the mob without a target.
 
 Handled by [`Event::on_mob_target`](crate::prelude::Event::on_mob_target) and [`Server::on_mob_target`](crate::server::Server::on_mob_target).
 */

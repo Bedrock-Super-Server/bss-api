@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A sculk sensor detects a vibration.
 
-Returning `true` from a handler keeps the sensor from reacting.
+`event.cancel()` keeps the sensor from reacting.
 
 Handled by [`Event::on_sculk_vibration`](crate::prelude::Event::on_sculk_vibration) and [`Server::on_sculk_vibration`](crate::server::Server::on_sculk_vibration).
 */

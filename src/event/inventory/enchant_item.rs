@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A player enchants an item at an enchanting table.
 
-Returning `true` from a handler cancels the enchantment.
+`event.cancel()` cancels the enchantment.
 
 Handled by [`Event::on_enchant_item`](crate::prelude::Event::on_enchant_item) and [`Server::on_enchant_item`](crate::server::Server::on_enchant_item).
 */
@@ -15,6 +15,13 @@ pub struct EnchantItemEvent {
     /// Which of the three offered enchantments was chosen, from `0` to `2`.
     pub option: i32,
     pub(crate) levels: Cell<i32>,
+}
+
+impl EnchantItemEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl EnchantItemEvent {

@@ -1,6 +1,6 @@
 use crate::event::dragon::{DragonDeathEvent, DragonPhaseEvent, DragonSpawnEvent};
 use crate::ffi::behaviour::{DragonDeathEventData, DragonPhaseEventData, DragonSpawnEventData};
-use crate::registry::hook::{Cancellable, hook, register};
+use crate::registry::hook::{Cancellable, Verdict, hook, register};
 use crate::server::{Server, ffi_string};
 
 hook!(
@@ -18,19 +18,19 @@ hook!(
 
 impl Cancellable for DragonSpawnEvent {}
 
+impl DragonSpawnEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when an ender dragon is about to spawn in the End.
-
-    Returning `true` prevents the dragon from spawning.
-
-    See [`DragonSpawnEvent`].
-    */
-    pub fn on_dragon_spawn(
+    pub fn on_dragon_spawn<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &DragonSpawnEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &DragonSpawnEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<dragon_spawn>(handler);
+        register::<dragon_spawn, V>(handler);
     }
 }
 
@@ -46,19 +46,19 @@ hook!(
 
 impl Cancellable for DragonPhaseEvent {}
 
+impl DragonPhaseEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when the ender dragon changes its behaviour phase.
-
-    The value returned is ignored: this event cannot be cancelled.
-
-    See [`DragonPhaseEvent`].
-    */
-    pub fn on_dragon_phase(
+    pub fn on_dragon_phase<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &DragonPhaseEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &DragonPhaseEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<dragon_phase>(handler);
+        register::<dragon_phase, V>(handler);
     }
 }
 
@@ -81,18 +81,18 @@ hook!(
 
 impl Cancellable for DragonDeathEvent {}
 
+impl DragonDeathEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when the ender dragon dies.
-
-    The value returned is ignored: this event cannot be cancelled.
-
-    See [`DragonDeathEvent`].
-    */
-    pub fn on_dragon_death(
+    pub fn on_dragon_death<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &DragonDeathEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &DragonDeathEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<dragon_death>(handler);
+        register::<dragon_death, V>(handler);
     }
 }

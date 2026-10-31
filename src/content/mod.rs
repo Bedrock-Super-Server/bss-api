@@ -5,7 +5,7 @@ The server sends custom content to players when they join, along with the resour
 
 # Example
 
-A ruby, a ruby block, the recipe between them, and a creative group:
+A ruby, a ruby block, the recipe between them, and a creative group (see [`CustomGroup`] to define a group as a type that items and blocks name as theirs, and [`VanillaGroup`] to put them in a group of the game):
 
 ```
 use bss_api::prelude::*;
@@ -166,9 +166,9 @@ A plugin reads and sets the states of a block with [`Block`](crate::server::worl
 use bss_api::prelude::*;
 
 fn switch(server: &Server, x: i32, y: i32, z: i32) {
-    let block = Block::from_runtime_id(server.block_at(x, y, z));
+    let block = Block::from_runtime_id(server.blocks().at(x, y, z).0);
     let up = block.state_bool("custom:up").unwrap_or(false);
-    server.set_block(x, y, z, block.with("custom:up", !up).runtime_id());
+    server.blocks().set(x, y, z, block.with("custom:up", !up).runtime_id());
 }
 ```
 */
@@ -185,6 +185,7 @@ mod material;
 mod permutation;
 mod recipe;
 mod tool;
+mod vanilla_group;
 
 pub(crate) mod block;
 pub(crate) mod item;
@@ -196,11 +197,12 @@ pub use block_state::{BlockState, StateValues};
 pub use category::Category;
 pub use custom_block::CustomBlock;
 pub use custom_item::CustomItem;
-pub use group::GroupDef;
+pub use group::{CustomGroup, GroupDef, GroupRef};
 pub use material::Material;
 pub use permutation::{BlockPermutation, Condition, StateValue};
 pub use recipe::RecipeDef;
 pub use tool::ToolType;
+pub use vanilla_group::VanillaGroup;
 
 pub(crate) use block::BlockDef;
 pub(crate) use item::ItemDef;
@@ -235,7 +237,7 @@ impl Server {
     /**
     Adds a recipe of another station than the crafting table: `furnace`, `blast_furnace`,
     `smoker`, `campfire`, `soul_campfire` or `stonecutter`, which take a single input, or
-    `crafting_table`. Returns `false` when the server is older than ABI 1.5 and cannot take it.
+    `crafting_table`.
 
     ```
     use bss_api::prelude::*;

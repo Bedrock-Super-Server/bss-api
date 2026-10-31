@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 Mending repairs an item with experience the player picked up.
 
-Returning `true` from a handler cancels the repair.
+`event.cancel()` cancels the repair.
 
 Handled by [`Event::on_item_mend`](crate::prelude::Event::on_item_mend) and [`Server::on_item_mend`](crate::server::Server::on_item_mend).
 */
@@ -13,6 +13,13 @@ pub struct ItemMendEvent {
     /// Numeric id of the item; [`Server::item_name`](crate::server::Server::item_name) gives its name.
     pub item: i16,
     pub(crate) repair: Cell<u32>,
+}
+
+impl ItemMendEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl ItemMendEvent {

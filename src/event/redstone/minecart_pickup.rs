@@ -1,7 +1,7 @@
 /**
 A hopper minecart picks up an item entity.
 
-Returning `true` from a handler leaves the item where it is.
+`event.cancel()` leaves the item where it is.
 
 Handled by [`Event::on_minecart_pickup`](crate::prelude::Event::on_minecart_pickup) and [`Server::on_minecart_pickup`](crate::server::Server::on_minecart_pickup).
 */

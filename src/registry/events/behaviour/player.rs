@@ -1,23 +1,28 @@
 use crate::event::player::{
     BookEditEvent, CrossbowLoadEvent, DduiCloseEvent, DduiResponseEvent, ExperienceChangeEvent,
     ExperiencePickupEvent, FishEvent, FoodChangeEvent, HornBlowEvent, ItemBreakEvent,
-    ItemDamageEvent, ItemMendEvent, OffhandChangeEvent, PlayerBedEnterEvent, PlayerBedLeaveEvent,
-    PlayerCombustEvent, PlayerDamageEvent, PlayerEffectAddEvent, PlayerEffectRemoveEvent,
-    PlayerHealEvent, PlayerJumpEvent, PlayerKickEvent, PlayerMountEvent,
-    PlayerViewDistanceChangeEvent, PlayerWarpEvent, ShieldBlockEvent, TotemUseEvent,
+    ItemDamageEvent, ItemMendEvent, OffhandChangeEvent, PlayerAfkEvent, PlayerAttackEvent,
+    PlayerBedEnterEvent, PlayerBedLeaveEvent, PlayerChunkEnterEvent, PlayerCombustEvent,
+    PlayerCrawlEvent, PlayerDamageEvent, PlayerEffectAddEvent, PlayerEffectRemoveEvent,
+    PlayerFallEvent, PlayerFlyToggleEvent, PlayerHealEvent, PlayerJumpEvent, PlayerKickEvent,
+    PlayerMountEvent, PlayerSwingMissEvent, PlayerViewDistanceChangeEvent, PlayerWarpEvent,
+    PlayerWorldChangeEvent, ResourcePackStatusEvent, ShieldBlockEvent, TotemUseEvent,
     TridentRiptideEvent, VehicleMoveEvent,
 };
 use crate::ffi::behaviour::{
     BookEditEventData, CrossbowLoadEventData, DduiCloseEventData, DduiResponseEventData,
     ExperienceChangeEventData, ExperiencePickupEventData, FishEventData, FoodChangeEventData,
     HornBlowEventData, ItemBreakEventData, ItemDamageEventData, ItemMendEventData,
-    OffhandChangeEventData, PlayerBedEnterEventData, PlayerBedLeaveEventData,
-    PlayerCombustEventData, PlayerDamageEventData, PlayerEffectAddEventData,
-    PlayerEffectRemoveEventData, PlayerHealEventData, PlayerJumpEventData, PlayerKickEventData,
-    PlayerMountEventData, PlayerViewDistanceChangeEventData, PlayerWarpEventData,
-    ShieldBlockEventData, TotemUseEventData, TridentRiptideEventData, VehicleMoveEventData,
+    OffhandChangeEventData, PlayerAfkEventData, PlayerAttackEventData, PlayerBedEnterEventData,
+    PlayerBedLeaveEventData, PlayerChunkEnterEventData, PlayerCombustEventData,
+    PlayerCrawlEventData, PlayerDamageEventData, PlayerEffectAddEventData,
+    PlayerEffectRemoveEventData, PlayerFallEventData, PlayerFlyToggleEventData,
+    PlayerHealEventData, PlayerJumpEventData, PlayerKickEventData, PlayerMountEventData,
+    PlayerSwingMissEventData, PlayerViewDistanceChangeEventData, PlayerWarpEventData,
+    PlayerWorldChangeEventData, ResourcePackStatusEventData, ShieldBlockEventData,
+    TotemUseEventData, TridentRiptideEventData, VehicleMoveEventData,
 };
-use crate::registry::hook::{Cancellable, hook, register};
+use crate::registry::hook::{Cancellable, Verdict, hook, register};
 use crate::server::{Server, ffi_string};
 
 hook!(
@@ -36,19 +41,19 @@ hook!(
 
 impl Cancellable for PlayerDamageEvent {}
 
+impl PlayerDamageEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player takes damage.
-
-    Returning `true` cancels the damage.
-
-    See [`PlayerDamageEvent`].
-    */
-    pub fn on_player_damage(
+    pub fn on_player_damage<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PlayerDamageEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PlayerDamageEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<player_damage>(handler);
+        register::<player_damage, V>(handler);
     }
 }
 
@@ -67,19 +72,19 @@ hook!(
 
 impl Cancellable for PlayerHealEvent {}
 
+impl PlayerHealEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player regains health.
-
-    Returning `true` cancels the healing.
-
-    See [`PlayerHealEvent`].
-    */
-    pub fn on_player_heal(
+    pub fn on_player_heal<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PlayerHealEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PlayerHealEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<player_heal>(handler);
+        register::<player_heal, V>(handler);
     }
 }
 
@@ -97,19 +102,19 @@ hook!(
 
 impl Cancellable for PlayerCombustEvent {}
 
+impl PlayerCombustEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player catches fire.
-
-    Returning `true` keeps the player from burning.
-
-    See [`PlayerCombustEvent`].
-    */
-    pub fn on_player_combust(
+    pub fn on_player_combust<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PlayerCombustEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PlayerCombustEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<player_combust>(handler);
+        register::<player_combust, V>(handler);
     }
 }
 
@@ -130,19 +135,19 @@ hook!(
 
 impl Cancellable for FoodChangeEvent {}
 
+impl FoodChangeEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player's hunger bar changes.
-
-    Returning `true` keeps the previous values.
-
-    See [`FoodChangeEvent`].
-    */
-    pub fn on_food_change(
+    pub fn on_food_change<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &FoodChangeEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &FoodChangeEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<food_change>(handler);
+        register::<food_change, V>(handler);
     }
 }
 
@@ -162,19 +167,19 @@ hook!(
 
 impl Cancellable for ExperienceChangeEvent {}
 
+impl ExperienceChangeEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player gains or loses experience.
-
-    Returning `true` leaves the experience unchanged.
-
-    See [`ExperienceChangeEvent`].
-    */
-    pub fn on_experience_change(
+    pub fn on_experience_change<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ExperienceChangeEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ExperienceChangeEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<experience_change>(handler);
+        register::<experience_change, V>(handler);
     }
 }
 
@@ -193,19 +198,19 @@ hook!(
 
 impl Cancellable for ExperiencePickupEvent {}
 
+impl ExperiencePickupEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player picks up an experience orb.
-
-    Returning `true` leaves the orb where it is.
-
-    See [`ExperiencePickupEvent`].
-    */
-    pub fn on_experience_pickup(
+    pub fn on_experience_pickup<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ExperiencePickupEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ExperiencePickupEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<experience_pickup>(handler);
+        register::<experience_pickup, V>(handler);
     }
 }
 
@@ -224,19 +229,19 @@ hook!(
 
 impl Cancellable for ItemMendEvent {}
 
+impl ItemMendEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when mending repairs an item with experience the player picked up.
-
-    Returning `true` cancels the repair.
-
-    See [`ItemMendEvent`].
-    */
-    pub fn on_item_mend(
+    pub fn on_item_mend<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ItemMendEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ItemMendEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<item_mend>(handler);
+        register::<item_mend, V>(handler);
     }
 }
 
@@ -256,19 +261,19 @@ hook!(
 
 impl Cancellable for ItemDamageEvent {}
 
+impl ItemDamageEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a tool, weapon or piece of armor is about to lose durability.
-
-    Returning `true` prevents the loss.
-
-    See [`ItemDamageEvent`].
-    */
-    pub fn on_item_damage(
+    pub fn on_item_damage<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ItemDamageEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ItemDamageEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<item_damage>(handler);
+        register::<item_damage, V>(handler);
     }
 }
 
@@ -284,19 +289,19 @@ hook!(
 
 impl Cancellable for ItemBreakEvent {}
 
+impl ItemBreakEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a tool, weapon or piece of armor breaks after losing its last durability point.
-
-    The value returned is ignored: this event cannot be cancelled.
-
-    See [`ItemBreakEvent`].
-    */
-    pub fn on_item_break(
+    pub fn on_item_break<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ItemBreakEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ItemBreakEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<item_break>(handler);
+        register::<item_break, V>(handler);
     }
 }
 
@@ -312,19 +317,19 @@ hook!(
 
 impl Cancellable for ShieldBlockEvent {}
 
+impl ShieldBlockEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player blocks an attack with a shield.
-
-    Returning `true` cancels it.
-
-    See [`ShieldBlockEvent`].
-    */
-    pub fn on_shield_block(
+    pub fn on_shield_block<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ShieldBlockEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ShieldBlockEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<shield_block>(handler);
+        register::<shield_block, V>(handler);
     }
 }
 
@@ -338,19 +343,19 @@ hook!(
 
 impl Cancellable for TotemUseEvent {}
 
+impl TotemUseEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a totem of undying saves a player from death.
-
-    Returning `true` stops the totem from saving the player.
-
-    See [`TotemUseEvent`].
-    */
-    pub fn on_totem_use(
+    pub fn on_totem_use<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &TotemUseEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &TotemUseEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<totem_use>(handler);
+        register::<totem_use, V>(handler);
     }
 }
 
@@ -373,19 +378,19 @@ hook!(
 
 impl Cancellable for PlayerWarpEvent {}
 
+impl PlayerWarpEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player teleports with an ender pearl or a chorus fruit.
-
-    Returning `true` cancels the teleport.
-
-    See [`PlayerWarpEvent`].
-    */
-    pub fn on_player_warp(
+    pub fn on_player_warp<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PlayerWarpEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PlayerWarpEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<player_warp>(handler);
+        register::<player_warp, V>(handler);
     }
 }
 
@@ -401,19 +406,19 @@ hook!(
 
 impl Cancellable for PlayerMountEvent {}
 
+impl PlayerMountEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player gets on or off a vehicle or a mob.
-
-    Returning `true` cancels it.
-
-    See [`PlayerMountEvent`].
-    */
-    pub fn on_player_mount(
+    pub fn on_player_mount<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PlayerMountEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PlayerMountEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<player_mount>(handler);
+        register::<player_mount, V>(handler);
     }
 }
 
@@ -431,19 +436,19 @@ hook!(
 
 impl Cancellable for VehicleMoveEvent {}
 
+impl VehicleMoveEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player moves the vehicle they ride.
-
-    Returning `true` keeps the vehicle where it was.
-
-    See [`VehicleMoveEvent`].
-    */
-    pub fn on_vehicle_move(
+    pub fn on_vehicle_move<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &VehicleMoveEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &VehicleMoveEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<vehicle_move>(handler);
+        register::<vehicle_move, V>(handler);
     }
 }
 
@@ -458,19 +463,19 @@ hook!(
 
 impl Cancellable for CrossbowLoadEvent {}
 
+impl CrossbowLoadEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player loads a crossbow.
-
-    Returning `true` keeps the crossbow unloaded.
-
-    See [`CrossbowLoadEvent`].
-    */
-    pub fn on_crossbow_load(
+    pub fn on_crossbow_load<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &CrossbowLoadEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &CrossbowLoadEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<crossbow_load>(handler);
+        register::<crossbow_load, V>(handler);
     }
 }
 
@@ -488,19 +493,19 @@ hook!(
 
 impl Cancellable for TridentRiptideEvent {}
 
+impl TridentRiptideEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player launches with a Riptide trident.
-
-    Returning `true` cancels the launch.
-
-    See [`TridentRiptideEvent`].
-    */
-    pub fn on_trident_riptide(
+    pub fn on_trident_riptide<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &TridentRiptideEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &TridentRiptideEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<trident_riptide>(handler);
+        register::<trident_riptide, V>(handler);
     }
 }
 
@@ -522,16 +527,19 @@ hook!(
 
 impl Cancellable for FishEvent {}
 
+impl FishEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player casts a fishing rod, or reels it in.
-
-    Returning `true` cancels the cast or the catch.
-
-    See [`FishEvent`].
-    */
-    pub fn on_fish(&self, handler: impl Fn(&Server, &FishEvent) -> bool + Send + Sync + 'static) {
-        register::<fish>(handler);
+    pub fn on_fish<V: Verdict>(
+        &self,
+        handler: impl Fn(&Server, &FishEvent) -> V + Send + Sync + 'static,
+    ) {
+        register::<fish, V>(handler);
     }
 }
 
@@ -549,19 +557,19 @@ hook!(
 
 impl Cancellable for HornBlowEvent {}
 
+impl HornBlowEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player blows a goat horn.
-
-    Returning `true` keeps the horn silent.
-
-    See [`HornBlowEvent`].
-    */
-    pub fn on_horn_blow(
+    pub fn on_horn_blow<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &HornBlowEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &HornBlowEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<horn_blow>(handler);
+        register::<horn_blow, V>(handler);
     }
 }
 
@@ -579,19 +587,19 @@ hook!(
 
 impl Cancellable for BookEditEvent {}
 
+impl BookEditEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player edits or signs a book and quill.
-
-    Returning `true` rejects the edit.
-
-    See [`BookEditEvent`].
-    */
-    pub fn on_book_edit(
+    pub fn on_book_edit<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &BookEditEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &BookEditEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<book_edit>(handler);
+        register::<book_edit, V>(handler);
     }
 }
 
@@ -607,19 +615,19 @@ hook!(
 
 impl Cancellable for OffhandChangeEvent {}
 
+impl OffhandChangeEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player changes the item in their off hand.
-
-    Returning `true` cancels it.
-
-    See [`OffhandChangeEvent`].
-    */
-    pub fn on_offhand_change(
+    pub fn on_offhand_change<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &OffhandChangeEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &OffhandChangeEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<offhand_change>(handler);
+        register::<offhand_change, V>(handler);
     }
 }
 
@@ -637,19 +645,19 @@ hook!(
 
 impl Cancellable for PlayerBedEnterEvent {}
 
+impl PlayerBedEnterEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player lies down in a bed: it is night or a thunderstorm, no monster is near and nobody else lies there.
-
-    Returning `true` from a handler keeps the player standing; the bed still becomes their respawn point.
-
-    See [`PlayerBedEnterEvent`].
-    */
-    pub fn on_player_bed_enter(
+    pub fn on_player_bed_enter<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PlayerBedEnterEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PlayerBedEnterEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<player_bed_enter>(handler);
+        register::<player_bed_enter, V>(handler);
     }
 }
 
@@ -668,19 +676,19 @@ hook!(
 
 impl Cancellable for PlayerBedLeaveEvent {}
 
+impl PlayerBedLeaveEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player gets out of bed. `cause` is `morning` when the world woke everyone up, `manual` when the player left by themselves, `damage`, `gamemode` or `travel` when something forced them out, and `bed_destroyed` when the bed is gone.
-
-    Returning `true` changes nothing: the player leaves the bed anyway.
-
-    See [`PlayerBedLeaveEvent`].
-    */
-    pub fn on_player_bed_leave(
+    pub fn on_player_bed_leave<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PlayerBedLeaveEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PlayerBedLeaveEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<player_bed_leave>(handler);
+        register::<player_bed_leave, V>(handler);
     }
 }
 
@@ -700,19 +708,19 @@ hook!(
 
 impl Cancellable for PlayerViewDistanceChangeEvent {}
 
+impl PlayerViewDistanceChangeEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player's client asks for another view distance, in chunks. `radius` is what the server grants, within its own `view_distance`; set another one to grant that instead.
-
-    Returning `true` from a handler keeps the view distance the player has.
-
-    See [`PlayerViewDistanceChangeEvent`].
-    */
-    pub fn on_player_view_distance_change(
+    pub fn on_player_view_distance_change<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PlayerViewDistanceChangeEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PlayerViewDistanceChangeEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<player_view_distance_change>(handler);
+        register::<player_view_distance_change, V>(handler);
     }
 }
 
@@ -727,19 +735,19 @@ hook!(
 
 impl Cancellable for PlayerKickEvent {}
 
+impl PlayerKickEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when something asks to disconnect a player: a plugin, the `/kick` command or the server's own protections.
-
-    Returning `true` from a handler keeps the player connected.
-
-    See [`PlayerKickEvent`].
-    */
-    pub fn on_player_kick(
+    pub fn on_player_kick<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PlayerKickEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PlayerKickEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<player_kick>(handler);
+        register::<player_kick, V>(handler);
     }
 }
 
@@ -756,19 +764,280 @@ hook!(
 
 impl Cancellable for PlayerJumpEvent {}
 
+impl PlayerJumpEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player jumps: their client presses jump while they stand on the ground.
-
-    Returning `true` changes nothing.
-
-    See [`PlayerJumpEvent`].
-    */
-    pub fn on_player_jump(
+    pub fn on_player_jump<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PlayerJumpEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PlayerJumpEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<player_jump>(handler);
+        register::<player_jump, V>(handler);
+    }
+}
+
+hook!(
+    player_swing_miss,
+    PlayerSwingMissEventData => PlayerSwingMissEvent,
+    |raw: &PlayerSwingMissEventData| PlayerSwingMissEvent {
+        player: ffi_string(raw.player),
+        x: raw.x,
+        y: raw.y,
+        z: raw.z,
+        pitch: raw.pitch,
+        yaw: raw.yaw,
+    }
+);
+
+impl Cancellable for PlayerSwingMissEvent {}
+
+impl PlayerSwingMissEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
+impl Server {
+    pub fn on_player_swing_miss<V: Verdict>(
+        &self,
+        handler: impl Fn(&Server, &PlayerSwingMissEvent) -> V + Send + Sync + 'static,
+    ) {
+        register::<player_swing_miss, V>(handler);
+    }
+}
+
+hook!(
+    player_fly_toggle,
+    PlayerFlyToggleEventData => PlayerFlyToggleEvent,
+    |raw: &PlayerFlyToggleEventData| PlayerFlyToggleEvent {
+        player: ffi_string(raw.player),
+        flying: raw.flying,
+    }
+);
+
+impl Cancellable for PlayerFlyToggleEvent {}
+
+impl PlayerFlyToggleEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
+impl Server {
+    pub fn on_player_fly_toggle<V: Verdict>(
+        &self,
+        handler: impl Fn(&Server, &PlayerFlyToggleEvent) -> V + Send + Sync + 'static,
+    ) {
+        register::<player_fly_toggle, V>(handler);
+    }
+}
+
+hook!(
+    player_crawl,
+    PlayerCrawlEventData => PlayerCrawlEvent,
+    |raw: &PlayerCrawlEventData| PlayerCrawlEvent {
+        player: ffi_string(raw.player),
+        crawling: raw.crawling,
+    }
+);
+
+impl Cancellable for PlayerCrawlEvent {}
+
+impl PlayerCrawlEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
+impl Server {
+    pub fn on_player_crawl<V: Verdict>(
+        &self,
+        handler: impl Fn(&Server, &PlayerCrawlEvent) -> V + Send + Sync + 'static,
+    ) {
+        register::<player_crawl, V>(handler);
+    }
+}
+
+hook!(
+    player_attack,
+    PlayerAttackEventData => PlayerAttackEvent,
+    |raw: &PlayerAttackEventData| PlayerAttackEvent {
+        player: ffi_string(raw.player),
+        entity: raw.entity,
+        victim: ffi_string(raw.victim),
+        item: raw.item,
+    }
+);
+
+impl Cancellable for PlayerAttackEvent {}
+
+impl PlayerAttackEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
+impl Server {
+    pub fn on_player_attack<V: Verdict>(
+        &self,
+        handler: impl Fn(&Server, &PlayerAttackEvent) -> V + Send + Sync + 'static,
+    ) {
+        register::<player_attack, V>(handler);
+    }
+}
+
+hook!(
+    player_fall,
+    PlayerFallEventData => PlayerFallEvent,
+    |raw: &PlayerFallEventData| PlayerFallEvent {
+        player: ffi_string(raw.player),
+        distance: raw.distance,
+        damage: std::cell::Cell::new(raw.damage),
+        block: ffi_string(raw.block),
+    },
+    |safe: PlayerFallEvent, raw: &mut PlayerFallEventData| {
+        raw.damage = safe.damage.get();
+    }
+);
+
+impl Cancellable for PlayerFallEvent {}
+
+impl PlayerFallEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
+impl Server {
+    pub fn on_player_fall<V: Verdict>(
+        &self,
+        handler: impl Fn(&Server, &PlayerFallEvent) -> V + Send + Sync + 'static,
+    ) {
+        register::<player_fall, V>(handler);
+    }
+}
+
+hook!(
+    player_world_change,
+    PlayerWorldChangeEventData => PlayerWorldChangeEvent,
+    |raw: &PlayerWorldChangeEventData| PlayerWorldChangeEvent {
+        player: ffi_string(raw.player),
+        from_world: raw.from_world,
+        to_world: raw.to_world,
+        cause: ffi_string(raw.cause),
+    }
+);
+
+impl Cancellable for PlayerWorldChangeEvent {}
+
+impl PlayerWorldChangeEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
+impl Server {
+    pub fn on_player_world_change<V: Verdict>(
+        &self,
+        handler: impl Fn(&Server, &PlayerWorldChangeEvent) -> V + Send + Sync + 'static,
+    ) {
+        register::<player_world_change, V>(handler);
+    }
+}
+
+hook!(
+    player_chunk_enter,
+    PlayerChunkEnterEventData => PlayerChunkEnterEvent,
+    |raw: &PlayerChunkEnterEventData| PlayerChunkEnterEvent {
+        player: ffi_string(raw.player),
+        chunk_x: raw.chunk_x,
+        chunk_z: raw.chunk_z,
+        from_x: raw.from_x,
+        from_z: raw.from_z,
+        world: raw.world,
+    }
+);
+
+impl Cancellable for PlayerChunkEnterEvent {}
+
+impl PlayerChunkEnterEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
+impl Server {
+    pub fn on_player_chunk_enter<V: Verdict>(
+        &self,
+        handler: impl Fn(&Server, &PlayerChunkEnterEvent) -> V + Send + Sync + 'static,
+    ) {
+        register::<player_chunk_enter, V>(handler);
+    }
+}
+
+hook!(
+    resource_pack_status,
+    ResourcePackStatusEventData => ResourcePackStatusEvent,
+    |raw: &ResourcePackStatusEventData| ResourcePackStatusEvent {
+        player: ffi_string(raw.player),
+        status: ffi_string(raw.status),
+    }
+);
+
+impl Cancellable for ResourcePackStatusEvent {}
+
+impl ResourcePackStatusEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
+impl Server {
+    pub fn on_resource_pack_status<V: Verdict>(
+        &self,
+        handler: impl Fn(&Server, &ResourcePackStatusEvent) -> V + Send + Sync + 'static,
+    ) {
+        register::<resource_pack_status, V>(handler);
+    }
+}
+
+hook!(
+    player_afk,
+    PlayerAfkEventData => PlayerAfkEvent,
+    |raw: &PlayerAfkEventData| PlayerAfkEvent {
+        player: ffi_string(raw.player),
+        afk: raw.afk,
+        idle: raw.idle,
+    }
+);
+
+impl Cancellable for PlayerAfkEvent {}
+
+impl PlayerAfkEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
+impl Server {
+    pub fn on_player_afk<V: Verdict>(
+        &self,
+        handler: impl Fn(&Server, &PlayerAfkEvent) -> V + Send + Sync + 'static,
+    ) {
+        register::<player_afk, V>(handler);
     }
 }
 
@@ -789,19 +1058,19 @@ hook!(
 
 impl Cancellable for PlayerEffectAddEvent {}
 
+impl PlayerEffectAddEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player is about to get a potion effect, from a potion, food, a totem, a command or a plugin; `effect` is its name, such as `speed`.
-
-    Returning `true` from a handler keeps the player from getting the effect.
-
-    See [`PlayerEffectAddEvent`].
-    */
-    pub fn on_player_effect_add(
+    pub fn on_player_effect_add<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PlayerEffectAddEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PlayerEffectAddEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<player_effect_add>(handler);
+        register::<player_effect_add, V>(handler);
     }
 }
 
@@ -817,19 +1086,19 @@ hook!(
 
 impl Cancellable for PlayerEffectRemoveEvent {}
 
+impl PlayerEffectRemoveEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player loses a potion effect: it ran out, milk or a command cleared it, or a totem replaced it.
-
-    Returning `true` changes nothing: the effect is removed anyway.
-
-    See [`PlayerEffectRemoveEvent`].
-    */
-    pub fn on_player_effect_remove(
+    pub fn on_player_effect_remove<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PlayerEffectRemoveEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PlayerEffectRemoveEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<player_effect_remove>(handler);
+        register::<player_effect_remove, V>(handler);
     }
 }
 
@@ -849,19 +1118,19 @@ hook!(
 
 impl Cancellable for DduiResponseEvent {}
 
+impl DduiResponseEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player used a control of a data-driven screen: pressed a button, switched a toggle, moved a slider, chose an option or typed in a text field. The server has checked the value.
-
-    Returning `true` from a handler puts the control back as it was, and keeps the handler of the screen from seeing it.
-
-    See [`DduiResponseEvent`].
-    */
-    pub fn on_ddui_response(
+    pub fn on_ddui_response<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &DduiResponseEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &DduiResponseEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<ddui_response>(handler);
+        register::<ddui_response, V>(handler);
     }
 }
 
@@ -877,18 +1146,18 @@ hook!(
 
 impl Cancellable for DduiCloseEvent {}
 
+impl DduiCloseEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a data-driven screen closed.
-
-    Returning `true` changes nothing.
-
-    See [`DduiCloseEvent`].
-    */
-    pub fn on_ddui_close(
+    pub fn on_ddui_close<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &DduiCloseEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &DduiCloseEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<ddui_close>(handler);
+        register::<ddui_close, V>(handler);
     }
 }

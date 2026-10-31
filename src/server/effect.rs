@@ -14,6 +14,8 @@ fn boost(player: &Player) {
 ```
 */
 
+#![allow(deprecated)]
+
 use crate::ffi::abi::FfiStr;
 use crate::ffi::call::HostFn;
 use crate::player::Player;
@@ -124,6 +126,9 @@ impl Effect {
 
 impl Server {
     /// Gives an effect to a player or an entity for `duration_ticks` ticks, with particles. `amplifier` `0` is level I. Returns `false` when the target does not exist or `duration_ticks` is not positive.
+    #[deprecated(
+        note = "use `server.entities().apply_effect(entity_id, effect, amplifier, duration_ticks)`"
+    )]
     pub fn apply_effect(
         &self,
         entity_id: u64,
@@ -142,6 +147,9 @@ impl Server {
     }
 
     /// Gives an effect by its name, such as `minecraft:speed`. `ambient` makes the particles faint, as a beacon's are, and `particles` shows them at all.
+    #[deprecated(
+        note = "use `server.entities().apply_effect_named(entity_id, name, amplifier, duration_ticks, ambient, particles)`"
+    )]
     pub fn apply_effect_named(
         &self,
         entity_id: u64,
@@ -167,6 +175,7 @@ impl Server {
     }
 
     /// Removes an effect. Returns `false` when the target did not have it.
+    #[deprecated(note = "use `server.entities().remove_effect(entity_id, effect)`")]
     pub fn remove_effect(&self, entity_id: u64, effect: Effect) -> bool {
         host_call!(
             self.host(),
@@ -176,11 +185,13 @@ impl Server {
     }
 
     /// Removes every effect. Returns `false` when the target had none.
+    #[deprecated(note = "use `server.entities().clear_effects(entity_id)`")]
     pub fn clear_effects(&self, entity_id: u64) -> bool {
         host_call!(self.host(), effect_clear(entity_id)).unwrap_or(false)
     }
 
     /// Returns whether the target has an effect.
+    #[deprecated(note = "use `server.entities().has_effect(entity_id, effect)`")]
     pub fn has_effect(&self, entity_id: u64, effect: Effect) -> bool {
         host_call!(
             self.host(),
@@ -190,6 +201,7 @@ impl Server {
     }
 
     /// Returns the amplifier of an effect, `0` for level I, or `None` when the target does not have it.
+    #[deprecated(note = "use `server.entities().effect_amplifier(entity_id, effect)`")]
     pub fn effect_amplifier(&self, entity_id: u64, effect: Effect) -> Option<u8> {
         let level = host_call!(
             self.host(),
@@ -200,6 +212,7 @@ impl Server {
     }
 
     /// Returns the ticks left of an effect, or `None` when the target does not have it.
+    #[deprecated(note = "use `server.entities().effect_duration(entity_id, effect)`")]
     pub fn effect_duration(&self, entity_id: u64, effect: Effect) -> Option<i32> {
         let ticks = host_call!(
             self.host(),
@@ -210,6 +223,7 @@ impl Server {
     }
 
     /// Returns the names of the effects the target has.
+    #[deprecated(note = "use `server.entities().active_effects(entity_id)`")]
     pub fn active_effects(&self, entity_id: u64) -> Vec<String> {
         let Some(f) = self.host().effect_active else {
             return Vec::new();

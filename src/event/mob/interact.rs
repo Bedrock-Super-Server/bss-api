@@ -1,7 +1,7 @@
 /**
 A player uses an item on a mob: feeds, tames, shears, milks, names...
 
-Returning `true` from a handler cancels the interaction.
+`event.cancel()` cancels the interaction.
 
 Handled by [`Event::on_mob_interact`](crate::prelude::Event::on_mob_interact) and [`Server::on_mob_interact`](crate::server::Server::on_mob_interact).
 */
@@ -16,4 +16,11 @@ pub struct MobInteractEvent {
     pub item: i16,
     /// The interaction, such as `feed`, `tame`, `shear` or `milk`.
     pub action: String,
+}
+
+impl MobInteractEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }

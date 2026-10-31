@@ -1,7 +1,7 @@
 /**
 A sapling or a fungus grows into a tree.
 
-Returning `true` from a handler keeps the sapling as it is.
+`event.cancel()` keeps the sapling as it is.
 
 Handled by [`Event::on_tree_grow`](crate::prelude::Event::on_tree_grow) and [`Server::on_tree_grow`](crate::server::Server::on_tree_grow).
 */

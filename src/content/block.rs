@@ -1,5 +1,6 @@
 use serde::Serialize;
 
+use super::group::GroupRef;
 use super::tool::ToolType;
 use super::{BlockPermutation, BlockShape, BlockState, Condition};
 
@@ -21,4 +22,6 @@ pub(crate) struct BlockDef {
     pub bone_visibility: Vec<(String, Condition)>,
     pub custom_sound: bool,
     pub slab: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub group: Option<GroupRef>,
 }

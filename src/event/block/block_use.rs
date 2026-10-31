@@ -1,7 +1,7 @@
 /**
 A player uses a block: opens a door or a container, presses a button, flips a lever, rings a bell...
 
-Returning `true` from a handler cancels the use: the block does not react.
+`event.cancel()` cancels the use: the block does not react.
 
 Handled by [`Event::on_block_use`](crate::prelude::Event::on_block_use) and [`Server::on_block_use`](crate::server::Server::on_block_use).
 */
@@ -20,4 +20,11 @@ pub struct BlockUseEvent {
     pub item: i16,
     /// What the use does, as named by the server, such as `open` or `toggle`.
     pub action: String,
+}
+
+impl BlockUseEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }

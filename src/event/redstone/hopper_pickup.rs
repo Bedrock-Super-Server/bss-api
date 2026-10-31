@@ -1,7 +1,7 @@
 /**
 A hopper picks up an item entity lying above it.
 
-Returning `true` from a handler leaves the item where it is.
+`event.cancel()` leaves the item where it is.
 
 Handled by [`Event::on_hopper_pickup`](crate::prelude::Event::on_hopper_pickup) and [`Server::on_hopper_pickup`](crate::server::Server::on_hopper_pickup).
 */

@@ -1,7 +1,7 @@
 /**
 A player used a control of a data-driven screen: pressed a button, switched a toggle, moved a slider, chose an option or typed in a text field. The server has checked the value.
 
-Returning `true` from a handler puts the control back as it was, and keeps the handler of the screen from seeing it.
+`event.cancel()` puts the control back as it was, and keeps the handler of the screen from seeing it.
 
 Handled by [`Event::on_ddui_response`](crate::prelude::Event::on_ddui_response) and [`Server::on_ddui_response`](crate::server::Server::on_ddui_response).
 */
@@ -20,4 +20,11 @@ pub struct DduiResponseEvent {
     pub flag: bool,
     /// What a text field holds after the player typed; empty otherwise.
     pub text: String,
+}
+
+impl DduiResponseEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }

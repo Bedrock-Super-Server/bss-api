@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A thrown potion breaks.
 
-Returning `true` from a handler cancels the effect: the potion breaks without affecting anything.
+`event.cancel()` cancels the effect: the potion breaks without affecting anything.
 
 Handled by [`Event::on_potion_splash`](crate::prelude::Event::on_potion_splash) and [`Server::on_potion_splash`](crate::server::Server::on_potion_splash).
 */

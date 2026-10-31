@@ -1,7 +1,7 @@
 /**
 A hopper moves an item into or out of a minecart.
 
-Returning `true` from a handler cancels the transfer.
+`event.cancel()` cancels the transfer.
 
 Handled by [`Event::on_minecart_transfer`](crate::prelude::Event::on_minecart_transfer) and [`Server::on_minecart_transfer`](crate::server::Server::on_minecart_transfer).
 */

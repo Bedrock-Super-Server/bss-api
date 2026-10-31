@@ -6,7 +6,7 @@ use crate::ffi::behaviour::{
     MobAttackEventData, MobBreedEventData, MobDespawnEventData, MobInteractEventData,
     MobLeashEventData, MobSpawnEventData, MobTameEventData, MobTargetEventData,
 };
-use crate::registry::hook::{Cancellable, hook, register};
+use crate::registry::hook::{Cancellable, Verdict, hook, register};
 use crate::server::{Server, ffi_string};
 
 hook!(
@@ -24,19 +24,19 @@ hook!(
 
 impl Cancellable for MobSpawnEvent {}
 
+impl MobSpawnEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a mob is about to spawn.
-
-    Returning `true` prevents the spawn.
-
-    See [`MobSpawnEvent`].
-    */
-    pub fn on_mob_spawn(
+    pub fn on_mob_spawn<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &MobSpawnEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &MobSpawnEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<mob_spawn>(handler);
+        register::<mob_spawn, V>(handler);
     }
 }
 
@@ -52,19 +52,19 @@ hook!(
 
 impl Cancellable for MobDespawnEvent {}
 
+impl MobDespawnEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a mob is about to despawn because no player is close enough.
-
-    Returning `true` keeps the mob.
-
-    See [`MobDespawnEvent`].
-    */
-    pub fn on_mob_despawn(
+    pub fn on_mob_despawn<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &MobDespawnEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &MobDespawnEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<mob_despawn>(handler);
+        register::<mob_despawn, V>(handler);
     }
 }
 
@@ -84,19 +84,19 @@ hook!(
 
 impl Cancellable for MobTargetEvent {}
 
+impl MobTargetEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a mob picks a new target.
-
-    Returning `true` leaves the mob without a target.
-
-    See [`MobTargetEvent`].
-    */
-    pub fn on_mob_target(
+    pub fn on_mob_target<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &MobTargetEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &MobTargetEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<mob_target>(handler);
+        register::<mob_target, V>(handler);
     }
 }
 
@@ -117,19 +117,19 @@ hook!(
 
 impl Cancellable for MobAttackEvent {}
 
+impl MobAttackEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a mob attacks its target.
-
-    Returning `true` cancels the attack.
-
-    See [`MobAttackEvent`].
-    */
-    pub fn on_mob_attack(
+    pub fn on_mob_attack<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &MobAttackEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &MobAttackEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<mob_attack>(handler);
+        register::<mob_attack, V>(handler);
     }
 }
 
@@ -150,19 +150,19 @@ hook!(
 
 impl Cancellable for MobBreedEvent {}
 
+impl MobBreedEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when two mobs breed and a baby is about to be born.
-
-    Returning `true` prevents the birth.
-
-    See [`MobBreedEvent`].
-    */
-    pub fn on_mob_breed(
+    pub fn on_mob_breed<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &MobBreedEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &MobBreedEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<mob_breed>(handler);
+        register::<mob_breed, V>(handler);
     }
 }
 
@@ -180,19 +180,19 @@ hook!(
 
 impl Cancellable for MobInteractEvent {}
 
+impl MobInteractEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player uses an item on a mob: feeds, tames, shears, milks, names...
-
-    Returning `true` cancels the interaction.
-
-    See [`MobInteractEvent`].
-    */
-    pub fn on_mob_interact(
+    pub fn on_mob_interact<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &MobInteractEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &MobInteractEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<mob_interact>(handler);
+        register::<mob_interact, V>(handler);
     }
 }
 
@@ -209,19 +209,19 @@ hook!(
 
 impl Cancellable for MobTameEvent {}
 
+impl MobTameEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player tames a mob.
-
-    Returning `true` makes this taming attempt fail.
-
-    See [`MobTameEvent`].
-    */
-    pub fn on_mob_tame(
+    pub fn on_mob_tame<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &MobTameEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &MobTameEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<mob_tame>(handler);
+        register::<mob_tame, V>(handler);
     }
 }
 
@@ -243,18 +243,18 @@ hook!(
 
 impl Cancellable for MobLeashEvent {}
 
+impl MobLeashEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a mob is leashed or unleashed.
-
-    Returning `true` leaves the leash as it was.
-
-    See [`MobLeashEvent`].
-    */
-    pub fn on_mob_leash(
+    pub fn on_mob_leash<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &MobLeashEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &MobLeashEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<mob_leash>(handler);
+        register::<mob_leash, V>(handler);
     }
 }

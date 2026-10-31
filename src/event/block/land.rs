@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A falling block lands and is about to become a block again.
 
-Returning `true` from a handler drops the block as an item instead of placing it.
+`event.cancel()` drops the block as an item instead of placing it.
 
 Handled by [`Event::on_block_land`](crate::prelude::Event::on_block_land) and [`Server::on_block_land`](crate::server::Server::on_block_land).
 */

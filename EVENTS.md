@@ -1,15 +1,15 @@
 # Behaviour events
 
 Every gameplay behaviour raises one of these events. Implement the matching method of
-the `Event` trait (or register a closure with `server.on_<name>`) and return `true` to
-cancel it. Fields listed as editable can be changed with `set_<field>`, and the server
-uses the new value. Each event lives in `bss_api::event::<domain>`.
+the `Event` trait (or register a closure with `server.on_<name>`) and call `event.cancel()`
+to cancel it; a closure may also return `true`. Fields listed as editable can be changed
+with `set_<field>`, and the server uses the new value. Each event lives in
+`bss_api::event::<domain>`.
 
 ```rust
 impl Event for Guard {
-    fn on_explosion(&self, _server: &Server, event: &ExplosionEvent) -> bool {
+    fn on_explosion(&self, _server: &Server, event: &ExplosionEvent) {
         event.set_breaks_blocks(false);
-        false
     }
 }
 ```
@@ -118,6 +118,15 @@ impl Event for Guard {
 | `on_player_view_distance_change` | A player's client asks for another view distance, in chunks. `radius` is what the server grants, within the limit the player has: the `view_distance` of the server, or the one a plugin set with `Player::set_view_distance`; set another one to grant that instead, within the same limit. Cancelled, the player keeps the view distance they have. | `player: String`, `requested: i32`, `old_radius: i32` | `radius: i32` |
 | `on_player_kick` | Something asks to disconnect a player: a plugin, the `/kick` command or the server's own protections. Cancelled, the player stays connected. | `player: String`, `reason: String` | --- |
 | `on_player_jump` | A player presses the jump key, once for each press, unless they are flying. Cancelling changes nothing. | `player: String`, `x: f32`, `y: f32`, `z: f32` | --- |
+| `on_player_swing_miss` | A player swings their arm and hits nothing, as their client reports. Cancelling changes nothing. | `player: String`, `x: f32`, `y: f32`, `z: f32`, `pitch: f32`, `yaw: f32` | --- |
+| `on_player_fly_toggle` | A player starts or stops flying, in creative or spectator mode or with the flight a plugin granted. Cancelling changes nothing. | `player: String`, `flying: bool` | --- |
+| `on_player_crawl` | A player starts or stops crawling. Cancelling changes nothing. | `player: String`, `crawling: bool` | --- |
+| `on_player_attack` | A player attacks an entity or another player. Cancelled, the hit does nothing. | `player: String`, `entity: u64`, `victim: String`, `item: i16` | --- |
+| `on_player_fall` | A player lands after a fall that hurts them. Set another damage to hurt them less or more; cancelled, they take none. | `player: String`, `distance: f32`, `block: String` | `damage: f32` |
+| `on_player_world_change` | A player moves to another world, or to another dimension of one. Cancelling changes nothing. | `player: String`, `from_world: u32`, `to_world: u32`, `cause: String` | --- |
+| `on_player_chunk_enter` | A player moves into another chunk. Cancelling changes nothing. | `player: String`, `chunk_x: i32`, `chunk_z: i32`, `from_x: i32`, `from_z: i32`, `world: u32` | --- |
+| `on_resource_pack_status` | A player's client reports on the resource packs of the server. Cancelling changes nothing. | `player: String`, `status: String` | --- |
+| `on_player_afk` | A player has done nothing for two minutes, or acts again. Cancelling changes nothing. | `player: String`, `afk: bool`, `idle: u32` | --- |
 | `on_player_effect_add` | A player is about to get a potion effect from what they drink, eat or use: a potion, food, a totem of undying; `effect` is its name, such as `minecraft:speed`. Effects given by a command, a beacon or a plugin are not asked. Cancelled, they do not get it. | `player: String`, `effect: String` | `amplifier: u32`, `duration: i32` |
 | `on_player_effect_remove` | A player loses a potion effect: it ran out, milk or a command cleared it, or a totem replaced it. Cancelling changes nothing. | `player: String`, `effect: String`, `amplifier: u32` | --- |
 | `on_ddui_response` | A player used a control of a data-driven screen: pressed a button, switched a toggle, moved a slider, chose an option or typed in a text field. The server has checked the value. Cancelled, the control goes back to what it was and the handler of the screen does not see it. | `player: String`, `form_id: u32`, `element: String`, `kind: String`, `number: i32`, `flag: bool`, `text: String` | --- |
@@ -190,7 +199,7 @@ impl Event for Guard {
 # Core events
 
 The first events of the `Event` trait, written by hand in `registry/events/handler.rs`. Those
-marked as cancellable return `bool`: `true` cancels them. Editable fields have a `set_<field>`.
+marked as cancellable can be cancelled with `event.cancel()`. Editable fields have a `set_<field>`.
 
 ## Players (`event::player`)
 
@@ -214,7 +223,7 @@ marked as cancellable return `bool`: `true` cancels them. Editable fields have a
 | `on_consume` | A player finishes eating or drinking an item. | `name: String`, `item_id: i16` | `food_points: u32`, `saturation: f32` | yes |
 | `on_teleport` | A player is about to be teleported. | `name: String`, `from: (f32, f32, f32)`, `to: (f32, f32, f32)` | --- | yes |
 | `on_gamemode_change` | A player's game mode is about to change. | `name: String`, `from: i32`, `to: i32` | --- | yes |
-| `on_armor_equip` | A player equips a piece of armor. | `name: String`, `item_id: i16`, `count: u8`, `block_runtime_id: u32`, `source_slot: u32`, `armor_slot: u32` | --- | yes |
+| `on_armor_equip` | A player equips a piece of armor. | `name: String`, `item_id: i16`, `count: u8`, `block_runtime_id: u32`, `source_slot: u32`, `armor_slot: u32` | --- | no |
 | `on_bucket_use` | A player fills or empties a bucket. | `name: String`, `item_id: i16`, `x: i32`, `y: i32`, `z: i32`, `filling: bool` | --- | no |
 | `on_emote` | A player plays an emote. | `name: String`, `entity_id: u64`, `duration: u32`, `xuid: String`, `platform_id: String`, `flags: u8` | `emote_id: String` | yes |
 | `on_skin_change` | A player changes skin while in game. | `name: String`, `skin: Vec<u8>`, `new_skin_name: String`, `old_skin_name: String` | --- | yes |

@@ -1,7 +1,7 @@
 /**
 A mob is about to despawn because no player is close enough.
 
-Returning `true` from a handler keeps the mob.
+`event.cancel()` keeps the mob.
 
 Handled by [`Event::on_mob_despawn`](crate::prelude::Event::on_mob_despawn) and [`Server::on_mob_despawn`](crate::server::Server::on_mob_despawn).
 */

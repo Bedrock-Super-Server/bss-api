@@ -16,10 +16,23 @@ only reads what the other one wrote. Those headers never change.
 */
 
 /// Changes when the ABI breaks: something existing changed or was removed.
-pub const ABI_MAJOR: u16 = 1;
+pub const ABI_MAJOR: u16 = 2;
 
 /// Grows with every addition to the ABI.
-pub const ABI_MINOR: u16 = 12;
+pub const ABI_MINOR: u16 = 0;
+
+/// The grants a server can give a plugin in `plugins.toml`, in the order [`ApiError::NeedsGrant`](crate::error::ApiError::NeedsGrant) and the answer of `__refusal` number them.
+pub const GRANTS: &[&str] = &[
+    "console",
+    "commands",
+    "operators",
+    "permissions",
+    "moderation",
+    "worlds",
+    "raw_packets",
+    "player_data",
+    "http",
+];
 
 /// The value [`HostHeader::magic`] holds: `BSSHOST1` in ASCII.
 pub const HOST_MAGIC: u64 = u64::from_be_bytes(*b"BSSHOST1");

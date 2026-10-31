@@ -2,7 +2,7 @@ use crate::event::villager::{VillagerLevelUpEvent, VillagerProfessionEvent, Vill
 use crate::ffi::behaviour::{
     VillagerLevelUpEventData, VillagerProfessionEventData, VillagerTradeEventData,
 };
-use crate::registry::hook::{Cancellable, hook, register};
+use crate::registry::hook::{Cancellable, Verdict, hook, register};
 use crate::server::{Server, ffi_string};
 
 hook!(
@@ -20,19 +20,19 @@ hook!(
 
 impl Cancellable for VillagerProfessionEvent {}
 
+impl VillagerProfessionEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a villager takes a profession by claiming a workstation.
-
-    Returning `true` keeps the villager unemployed.
-
-    See [`VillagerProfessionEvent`].
-    */
-    pub fn on_villager_profession(
+    pub fn on_villager_profession<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &VillagerProfessionEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &VillagerProfessionEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<villager_profession>(handler);
+        register::<villager_profession, V>(handler);
     }
 }
 
@@ -54,19 +54,19 @@ hook!(
 
 impl Cancellable for VillagerTradeEvent {}
 
+impl VillagerTradeEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player trades with a villager or a wandering trader.
-
-    Returning `true` cancels the trade.
-
-    See [`VillagerTradeEvent`].
-    */
-    pub fn on_villager_trade(
+    pub fn on_villager_trade<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &VillagerTradeEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &VillagerTradeEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<villager_trade>(handler);
+        register::<villager_trade, V>(handler);
     }
 }
 
@@ -83,18 +83,18 @@ hook!(
 
 impl Cancellable for VillagerLevelUpEvent {}
 
+impl VillagerLevelUpEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a villager reaches a new trading level.
-
-    The value returned is ignored: this event cannot be cancelled.
-
-    See [`VillagerLevelUpEvent`].
-    */
-    pub fn on_villager_level_up(
+    pub fn on_villager_level_up<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &VillagerLevelUpEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &VillagerLevelUpEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<villager_level_up>(handler);
+        register::<villager_level_up, V>(handler);
     }
 }

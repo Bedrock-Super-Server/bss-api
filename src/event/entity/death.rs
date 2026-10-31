@@ -1,7 +1,7 @@
 /**
 An entity dies.
 
-Returning `true` from a handler keeps the entity alive.
+`event.cancel()` keeps the entity alive.
 
 Handled by [`Event::on_entity_death`](crate::prelude::Event::on_entity_death).
 */

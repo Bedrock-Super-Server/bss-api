@@ -1,7 +1,7 @@
 /**
 A player moves or turns.
 
-Returning `true` from a handler moves the player back to where they were.
+`event.cancel()` moves the player back to where they were.
 
 Handled by [`Event::on_move`](crate::prelude::Event::on_move).
 */
@@ -20,4 +20,11 @@ pub struct MoveEvent {
     pub sneaking: bool,
     /// `true` while the player sprints.
     pub sprinting: bool,
+}
+
+impl MoveEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
+    }
 }

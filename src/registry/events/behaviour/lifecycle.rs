@@ -5,7 +5,7 @@ use crate::ffi::behaviour::{
     ConsoleCommandEventData, PluginDisableEventData, PluginEnableEventData, ServerStartedEventData,
     ServerStopEventData,
 };
-use crate::registry::hook::{Cancellable, hook, register};
+use crate::registry::hook::{Cancellable, Verdict, hook, register};
 use crate::server::{Server, ffi_string};
 
 hook!(
@@ -18,19 +18,19 @@ hook!(
 
 impl Cancellable for ServerStartedEvent {}
 
+impl ServerStartedEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when the server finished starting and now accepts players. `worlds` is how many worlds are loaded.
-
-    Returning `true` changes nothing.
-
-    See [`ServerStartedEvent`].
-    */
-    pub fn on_server_started(
+    pub fn on_server_started<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ServerStartedEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ServerStartedEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<server_started>(handler);
+        register::<server_started, V>(handler);
     }
 }
 
@@ -44,19 +44,19 @@ hook!(
 
 impl Cancellable for ServerStopEvent {}
 
+impl ServerStopEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when the server begins to stop, before it disconnects the players, unloads the plugins and saves the worlds. `players` is how many are online.
-
-    Returning `true` does not keep the server from stopping.
-
-    See [`ServerStopEvent`].
-    */
-    pub fn on_server_stop(
+    pub fn on_server_stop<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ServerStopEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ServerStopEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<server_stop>(handler);
+        register::<server_stop, V>(handler);
     }
 }
 
@@ -77,19 +77,19 @@ hook!(
 
 impl Cancellable for ConsoleCommandEvent {}
 
+impl ConsoleCommandEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a line is typed in the server console, before it runs. Change `command` to run something else.
-
-    Returning `true` from a handler keeps the line from running.
-
-    See [`ConsoleCommandEvent`].
-    */
-    pub fn on_console_command(
+    pub fn on_console_command<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ConsoleCommandEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ConsoleCommandEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<console_command>(handler);
+        register::<console_command, V>(handler);
     }
 }
 
@@ -104,19 +104,19 @@ hook!(
 
 impl Cancellable for PluginEnableEvent {}
 
+impl PluginEnableEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a plugin finished loading and is now enabled, itself included.
-
-    Returning `true` changes nothing.
-
-    See [`PluginEnableEvent`].
-    */
-    pub fn on_plugin_enable(
+    pub fn on_plugin_enable<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PluginEnableEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PluginEnableEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<plugin_enable>(handler);
+        register::<plugin_enable, V>(handler);
     }
 }
 
@@ -131,18 +131,18 @@ hook!(
 
 impl Cancellable for PluginDisableEvent {}
 
+impl PluginDisableEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a plugin is about to be disabled, by a reload, an unload or the server stopping.
-
-    Returning `true` does not keep the plugin loaded.
-
-    See [`PluginDisableEvent`].
-    */
-    pub fn on_plugin_disable(
+    pub fn on_plugin_disable<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PluginDisableEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PluginDisableEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<plugin_disable>(handler);
+        register::<plugin_disable, V>(handler);
     }
 }

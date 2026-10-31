@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 The spawn point of a world is about to move, with `/setworldspawn` or a plugin. Set another position to move it there instead.
 
-Returning `true` from a handler keeps the spawn point where it is.
+`event.cancel()` keeps the spawn point where it is.
 
 Handled by [`Event::on_spawn_change`](crate::prelude::Event::on_spawn_change) and [`Server::on_spawn_change`](crate::server::Server::on_spawn_change).
 */

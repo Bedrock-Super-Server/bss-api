@@ -4,7 +4,7 @@ use crate::event::portal::{
 use crate::ffi::behaviour::{
     EndGatewayEventData, EntityPortalEventData, PlayerPortalEventData, PortalCreateEventData,
 };
-use crate::registry::hook::{Cancellable, hook, register};
+use crate::registry::hook::{Cancellable, Verdict, hook, register};
 use crate::server::{Server, ffi_string};
 
 hook!(
@@ -25,19 +25,19 @@ hook!(
 
 impl Cancellable for PortalCreateEvent {}
 
+impl PortalCreateEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a portal is about to be created: a Nether portal is lit or generated for travel, or an End portal is completed.
-
-    Returning `true` prevents the portal from being created.
-
-    See [`PortalCreateEvent`].
-    */
-    pub fn on_portal_create(
+    pub fn on_portal_create<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PortalCreateEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PortalCreateEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<portal_create>(handler);
+        register::<portal_create, V>(handler);
     }
 }
 
@@ -62,19 +62,19 @@ hook!(
 
 impl Cancellable for PlayerPortalEvent {}
 
+impl PlayerPortalEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player goes through a portal.
-
-    Returning `true` keeps the player where they are.
-
-    See [`PlayerPortalEvent`].
-    */
-    pub fn on_player_portal(
+    pub fn on_player_portal<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PlayerPortalEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PlayerPortalEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<player_portal>(handler);
+        register::<player_portal, V>(handler);
     }
 }
 
@@ -100,19 +100,19 @@ hook!(
 
 impl Cancellable for EntityPortalEvent {}
 
+impl EntityPortalEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when an entity other than a player goes through a portal.
-
-    Returning `true` keeps the entity where it is.
-
-    See [`EntityPortalEvent`].
-    */
-    pub fn on_entity_portal(
+    pub fn on_entity_portal<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &EntityPortalEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &EntityPortalEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<entity_portal>(handler);
+        register::<entity_portal, V>(handler);
     }
 }
 
@@ -129,18 +129,18 @@ hook!(
 
 impl Cancellable for EndGatewayEvent {}
 
+impl EndGatewayEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when an End gateway is about to be generated after a dragon fight.
-
-    Returning `true` prevents the gateway.
-
-    See [`EndGatewayEvent`].
-    */
-    pub fn on_end_gateway(
+    pub fn on_end_gateway<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &EndGatewayEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &EndGatewayEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<end_gateway>(handler);
+        register::<end_gateway, V>(handler);
     }
 }

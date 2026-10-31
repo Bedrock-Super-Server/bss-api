@@ -6,7 +6,7 @@ use crate::ffi::behaviour::{
     AnvilUseEventData, BeaconChangeEventData, CraftItemEventData, EnchantItemEventData,
     GrindstoneUseEventData, SmithingUseEventData,
 };
-use crate::registry::hook::{Cancellable, hook, register};
+use crate::registry::hook::{Cancellable, Verdict, hook, register};
 use crate::server::{Server, ffi_string};
 
 hook!(
@@ -23,19 +23,19 @@ hook!(
 
 impl Cancellable for CraftItemEvent {}
 
+impl CraftItemEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player crafts an item.
-
-    Returning `true` cancels the craft.
-
-    See [`CraftItemEvent`].
-    */
-    pub fn on_craft_item(
+    pub fn on_craft_item<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &CraftItemEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &CraftItemEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<craft_item>(handler);
+        register::<craft_item, V>(handler);
     }
 }
 
@@ -55,19 +55,19 @@ hook!(
 
 impl Cancellable for EnchantItemEvent {}
 
+impl EnchantItemEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player enchants an item at an enchanting table.
-
-    Returning `true` cancels the enchantment.
-
-    See [`EnchantItemEvent`].
-    */
-    pub fn on_enchant_item(
+    pub fn on_enchant_item<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &EnchantItemEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &EnchantItemEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<enchant_item>(handler);
+        register::<enchant_item, V>(handler);
     }
 }
 
@@ -87,19 +87,19 @@ hook!(
 
 impl Cancellable for AnvilUseEvent {}
 
+impl AnvilUseEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player takes the result out of an anvil.
-
-    Returning `true` cancels the operation.
-
-    See [`AnvilUseEvent`].
-    */
-    pub fn on_anvil_use(
+    pub fn on_anvil_use<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &AnvilUseEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &AnvilUseEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<anvil_use>(handler);
+        register::<anvil_use, V>(handler);
     }
 }
 
@@ -118,19 +118,19 @@ hook!(
 
 impl Cancellable for GrindstoneUseEvent {}
 
+impl GrindstoneUseEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player takes the result out of a grindstone.
-
-    Returning `true` cancels the operation.
-
-    See [`GrindstoneUseEvent`].
-    */
-    pub fn on_grindstone_use(
+    pub fn on_grindstone_use<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &GrindstoneUseEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &GrindstoneUseEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<grindstone_use>(handler);
+        register::<grindstone_use, V>(handler);
     }
 }
 
@@ -146,19 +146,19 @@ hook!(
 
 impl Cancellable for SmithingUseEvent {}
 
+impl SmithingUseEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player takes the result out of a smithing table.
-
-    Returning `true` cancels the operation.
-
-    See [`SmithingUseEvent`].
-    */
-    pub fn on_smithing_use(
+    pub fn on_smithing_use<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &SmithingUseEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &SmithingUseEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<smithing_use>(handler);
+        register::<smithing_use, V>(handler);
     }
 }
 
@@ -177,18 +177,18 @@ hook!(
 
 impl Cancellable for BeaconChangeEvent {}
 
+impl BeaconChangeEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player changes the effects of a beacon.
-
-    Returning `true` keeps the previous effects.
-
-    See [`BeaconChangeEvent`].
-    */
-    pub fn on_beacon_change(
+    pub fn on_beacon_change<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &BeaconChangeEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &BeaconChangeEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<beacon_change>(handler);
+        register::<beacon_change, V>(handler);
     }
 }

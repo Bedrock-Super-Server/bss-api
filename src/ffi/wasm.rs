@@ -33,10 +33,17 @@ mod imports {
 
 #[link(wasm_import_module = "bss")]
 unsafe extern "C" {
-    /// Whether the server provides the function `name` to this plugin: it may hold back the ones
-    /// its sandbox does not allow.
-    #[link_name = "__available"]
-    fn available(name: *const u8, len: usize) -> u32;
+    /// Why the server does not provide the function `name` to this plugin, as a number: `0` when it
+    /// does, `1` when it has no such function, `2` when the plugin's section of `plugins.toml`
+    /// denies it, and `3` plus the index in [`GRANTS`](crate::ffi::GRANTS) of the grant it needs.
+    #[link_name = "__refusal"]
+    fn refusal(name: *const u8, len: usize) -> u32;
+}
+
+/// Why the server does not provide the function `name`: see `__refusal`.
+pub(crate) fn refusal_of(name: &str) -> u32 {
+    // SAFETY: the name is a live `&str` for the duration of the call.
+    unsafe { refusal(name.as_ptr(), name.len()) }
 }
 
 /// Version of the glue between the server and a WebAssembly plugin, which the server checks.
@@ -46,12 +53,7 @@ static TABLE: OnceLock<HostApi> = OnceLock::new();
 
 /// The plugin's table of the server's functions.
 pub fn host() -> &'static HostApi {
-    TABLE.get_or_init(|| {
-        imports::table(|name| {
-            // SAFETY: the name is a live `&str` for the duration of the call.
-            unsafe { available(name.as_ptr(), name.len()) != 0 }
-        })
-    })
+    TABLE.get_or_init(|| imports::table(|name| refusal_of(name) == 0))
 }
 
 /// Calls `on_enable` of the plugin's table, with the server's functions.

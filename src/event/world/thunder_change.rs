@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A thunderstorm starts or stops.
 
-Returning `true` from a handler keeps the current weather.
+`event.cancel()` keeps the current weather.
 
 Handled by [`Event::on_thunder_change`](crate::prelude::Event::on_thunder_change) and [`Server::on_thunder_change`](crate::server::Server::on_thunder_change).
 */

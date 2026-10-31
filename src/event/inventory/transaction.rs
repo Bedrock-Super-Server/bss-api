@@ -63,7 +63,7 @@ pub enum TransactionAction {
 /**
 A player moves, swaps, drops or uses items in an inventory.
 
-Returning `true` from a handler rejects the whole request: the client is told to put everything back.
+`event.cancel()` rejects the whole request: the client is told to put everything back.
 
 Handled by [`Event::on_inventory_transaction`](crate::prelude::Event::on_inventory_transaction).
 */
@@ -76,4 +76,11 @@ pub struct InventoryTransactionEvent {
     pub action_count: u32,
     /// The actions, in the order the client sent them.
     pub actions: Vec<TransactionAction>,
+}
+
+impl InventoryTransactionEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
+    }
 }

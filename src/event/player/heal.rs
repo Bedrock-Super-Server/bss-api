@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A player regains health.
 
-Returning `true` from a handler cancels the healing.
+`event.cancel()` cancels the healing.
 
 Handled by [`Event::on_player_heal`](crate::prelude::Event::on_player_heal) and [`Server::on_player_heal`](crate::server::Server::on_player_heal).
 */
@@ -13,6 +13,13 @@ pub struct PlayerHealEvent {
     pub(crate) amount: Cell<f32>,
     /// Why, such as `effect` for regeneration or `saturation` for a full hunger bar.
     pub reason: String,
+}
+
+impl PlayerHealEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl PlayerHealEvent {

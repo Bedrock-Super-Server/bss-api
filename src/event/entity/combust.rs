@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 An entity other than a player catches fire.
 
-Returning `true` from a handler keeps the entity from burning.
+`event.cancel()` keeps the entity from burning.
 
 Handled by [`Event::on_entity_combust`](crate::prelude::Event::on_entity_combust) and [`Server::on_entity_combust`](crate::server::Server::on_entity_combust).
 */

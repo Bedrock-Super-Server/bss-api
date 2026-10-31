@@ -1,7 +1,7 @@
 /**
 A hopper moves an item from one container to another.
 
-Returning `true` from a handler cancels the transfer.
+`event.cancel()` cancels the transfer.
 
 Handled by [`Event::on_item_transfer`](crate::prelude::Event::on_item_transfer) and [`Server::on_item_transfer`](crate::server::Server::on_item_transfer).
 */

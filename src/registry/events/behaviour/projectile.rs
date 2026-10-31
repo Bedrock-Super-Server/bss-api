@@ -5,7 +5,7 @@ use crate::ffi::behaviour::{
     PotionSplashEventData, ProjectileHitEventData, ProjectileLaunchEventData,
     ProjectilePickupEventData,
 };
-use crate::registry::hook::{Cancellable, hook, register};
+use crate::registry::hook::{Cancellable, Verdict, hook, register};
 use crate::server::{Server, ffi_string};
 
 hook!(
@@ -23,19 +23,19 @@ hook!(
 
 impl Cancellable for ProjectileLaunchEvent {}
 
+impl ProjectileLaunchEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player launches a projectile: an arrow, a trident, a firework, a fishing hook...
-
-    Returning `true` cancels the launch.
-
-    See [`ProjectileLaunchEvent`].
-    */
-    pub fn on_projectile_launch(
+    pub fn on_projectile_launch<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ProjectileLaunchEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ProjectileLaunchEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<projectile_launch>(handler);
+        register::<projectile_launch, V>(handler);
     }
 }
 
@@ -59,19 +59,19 @@ hook!(
 
 impl Cancellable for ProjectileHitEvent {}
 
+impl ProjectileHitEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a projectile hits a block or an entity.
-
-    Returning `true` cancels the hit.
-
-    See [`ProjectileHitEvent`].
-    */
-    pub fn on_projectile_hit(
+    pub fn on_projectile_hit<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ProjectileHitEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ProjectileHitEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<projectile_hit>(handler);
+        register::<projectile_hit, V>(handler);
     }
 }
 
@@ -87,19 +87,19 @@ hook!(
 
 impl Cancellable for ProjectilePickupEvent {}
 
+impl ProjectilePickupEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a player picks up an arrow or a trident stuck in the world.
-
-    Returning `true` leaves it in place.
-
-    See [`ProjectilePickupEvent`].
-    */
-    pub fn on_projectile_pickup(
+    pub fn on_projectile_pickup<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &ProjectilePickupEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &ProjectilePickupEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<projectile_pickup>(handler);
+        register::<projectile_pickup, V>(handler);
     }
 }
 
@@ -122,18 +122,18 @@ hook!(
 
 impl Cancellable for PotionSplashEvent {}
 
+impl PotionSplashEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
-    /**
-    Calls `handler` when a thrown potion breaks.
-
-    Returning `true` cancels the effect: the potion breaks without affecting anything.
-
-    See [`PotionSplashEvent`].
-    */
-    pub fn on_potion_splash(
+    pub fn on_potion_splash<V: Verdict>(
         &self,
-        handler: impl Fn(&Server, &PotionSplashEvent) -> bool + Send + Sync + 'static,
+        handler: impl Fn(&Server, &PotionSplashEvent) -> V + Send + Sync + 'static,
     ) {
-        register::<potion_splash>(handler);
+        register::<potion_splash, V>(handler);
     }
 }

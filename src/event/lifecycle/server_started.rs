@@ -1,7 +1,7 @@
 /**
 The server finished starting and now accepts players. `worlds` is how many worlds are loaded.
 
-Returning `true` changes nothing.
+`event.cancel()` changes nothing.
 
 Handled by [`Event::on_server_started`](crate::prelude::Event::on_server_started) and [`Server::on_server_started`](crate::server::Server::on_server_started).
 */

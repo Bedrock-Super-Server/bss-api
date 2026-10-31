@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use crate::content::StateValue;
 use crate::ffi::abi::FfiStr;
 use crate::registry::server;

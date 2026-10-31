@@ -18,7 +18,7 @@ impl Server {
     See [`TickEvent`](crate::event::TickEvent).
     */
     pub(crate) fn on_tick(&self, handler: impl Fn(&Server, &TickEvent) + Send + Sync + 'static) {
-        crate::registry::hook::register::<tick>(move |server, event| {
+        crate::registry::hook::register::<tick, _>(move |server, event| {
             handler(server, event);
             false
         });
@@ -30,7 +30,7 @@ pub(crate) fn run_scheduled_tasks(server: &Server) {
     static ONCE: std::sync::Once = std::sync::Once::new();
     ONCE.call_once(|| {
         server.with_event_options(crate::registry::hook::EventOptions::default(), |_| {
-            crate::registry::hook::register::<tick>(|server, event| {
+            crate::registry::hook::register::<tick, _>(|server, event| {
                 crate::server::scheduler::run_due(server, event.tick);
                 false
             });
@@ -64,11 +64,18 @@ crate::registry::hook::hook!(
 
 impl crate::registry::hook::Cancellable for PacketEvent {}
 
+impl PacketEvent {
+    /// Cancels the event: see its documentation for what that prevents.
+    pub fn cancel(&self) {
+        crate::registry::hook::Cancellable::set_cancelled(self, true);
+    }
+}
+
 impl Server {
     /**
     Calls `handler` when a game packet passes from a player to the server.
 
-    Returning `true` drops the packet.
+    `event.cancel()` drops the packet.
 
     See [`PacketEvent`](crate::event::PacketEvent).
     */
@@ -76,13 +83,13 @@ impl Server {
         &self,
         handler: impl Fn(&Server, &PacketEvent) -> bool + Send + Sync + 'static,
     ) {
-        crate::registry::hook::register::<server_bound>(handler);
+        crate::registry::hook::register::<server_bound, _>(handler);
     }
 
     /**
     Calls `handler` when a game packet passes from the server to a player.
 
-    Returning `true` drops the packet.
+    `event.cancel()` drops the packet.
 
     See [`PacketEvent`](crate::event::PacketEvent).
     */
@@ -90,7 +97,7 @@ impl Server {
         &self,
         handler: impl Fn(&Server, &PacketEvent) -> bool + Send + Sync + 'static,
     ) {
-        crate::registry::hook::register::<client_bound>(handler);
+        crate::registry::hook::register::<client_bound, _>(handler);
     }
 }
 
@@ -112,7 +119,7 @@ impl Server {
         &self,
         handler: impl Fn(&Server, &ServerSettingsRequestEvent) + Send + Sync + 'static,
     ) {
-        crate::registry::hook::register::<server_settings_request>(move |server, event| {
+        crate::registry::hook::register::<server_settings_request, _>(move |server, event| {
             handler(server, event);
             false
         });

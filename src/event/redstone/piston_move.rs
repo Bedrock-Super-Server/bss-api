@@ -1,7 +1,7 @@
 /**
 A piston extends or retracts.
 
-Returning `true` from a handler keeps the piston still.
+`event.cancel()` keeps the piston still.
 
 Handled by [`Event::on_piston_move`](crate::prelude::Event::on_piston_move) and [`Server::on_piston_move`](crate::server::Server::on_piston_move).
 */

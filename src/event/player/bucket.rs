@@ -17,3 +17,10 @@ pub struct BucketUseEvent {
     /// `true` when the bucket is filled, `false` when it is emptied.
     pub filling: bool,
 }
+
+impl BucketUseEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
+    }
+}

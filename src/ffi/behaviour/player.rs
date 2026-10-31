@@ -214,6 +214,84 @@ pub struct PlayerJumpEventData {
 }
 
 #[repr(C)]
+pub struct PlayerSwingMissEventData {
+    pub header: EventHeader,
+    pub player: FfiStr,
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+    pub pitch: f32,
+    pub yaw: f32,
+}
+
+#[repr(C)]
+pub struct PlayerFlyToggleEventData {
+    pub header: EventHeader,
+    pub player: FfiStr,
+    pub flying: bool,
+}
+
+#[repr(C)]
+pub struct PlayerCrawlEventData {
+    pub header: EventHeader,
+    pub player: FfiStr,
+    pub crawling: bool,
+}
+
+#[repr(C)]
+pub struct PlayerAttackEventData {
+    pub header: EventHeader,
+    pub player: FfiStr,
+    pub entity: u64,
+    pub victim: FfiStr,
+    pub item: i16,
+}
+
+#[repr(C)]
+pub struct PlayerFallEventData {
+    pub header: EventHeader,
+    pub player: FfiStr,
+    pub distance: f32,
+    pub damage: f32,
+    pub block: FfiStr,
+}
+
+#[repr(C)]
+pub struct PlayerWorldChangeEventData {
+    pub header: EventHeader,
+    pub player: FfiStr,
+    pub from_world: u32,
+    pub to_world: u32,
+    pub cause: FfiStr,
+}
+
+#[repr(C)]
+pub struct PlayerChunkEnterEventData {
+    pub header: EventHeader,
+    pub player: FfiStr,
+    pub chunk_x: i32,
+    pub chunk_z: i32,
+    pub from_x: i32,
+    pub from_z: i32,
+    pub world: u32,
+}
+
+#[repr(C)]
+pub struct ResourcePackStatusEventData {
+    pub header: EventHeader,
+    pub player: FfiStr,
+    pub status: FfiStr,
+}
+
+#[repr(C)]
+pub struct PlayerAfkEventData {
+    pub header: EventHeader,
+    pub player: FfiStr,
+    pub afk: bool,
+    pub idle: u32,
+}
+
+#[repr(C)]
 pub struct PlayerEffectAddEventData {
     pub header: EventHeader,
     pub player: FfiStr,
@@ -276,6 +354,15 @@ crate::event_data! {
     PlayerViewDistanceChangeEventData = 1101, "player_view_distance_change";
     PlayerKickEventData = 1102, "player_kick";
     PlayerJumpEventData = 1103, "player_jump";
+    PlayerSwingMissEventData = 1113, "player_swing_miss";
+    PlayerFlyToggleEventData = 1114, "player_fly_toggle";
+    PlayerCrawlEventData = 1115, "player_crawl";
+    PlayerAttackEventData = 1116, "player_attack";
+    PlayerFallEventData = 1117, "player_fall";
+    PlayerWorldChangeEventData = 1118, "player_world_change";
+    PlayerChunkEnterEventData = 1119, "player_chunk_enter";
+    ResourcePackStatusEventData = 1120, "resource_pack_status";
+    PlayerAfkEventData = 1121, "player_afk";
     PlayerEffectAddEventData = 1104, "player_effect_add";
     PlayerEffectRemoveEventData = 1105, "player_effect_remove";
     DduiResponseEventData = 1111, "ddui_response";

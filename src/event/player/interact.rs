@@ -1,7 +1,7 @@
 /**
 A player right-clicks a block or the air.
 
-Returning `true` from a handler cancels the interaction.
+`event.cancel()` cancels the interaction.
 
 Handled by [`Event::on_interact`](crate::prelude::Event::on_interact).
 */
@@ -37,4 +37,11 @@ impl InteractEvent {
     pub const RIGHT_CLICK_BLOCK: u32 = 0;
     /// [`action`](Self::action) of a click in the air.
     pub const RIGHT_CLICK_AIR: u32 = 1;
+}
+
+impl InteractEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
+    }
 }

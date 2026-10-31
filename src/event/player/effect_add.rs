@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A player is about to get a potion effect, from a potion, food, a totem, a command or a plugin; `effect` is its name, such as `speed`.
 
-Returning `true` from a handler keeps the player from getting the effect.
+`event.cancel()` keeps the player from getting the effect.
 
 Handled by [`Event::on_player_effect_add`](crate::prelude::Event::on_player_effect_add) and [`Server::on_player_effect_add`](crate::server::Server::on_player_effect_add).
 */
@@ -16,6 +16,13 @@ pub struct PlayerEffectAddEvent {
     pub(crate) amplifier: Cell<u32>,
     /// How long it lasts, in ticks.
     pub(crate) duration: Cell<i32>,
+}
+
+impl PlayerEffectAddEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl PlayerEffectAddEvent {

@@ -1,7 +1,7 @@
 /**
 A player places an entity from an item: an armor stand, a boat, a minecart, an end crystal...
 
-Returning `true` from a handler cancels the placement and keeps the item.
+`event.cancel()` cancels the placement and keeps the item.
 
 Handled by [`Event::on_entity_place`](crate::prelude::Event::on_entity_place) and [`Server::on_entity_place`](crate::server::Server::on_entity_place).
 */
@@ -16,4 +16,11 @@ pub struct EntityPlaceEvent {
     pub y: f32,
     /// Z coordinate, in blocks.
     pub z: f32,
+}
+
+impl EntityPlaceEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }

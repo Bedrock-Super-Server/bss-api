@@ -1,7 +1,7 @@
 /**
 The redstone power of a block changes.
 
-Returning `true` from a handler keeps the previous power.
+`event.cancel()` keeps the previous power.
 
 Handled by [`Event::on_redstone_power`](crate::prelude::Event::on_redstone_power) and [`Server::on_redstone_power`](crate::server::Server::on_redstone_power).
 */

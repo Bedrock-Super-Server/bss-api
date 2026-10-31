@@ -2,7 +2,7 @@ use parking_lot::Mutex;
 use std::sync::Arc;
 
 use crate::event::*;
-use crate::registry::hook::{EventOptions, cancel_current, current_options, is_cancelled};
+use crate::registry::hook::{EventOptions, current_options, is_cancelled};
 use crate::server::Server;
 
 /**
@@ -68,169 +68,155 @@ pub trait Event: Send + Sync + 'static {
     /**
     Called when a player sends a chat message.
 
-    Returning `true` cancels the message: nobody sees it.
+    `event.cancel()` cancels the message: nobody sees it.
 
     See [`ChatEvent`](crate::event::ChatEvent).
     */
-    fn on_chat(&self, server: &Server, event: &ChatEvent) -> bool {
+    fn on_chat(&self, server: &Server, event: &ChatEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when a player moves or turns.
 
-    Returning `true` moves the player back to where they were.
+    `event.cancel()` moves the player back to where they were.
 
     See [`MoveEvent`](crate::event::MoveEvent).
     */
-    fn on_move(&self, server: &Server, event: &MoveEvent) -> bool {
+    fn on_move(&self, server: &Server, event: &MoveEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when a player sends a command, before the server runs it.
 
-    Returning `true` cancels the command.
+    `event.cancel()` cancels the command.
 
     See [`CommandEvent`](crate::event::CommandEvent).
     */
-    fn on_command(&self, server: &Server, event: &CommandEvent) -> bool {
+    fn on_command(&self, server: &Server, event: &CommandEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when a player interacts with the world: clicks a block, starts or stops breaking it, uses an item in the air...
 
-    Returning `true` cancels the interaction.
+    `event.cancel()` cancels the interaction.
 
     See [`InteractEvent`](crate::event::InteractEvent).
     */
-    fn on_interact(&self, server: &Server, event: &InteractEvent) -> bool {
+    fn on_interact(&self, server: &Server, event: &InteractEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when a player plays an animation, such as swinging their arm.
 
-    Returning `true` hides the animation from other players.
+    `event.cancel()` hides the animation from other players.
 
     See [`AnimationEvent`](crate::event::AnimationEvent).
     */
-    fn on_animation(&self, server: &Server, event: &AnimationEvent) -> bool {
+    fn on_animation(&self, server: &Server, event: &AnimationEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when a player selects another hotbar slot.
 
-    Returning `true` keeps the previous slot selected.
+    `event.cancel()` keeps the previous slot selected.
 
     See [`ItemHeldEvent`](crate::event::ItemHeldEvent).
     */
-    fn on_item_held(&self, server: &Server, event: &ItemHeldEvent) -> bool {
+    fn on_item_held(&self, server: &Server, event: &ItemHeldEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when a player uses the item in their hand, on a block or in the air.
 
-    Returning `true` cancels the use.
+    `event.cancel()` cancels the use.
 
     See [`ItemUseEvent`](crate::event::ItemUseEvent).
     */
-    fn on_item_use(&self, server: &Server, event: &ItemUseEvent) -> bool {
+    fn on_item_use(&self, server: &Server, event: &ItemUseEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when a player drops an item from their inventory.
 
-    Returning `true` keeps the items in the inventory.
+    `event.cancel()` keeps the items in the inventory.
 
     See [`DropItemEvent`](crate::event::DropItemEvent).
     */
-    fn on_drop_item(&self, server: &Server, event: &DropItemEvent) -> bool {
+    fn on_drop_item(&self, server: &Server, event: &DropItemEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when a player picks up an item from the ground.
 
-    Returning `true` leaves the item on the ground.
+    `event.cancel()` leaves the item on the ground.
 
     See [`PickupItemEvent`](crate::event::PickupItemEvent).
     */
-    fn on_pickup_item(&self, server: &Server, event: &PickupItemEvent) -> bool {
+    fn on_pickup_item(&self, server: &Server, event: &PickupItemEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when a player finishes eating or drinking an item.
 
-    Returning `true` cancels the food the item gives.
+    `event.cancel()` cancels the food the item gives.
 
     See [`ConsumeEvent`](crate::event::ConsumeEvent).
     */
-    fn on_consume(&self, server: &Server, event: &ConsumeEvent) -> bool {
+    fn on_consume(&self, server: &Server, event: &ConsumeEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when a player is about to be teleported.
 
-    Returning `true` cancels the teleport.
+    `event.cancel()` cancels the teleport.
 
     See [`TeleportEvent`](crate::event::TeleportEvent).
     */
-    fn on_teleport(&self, server: &Server, event: &TeleportEvent) -> bool {
+    fn on_teleport(&self, server: &Server, event: &TeleportEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when a player's game mode is about to change.
 
-    Returning `true` keeps the current game mode.
+    `event.cancel()` keeps the current game mode.
 
     See [`GameModeChangeEvent`](crate::event::GameModeChangeEvent).
     */
-    fn on_gamemode_change(&self, server: &Server, event: &GameModeChangeEvent) -> bool {
+    fn on_gamemode_change(&self, server: &Server, event: &GameModeChangeEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when a player breaks a block.
 
-    Returning `true` cancels the break: the block is put back.
+    `event.cancel()` cancels the break: the block is put back.
 
     See [`BlockBreakEvent`](crate::event::BlockBreakEvent).
     */
-    fn on_block_break(&self, server: &Server, event: &BlockBreakEvent) -> bool {
+    fn on_block_break(&self, server: &Server, event: &BlockBreakEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when a player places a block.
 
-    Returning `true` cancels the placement and keeps the item.
+    `event.cancel()` cancels the placement and keeps the item.
 
     See [`BlockPlaceEvent`](crate::event::BlockPlaceEvent).
     */
-    fn on_block_place(&self, server: &Server, event: &BlockPlaceEvent) -> bool {
+    fn on_block_place(&self, server: &Server, event: &BlockPlaceEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
@@ -240,33 +226,30 @@ pub trait Event: Send + Sync + 'static {
 
     See [`ArmorEquipEvent`](crate::event::ArmorEquipEvent).
     */
-    fn on_armor_equip(&self, server: &Server, event: &ArmorEquipEvent) -> bool {
+    fn on_armor_equip(&self, server: &Server, event: &ArmorEquipEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when a player picks a block with the middle mouse button.
 
-    Returning `true` cancels the pick.
+    `event.cancel()` cancels the pick.
 
     See [`BlockPickEvent`](crate::event::BlockPickEvent).
     */
-    fn on_block_pick(&self, server: &Server, event: &BlockPickEvent) -> bool {
+    fn on_block_pick(&self, server: &Server, event: &BlockPickEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when a player starts, continues or stops breaking a block.
 
-    Returning `true` stops the progress.
+    `event.cancel()` stops the progress.
 
     See [`BlockBreakProgressEvent`](crate::event::BlockBreakProgressEvent).
     */
-    fn on_block_break_progress(&self, server: &Server, event: &BlockBreakProgressEvent) -> bool {
+    fn on_block_break_progress(&self, server: &Server, event: &BlockBreakProgressEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
@@ -281,13 +264,12 @@ pub trait Event: Send + Sync + 'static {
     /**
     Called when a block receives a random tick, which drives slow changes such as crop growth or leaf decay.
 
-    Returning `true` skips this tick.
+    `event.cancel()` skips this tick.
 
     See [`RandomTickEvent`](crate::event::RandomTickEvent).
     */
-    fn on_random_tick(&self, server: &Server, event: &RandomTickEvent) -> bool {
+    fn on_random_tick(&self, server: &Server, event: &RandomTickEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
@@ -356,25 +338,23 @@ pub trait Event: Send + Sync + 'static {
     /**
     Called when a player attacks an entity in melee.
 
-    Returning `true` cancels the hit.
+    `event.cancel()` cancels the hit.
 
     See [`EntityDamageEvent`](crate::event::EntityDamageEvent).
     */
-    fn on_entity_damage(&self, server: &Server, event: &EntityDamageEvent) -> bool {
+    fn on_entity_damage(&self, server: &Server, event: &EntityDamageEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when an entity dies.
 
-    Returning `true` keeps the entity alive.
+    `event.cancel()` keeps the entity alive.
 
     See [`EntityDeathEvent`](crate::event::EntityDeathEvent).
     */
-    fn on_entity_death(&self, server: &Server, event: &EntityDeathEvent) -> bool {
+    fn on_entity_death(&self, server: &Server, event: &EntityDeathEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
@@ -389,13 +369,12 @@ pub trait Event: Send + Sync + 'static {
     /**
     Called when a container window is about to open for a player.
 
-    Returning `true` keeps the window closed.
+    `event.cancel()` keeps the window closed.
 
     See [`InventoryOpenEvent`](crate::event::InventoryOpenEvent).
     */
-    fn on_inventory_open(&self, server: &Server, event: &InventoryOpenEvent) -> bool {
+    fn on_inventory_open(&self, server: &Server, event: &InventoryOpenEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
@@ -410,13 +389,12 @@ pub trait Event: Send + Sync + 'static {
     /**
     Called when a player moves, swaps, drops or uses items in an inventory.
 
-    Returning `true` rejects the whole request: the client is told to put everything back.
+    `event.cancel()` rejects the whole request: the client is told to put everything back.
 
     See [`InventoryTransactionEvent`](crate::event::InventoryTransactionEvent).
     */
-    fn on_inventory_transaction(&self, server: &Server, event: &InventoryTransactionEvent) -> bool {
+    fn on_inventory_transaction(&self, server: &Server, event: &InventoryTransactionEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
@@ -431,37 +409,34 @@ pub trait Event: Send + Sync + 'static {
     /**
     Called when a player plays an emote.
 
-    Returning `true` hides the emote from other players.
+    `event.cancel()` hides the emote from other players.
 
     See [`EmoteEvent`](crate::event::EmoteEvent).
     */
-    fn on_emote(&self, server: &Server, event: &EmoteEvent) -> bool {
+    fn on_emote(&self, server: &Server, event: &EmoteEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when a player changes skin while in game.
 
-    Returning `true` keeps the previous skin.
+    `event.cancel()` keeps the previous skin.
 
     See [`SkinChangeEvent`](crate::event::SkinChangeEvent).
     */
-    fn on_skin_change(&self, server: &Server, event: &SkinChangeEvent) -> bool {
+    fn on_skin_change(&self, server: &Server, event: &SkinChangeEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when a player answers or closes a form.
 
-    Returning `true` stops other handlers and the form callback from seeing the answer.
+    `event.cancel()` stops other handlers and the form callback from seeing the answer.
 
     See [`FormResponseEvent`](crate::event::FormResponseEvent).
     */
-    fn on_form_response(&self, server: &Server, event: &FormResponseEvent) -> bool {
+    fn on_form_response(&self, server: &Server, event: &FormResponseEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
@@ -476,31 +451,29 @@ pub trait Event: Send + Sync + 'static {
     /**
     Called when a player sends a game packet to the server, before the server reads it.
 
-    Returning `true` drops the packet.
+    `event.cancel()` drops the packet.
 
     See [`PacketEvent`](crate::event::PacketEvent).
     */
-    fn on_server_bound(&self, server: &Server, event: &PacketEvent) -> bool {
+    fn on_server_bound(&self, server: &Server, event: &PacketEvent) {
         let _ = (server, event);
-        false
     }
 
     /**
     Called when the server sends a game packet to a player, before it goes out.
 
-    Returning `true` drops the packet.
+    `event.cancel()` drops the packet.
 
     See [`PacketEvent`](crate::event::PacketEvent).
     */
-    fn on_client_bound(&self, server: &Server, event: &PacketEvent) -> bool {
+    fn on_client_bound(&self, server: &Server, event: &PacketEvent) {
         let _ = (server, event);
-        false
     }
 
     behaviour_methods!();
 }
 
-type Registry = Arc<Vec<Arc<dyn Event>>>;
+type Registry = Arc<[Arc<dyn Event>]>;
 
 /// The handlers registered with the same options, which share one closure per event.
 struct Group {
@@ -528,7 +501,7 @@ impl Server {
                 None => {
                     let group: &'static Group = Box::leak(Box::new(Group {
                         options,
-                        handlers: Mutex::new(Arc::new(Vec::new())),
+                        handlers: Mutex::new(Arc::from(Vec::new())),
                     }));
                     groups.push(group);
                     (group, true)
@@ -537,9 +510,9 @@ impl Server {
         };
         {
             let mut handlers = group.handlers.lock();
-            let mut updated = Vec::clone(&handlers);
+            let mut updated = handlers.to_vec();
             updated.push(Arc::new(handler));
-            *handlers = Arc::new(updated);
+            *handlers = Arc::from(updated);
         }
         if created {
             self.with_event_options(options, |server| install(server, group));
@@ -608,18 +581,17 @@ fn notify<F: FnMut(&Arc<dyn Event>)>(group: &Group, mut dispatch: F) {
     }
 }
 
-/// Calls every handler of the group in turn; one that returns `true` cancels the event for the
-/// handlers after it, and one may take the cancellation back with
+/// Calls every handler of the group in turn; one that cancels the event with
+/// [`cancel`](crate::registry::hook::Cancellable::cancel) cancels it for the handlers after it, and
+/// one may take the cancellation back with
 /// [`set_cancelled`](crate::registry::hook::Cancellable::set_cancelled).
-fn cancel<F: FnMut(&Arc<dyn Event>) -> bool>(group: &Group, mut dispatch: F) -> bool {
+fn cancel<F: FnMut(&Arc<dyn Event>)>(group: &Group, mut dispatch: F) -> bool {
     let handlers = group.handlers.lock().clone();
     for handler in handlers.iter() {
         if group.options.ignore_cancelled && is_cancelled() {
             break;
         }
-        if dispatch(handler) {
-            cancel_current();
-        }
+        dispatch(handler);
     }
     false
 }

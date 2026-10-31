@@ -35,3 +35,10 @@ pub struct ToggleEvent {
     /// `true` when it starts, `false` when it stops.
     pub active: bool,
 }
+
+impl ToggleEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
+    }
+}

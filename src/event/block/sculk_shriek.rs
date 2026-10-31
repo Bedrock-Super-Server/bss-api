@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A sculk shrieker shrieks because a player stepped near it or made a vibration it heard.
 
-Returning `true` from a handler keeps the shrieker silent.
+`event.cancel()` keeps the shrieker silent.
 
 Handled by [`Event::on_sculk_shriek`](crate::prelude::Event::on_sculk_shriek) and [`Server::on_sculk_shriek`](crate::server::Server::on_sculk_shriek).
 */
@@ -19,6 +19,13 @@ pub struct SculkShriekEvent {
     pub(crate) warning: Cell<u32>,
     /// Id of the world, in load order: the default world is `0`.
     pub world: u32,
+}
+
+impl SculkShriekEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl SculkShriekEvent {

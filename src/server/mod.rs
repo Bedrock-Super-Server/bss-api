@@ -1,5 +1,6 @@
 //! The [`Server`] handle and what hangs off it: worlds, entities, effects, the scheduler and services shared between plugins.
 
+mod api;
 pub mod catalog;
 pub mod effect;
 pub mod entity;
@@ -61,16 +62,8 @@ pub struct PluginInfo {
     pub sha: String,
 }
 
-/// A dimension, which sets the sky, the fog and the height of a world.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Dimension {
-    /// The overworld.
-    Overworld = 0,
-    /// The Nether.
-    Nether = 1,
-    /// The End.
-    End = 2,
-}
+pub use crate::types::Dimension;
+pub use api::{Access, Bans, Blocks, Entities, Items, Scheduler, Worlds};
 
 /**
 A handle to the server, given to every handler.
@@ -267,6 +260,7 @@ impl Server {
     }
 
     /// Bans a player, by name or XUID, or an IP address for `duration_secs` seconds; `0` bans for ever. The ban follows the player's XUID, recorded at once for an online player and at their next login otherwise. Banning an online player also bans their IP, unless it is a trusted address, and kicks them with `reason`.
+    #[deprecated(note = "use `server.bans().ban(target, duration, reason)`")]
     pub fn ban(&self, target: &str, duration_secs: u64, reason: &str) {
         host_call!(
             self.host,
@@ -275,21 +269,25 @@ impl Server {
     }
 
     /// Lifts the ban on a player, by name or XUID, or on an IP address. Returns `false` when it was not banned.
+    #[deprecated(note = "use `server.bans().unban(target)`")]
     pub fn unban(&self, target: &str) -> bool {
         host_call!(self.host, server_unban(FfiStr::new(target))).unwrap_or(false)
     }
 
     /// Adds a player, by name or XUID, to the whitelist; the entry follows their XUID. Returns `false` when they were already there.
+    #[deprecated(note = "use `server.access().whitelist_add(name)`")]
     pub fn whitelist_add(&self, name: &str) -> bool {
         host_call!(self.host, server_whitelist_add(FfiStr::new(name))).unwrap_or(false)
     }
 
     /// Removes a player, by name or XUID, from the whitelist. Returns `false` when they were not there.
+    #[deprecated(note = "use `server.access().whitelist_remove(name)`")]
     pub fn whitelist_remove(&self, name: &str) -> bool {
         host_call!(self.host, server_whitelist_remove(FfiStr::new(name))).unwrap_or(false)
     }
 
     /// Turns the whitelist on or off. Returns `false` when it already was.
+    #[deprecated(note = "use `server.access().set_whitelist(enabled)`")]
     pub fn whitelist_enabled(&self, enabled: bool) -> bool {
         host_call!(self.host, server_whitelist_set(enabled)).unwrap_or(false)
     }
@@ -300,16 +298,19 @@ impl Server {
     }
 
     /// Makes a player, by name or XUID, an operator; the entry follows their XUID. Returns `false` when they already were.
+    #[deprecated(note = "use `server.access().op(name)`")]
     pub fn op(&self, name: &str) -> bool {
         host_call!(self.host, server_op(FfiStr::new(name))).unwrap_or(false)
     }
 
     /// Removes a player, by name or XUID, from the operators. Returns `false` when they were not one.
+    #[deprecated(note = "use `server.access().deop(name)`")]
     pub fn deop(&self, name: &str) -> bool {
         host_call!(self.host, server_deop(FfiStr::new(name))).unwrap_or(false)
     }
 
     /// Returns the name of the biome the generator places at `(x, z)` in the default world, such as `plains`.
+    #[deprecated(note = "use `server.worlds().biome_at(x, z)`")]
     pub fn biome_at(&self, x: i32, z: i32) -> String {
         host_call!(self.host, world_biome(x, z))
             .map(crate::server::ffi_string)
@@ -317,21 +318,25 @@ impl Server {
     }
 
     /// Sets a boolean game rule, such as `doDaylightCycle`, and tells every player.
+    #[deprecated(note = "use `server.worlds().set_gamerule(name, value)`")]
     pub fn set_gamerule(&self, name: &str, value: bool) {
         host_call!(self.host, set_gamerule(FfiStr::new(name), value));
     }
 
     /// Returns a boolean game rule, or `default` when it was never set.
+    #[deprecated(note = "use `server.worlds().gamerule(name, default)`")]
     pub fn gamerule(&self, name: &str, default: bool) -> bool {
         host_call!(self.host, get_gamerule(FfiStr::new(name), default)).unwrap_or(default)
     }
 
     /// Loads a chunk of the default world, generating it if needed. Returns `true` when it was generated for the first time.
+    #[deprecated(note = "use `server.worlds().load_chunk(chunk_x, chunk_z)`")]
     pub fn load_chunk(&self, chunk_x: i32, chunk_z: i32) -> bool {
         host_call!(self.host, world_load_chunk(chunk_x, chunk_z)).unwrap_or(false)
     }
 
     /// Loads the world stored in `directory` as `name`, creating it if it does not exist. A bare directory name is looked up under `worlds/`; a path is used as it is. Loading a world that is already loaded succeeds. Returns `false` when the world cannot be opened.
+    #[deprecated(note = "use `server.worlds().load(name, directory, dimension)`")]
     pub fn load_world(&self, name: &str, directory: &str, dimension: Dimension) -> bool {
         host_call!(
             self.host,
@@ -341,7 +346,7 @@ impl Server {
     }
 
     /// Returns the names of the loaded worlds.
-    pub fn worlds(&self) -> Vec<String> {
+    pub(crate) fn world_names(&self) -> Vec<String> {
         let Some(f) = self.host.world_list else {
             return Vec::new();
         };
@@ -360,6 +365,7 @@ impl Server {
     }
 
     /// Returns the name of the default world, where players spawn.
+    #[deprecated(note = "use `server.worlds().default_name()`")]
     pub fn default_world(&self) -> String {
         host_call!(self.host, world_default())
             .map(crate::server::ffi_string)
@@ -367,7 +373,9 @@ impl Server {
     }
 
     /// Runs `task` at the start of the next tick, on the thread that runs the world.
+    #[deprecated(note = "use `server.scheduler().next_tick(task)`")]
     pub fn run_on_main(&self, task: impl Fn(&Server) + Send + Sync + 'static) {
+        #[allow(deprecated)]
         self.schedule(0, task);
     }
 
@@ -433,18 +441,21 @@ impl Server {
     }
 
     /// Returns the numeric id of the item named `name`, such as `minecraft:diamond`.
+    #[deprecated(note = "use `server.items().id(name)`")]
     pub fn item_id(&self, name: &str) -> Option<i16> {
         let id = host_call!(self.host, item_id(FfiStr::new(name))).unwrap_or(i16::MAX);
         (id != i16::MAX).then_some(id)
     }
 
     /// Returns the durability of a tool, weapon or armor piece, or `None` for an item that does not wear out.
+    #[deprecated(note = "use `server.items().max_durability(item)`")]
     pub fn max_durability(&self, item_id: i16) -> Option<u16> {
         let max = host_call!(self.host, item_max_durability(item_id)).unwrap_or(0);
         (max > 0).then_some(max)
     }
 
     /// Returns the name of an item, such as `minecraft:diamond`, or an empty string for an unknown id.
+    #[deprecated(note = "use `server.items().name(item)`")]
     pub fn item_name(&self, item_id: i16) -> String {
         host_call!(self.host, item_name(item_id))
             .map(ffi_string)
@@ -452,11 +463,13 @@ impl Server {
     }
 
     /// Returns the runtime id of the default state of the block named `name`, such as `minecraft:stone`, or `0` (air) for an unknown name.
+    #[deprecated(note = "use `server.blocks().id(name)`")]
     pub fn block_runtime_id(&self, name: &str) -> u32 {
         host_call!(self.host, block_runtime_id(FfiStr::new(name))).unwrap_or(0)
     }
 
     /// Returns the name of a block, such as `minecraft:stone`.
+    #[deprecated(note = "use `server.blocks().name(block)`")]
     pub fn block_name(&self, runtime_id: u32) -> String {
         host_call!(self.host, block_name(runtime_id))
             .map(ffi_string)
@@ -464,6 +477,7 @@ impl Server {
     }
 
     /// Returns how fast `item_id` mines blocks of the `tool` family; a bare hand is `1.0`.
+    #[deprecated(note = "use `server.items().mining_speed(item, tool)`")]
     pub fn mining_speed(&self, item_id: i16, tool: crate::content::ToolType) -> f32 {
         let tool = match tool {
             crate::content::ToolType::Pickaxe => 0,
@@ -482,21 +496,25 @@ impl Server {
     }
 
     /// Returns the time of day of the default world, in ticks: `0` is sunrise, `6000` noon, `13000` night.
+    #[deprecated(note = "use `server.worlds().time()`")]
     pub fn time(&self) -> i64 {
         host_call!(self.host, world_time()).unwrap_or(0)
     }
 
     /// Sets the time of day of the default world, in ticks.
+    #[deprecated(note = "use `server.worlds().set_time(time)`")]
     pub fn set_time(&self, time: i64) {
         host_call!(self.host, world_set_time(time));
     }
 
     /// Returns the seed of the default world.
+    #[deprecated(note = "use `server.worlds().seed()`")]
     pub fn seed(&self) -> u64 {
         host_call!(self.host, world_seed()).unwrap_or(0)
     }
 
     /// Returns the spawn point of the default world.
+    #[deprecated(note = "use `server.worlds().spawn()`")]
     pub fn world_spawn(&self) -> Option<(i32, i32, i32)> {
         let f = self.host.world_get_spawn?;
         let (mut x, mut y, mut z) = (0, 0, 0);
@@ -508,6 +526,7 @@ impl Server {
     }
 
     /// Returns the number of chunks loaded in the default world.
+    #[deprecated(note = "use `server.worlds().chunk_count()`")]
     pub fn chunk_count(&self) -> u32 {
         host_call!(self.host, world_chunk_count()).unwrap_or(0)
     }
@@ -574,7 +593,7 @@ impl Server {
             .collect()
     }
 
-    /// Returns the Minecraft version the server speaks, such as `1.26.52`.
+    /// Returns the Minecraft version the server speaks, such as `1.26.60`.
     pub fn minecraft_version(&self) -> String {
         host_call!(self.host, minecraft_version())
             .map(ffi_string)
@@ -589,11 +608,13 @@ impl Server {
     }
 
     /// Reserves a runtime id for an entity the plugin creates.
+    #[deprecated(note = "use `server.entities().next_id()`")]
     pub fn next_entity_id(&self) -> u64 {
         host_call!(self.host, next_entity_id()).unwrap_or(0)
     }
 
     /// Returns the runtime id of the block at `(x, y, z)` in the default world.
+    #[deprecated(note = "use `server.blocks().at(x, y, z)`")]
     pub fn block_at(&self, x: i32, y: i32, z: i32) -> u32 {
         host_call!(self.host, world_block_at(x, y, z)).unwrap_or(0)
     }
@@ -611,12 +632,14 @@ impl Server {
     }
     ```
     */
+    #[deprecated(note = "use `server.blocks().set(x, y, z, block)`")]
     pub fn set_block(&self, x: i32, y: i32, z: i32, runtime_id: u32) {
         host_call!(self.host, world_set_block(x, y, z, runtime_id));
     }
 
     /// Drops `item` at `x`, `y`, `z` of the world named `world` (empty: the default world), as the
     /// server drops items, for players to pick up. Returns whether it was dropped.
+    #[deprecated(note = "use `server.blocks().drop_item(world, x, y, z, item)`")]
     pub fn drop_item(
         &self,
         world: &str,
@@ -645,6 +668,7 @@ impl Server {
     }
 
     /// Places many blocks in the default world at once, as `(x, y, z, runtime_id)`, and returns how many changed. Much faster than calling [`set_block`](Self::set_block) in a loop.
+    #[deprecated(note = "use `server.blocks().set_many(edits)`")]
     pub fn set_blocks(&self, edits: &[(i32, i32, i32, u32)]) -> u32 {
         let Some(f) = self.host.world_set_blocks else {
             return 0;
@@ -662,6 +686,7 @@ impl Server {
     }
 
     /// Returns the runtime ids of every state of the block named `name`, such as the eight growth stages of `minecraft:wheat`.
+    #[deprecated(note = "use `server.blocks().variants(name)`")]
     pub fn block_variants(&self, name: &str) -> Vec<u32> {
         let Some(f) = self.host.block_variants else {
             return Vec::new();
@@ -672,6 +697,7 @@ impl Server {
     }
 
     /// Returns the states of a block, as `(name, value)`, such as `("growth", "7")`.
+    #[deprecated(note = "use `server.blocks().states(block)`")]
     pub fn block_states(&self, runtime_id: u32) -> Vec<(String, String)> {
         let Some(f) = self.host.block_states else {
             return Vec::new();
@@ -691,6 +717,7 @@ impl Server {
     }
 
     /// Returns the names of every vanilla block, sorted, without the `minecraft:` prefix.
+    #[deprecated(note = "use `server.blocks().names()`")]
     pub fn block_names(&self) -> Vec<String> {
         let Some(f) = self.host.block_names_all else {
             return Vec::new();
@@ -727,6 +754,7 @@ impl Server {
     }
 
     /// Returns the 27 slots of the chest at `(x, y, z)` in the default world, or an empty list when there is no chest there.
+    #[deprecated(note = "use `server.blocks().chest(x, y, z)`")]
     pub fn chest_at(&self, x: i32, y: i32, z: i32) -> Vec<ItemStack> {
         let Some(f) = self.host.world_get_chest else {
             return Vec::new();
@@ -738,6 +766,7 @@ impl Server {
     }
 
     /// Replaces the contents of the chest at `(x, y, z)` in the default world; slots past `slots` are emptied.
+    #[deprecated(note = "use `server.blocks().set_chest(x, y, z, slots)`")]
     pub fn set_chest(&self, x: i32, y: i32, z: i32, slots: &[ItemStack]) {
         host_call!(
             self.host,

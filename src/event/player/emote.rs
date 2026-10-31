@@ -3,7 +3,7 @@ use std::cell::RefCell;
 /**
 A player plays an emote.
 
-Returning `true` from a handler hides the emote from other players.
+`event.cancel()` hides the emote from other players.
 
 Handled by [`Event::on_emote`](crate::prelude::Event::on_emote).
 */
@@ -32,5 +32,12 @@ impl EmoteEvent {
     /// Sets the id of the emote shown to other players.
     pub fn set_emote_id(&self, emote_id: &str) {
         *self.emote_id.borrow_mut() = emote_id.to_string();
+    }
+}
+
+impl EmoteEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
     }
 }

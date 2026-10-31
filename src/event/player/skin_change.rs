@@ -1,7 +1,7 @@
 /**
 A player changes skin while in game.
 
-Returning `true` from a handler keeps the previous skin.
+`event.cancel()` keeps the previous skin.
 
 Handled by [`Event::on_skin_change`](crate::prelude::Event::on_skin_change).
 */
@@ -14,4 +14,11 @@ pub struct SkinChangeEvent {
     pub new_skin_name: String,
     /// Name of the previous skin.
     pub old_skin_name: String,
+}
+
+impl SkinChangeEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
+    }
 }

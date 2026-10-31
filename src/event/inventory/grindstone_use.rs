@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 A player takes the result out of a grindstone.
 
-Returning `true` from a handler cancels the operation.
+`event.cancel()` cancels the operation.
 
 Handled by [`Event::on_grindstone_use`](crate::prelude::Event::on_grindstone_use) and [`Server::on_grindstone_use`](crate::server::Server::on_grindstone_use).
 */
@@ -13,6 +13,13 @@ pub struct GrindstoneUseEvent {
     /// Numeric id of the resulting item.
     pub item: i16,
     pub(crate) experience: Cell<i32>,
+}
+
+impl GrindstoneUseEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl GrindstoneUseEvent {

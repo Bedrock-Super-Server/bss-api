@@ -11,3 +11,10 @@ pub struct ItemBreakEvent {
     /// Inventory slot of the item; armor pieces use `100` plus their armor slot.
     pub slot: u32,
 }
+
+impl ItemBreakEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
+}

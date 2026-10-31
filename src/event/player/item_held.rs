@@ -1,7 +1,7 @@
 /**
 A player selects another hotbar slot.
 
-Returning `true` from a handler keeps the previous slot selected.
+`event.cancel()` keeps the previous slot selected.
 
 Handled by [`Event::on_item_held`](crate::prelude::Event::on_item_held).
 */
@@ -14,4 +14,11 @@ pub struct ItemHeldEvent {
     pub new_slot: u32,
     /// Numeric id of the item in the new slot.
     pub item_id: i16,
+}
+
+impl ItemHeldEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.name)
+    }
 }

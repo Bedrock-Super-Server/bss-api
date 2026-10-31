@@ -3,7 +3,7 @@ use std::cell::Cell;
 /**
 Something steps on or leaves a pressure plate.
 
-Returning `true` from a handler keeps the plate in its previous state.
+`event.cancel()` keeps the plate in its previous state.
 
 Handled by [`Event::on_pressure_plate`](crate::prelude::Event::on_pressure_plate) and [`Server::on_pressure_plate`](crate::server::Server::on_pressure_plate).
 */
@@ -19,6 +19,13 @@ pub struct PressurePlateEvent {
     pub player: String,
     /// Id of the world, in load order: the default world is `0`.
     pub world: u32,
+}
+
+impl PressurePlateEvent {
+    /// The player, or `None` when they have already left the server.
+    pub fn player(&self) -> Option<crate::player::Player> {
+        crate::registry::server().player(&self.player)
+    }
 }
 
 impl PressurePlateEvent {

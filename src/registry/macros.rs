@@ -10,7 +10,7 @@ macro_rules! event_hook {
 
         impl Server {
             pub(crate) fn $method(&self, handler: impl Fn(&Server, &$safe) + Send + Sync + 'static) {
-                crate::registry::hook::register::<$entry>(move |server, event| {
+                crate::registry::hook::register::<$entry, _>(move |server, event| {
                     handler(server, event);
                     false
                 });
@@ -36,9 +36,16 @@ macro_rules! event_hook_cancel {
 
         impl crate::registry::hook::Cancellable for $safe {}
 
+        impl $safe {
+            /// Cancels the event: see its documentation for what that prevents.
+            pub fn cancel(&self) {
+                crate::registry::hook::Cancellable::set_cancelled(self, true);
+            }
+        }
+
         impl Server {
             pub(crate) fn $method(&self, handler: impl Fn(&Server, &$safe) -> bool + Send + Sync + 'static) {
-                crate::registry::hook::register::<$entry>(handler);
+                crate::registry::hook::register::<$entry, _>(handler);
             }
         }
     };
@@ -65,7 +72,7 @@ macro_rules! event_hook_message {
 
         impl Server {
             pub(crate) fn $method(&self, handler: impl Fn(&Server, &$safe) + Send + Sync + 'static) {
-                crate::registry::hook::register::<$entry>(move |server, event| {
+                crate::registry::hook::register::<$entry, _>(move |server, event| {
                     handler(server, event);
                     false
                 });
@@ -92,9 +99,16 @@ macro_rules! event_hook_cancel_message {
 
         impl crate::registry::hook::Cancellable for $safe {}
 
+        impl $safe {
+            /// Cancels the event: see its documentation for what that prevents.
+            pub fn cancel(&self) {
+                crate::registry::hook::Cancellable::set_cancelled(self, true);
+            }
+        }
+
         impl Server {
             pub(crate) fn $method(&self, handler: impl Fn(&Server, &$safe) -> bool + Send + Sync + 'static) {
-                crate::registry::hook::register::<$entry>(handler);
+                crate::registry::hook::register::<$entry, _>(handler);
             }
         }
     };
